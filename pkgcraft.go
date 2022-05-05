@@ -27,9 +27,9 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	}
 
 	atom := &Atom{C.pkgcraft_atom(atom_str, eapi_str)}
-	runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 
 	if atom.atom != nil {
+		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 		return atom, nil
 	} else {
 		return atom, errors.New(C.GoString(C.pkgcraft_last_error()))
