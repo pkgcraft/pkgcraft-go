@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches-ignore: [deploy]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - name: Checkout scallop
+      uses: actions/checkout@v3
+      with:
+        repository: pkgcraft/scallop
+        path: scallop
+        submodules: true
+
+    - name: Move scallop into expected location
+      run: mv scallop ../
+
+    - name: Checkout pkgcraft
+      uses: actions/checkout@v3
+      with:
+        repository: pkgcraft/pkgcraft
+        path: pkgcraft
+
+    - name: Move pkgcraft into expected location
+      run: mv pkgcraft ../
+
+    - name: Checkout pkgcraft-c
+      uses: actions/checkout@v3
+      with:
+        repository: pkgcraft/pkgcraft-c
+        path: pkgcraft-c
+
+    - name: Move pkgcraft-c into expected location
+      run: mv pkgcraft-c ../
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up rust toolchain
+      uses: actions-rs/toolchain@v1
+      id: rust
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: Set up rust cache
+      uses: actions/cache@v3
+      id: cache
+      with:
+        path: |
+          ~/.cargo/bin
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git/db
+          target
+        key: v1-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }}
+        restore-keys: v1-${{ github.job }}-${{ runner.os }}-rust-
+
+    - name: Update deps
+      run: cargo update --manifest-path=../pkgcraft-c/Cargo.toml
+
+    - name: Install cargo-c
+      run: |
+        # ignore return value since `cargo install` errors out when already installed
+        cargo install cargo-c || true
+
+    - name: Build and install C library
+      run: |
+        cargo cinstall --manifest-path=../pkgcraft-c/Cargo.toml --prefix="${PWD}/pkgcraft" --pkgconfigdir="${PWD}/pkgcraft"
+        echo "PKG_CONFIG_PATH=${PWD}/pkgcraft" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${PWD}/pkgcraft/lib" >> $GITHUB_ENV
+
+    - uses: actions/setup-go@v3
+      with:
+        go-version: '>=1.18.0'
+
+    - name: Build and test
+      run: |
+        go build
+        go test -v
+
+    - name: Run benchmarks
+      run: go test -bench=.
