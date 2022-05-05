@@ -63,8 +63,8 @@ jobs:
           ~/.cargo/registry/cache
           ~/.cargo/git/db
           target
-        key: v1-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }}
-        restore-keys: v1-${{ github.job }}-${{ runner.os }}-rust-
+        key: v2-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }}
+        restore-keys: v2-${{ github.job }}-${{ runner.os }}-rust-
 
     - name: Update deps
       run: cargo update --manifest-path=../pkgcraft-c/Cargo.toml
@@ -76,7 +76,7 @@ jobs:
 
     - name: Build and install C library
       run: |
-        cargo cinstall --manifest-path=../pkgcraft-c/Cargo.toml --prefix="${PWD}/pkgcraft" --pkgconfigdir="${PWD}/pkgcraft"
+        cargo cinstall --manifest-path=../pkgcraft-c/Cargo.toml --prefix="${PWD}/pkgcraft" --pkgconfigdir="${PWD}/pkgcraft" --target-dir target
         echo "PKG_CONFIG_PATH=${PWD}/pkgcraft" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=${PWD}/pkgcraft/lib" >> $GITHUB_ENV
         echo "DYLD_LIBRARY_PATH=${PWD}/pkgcraft/lib" >> $GITHUB_ENV
