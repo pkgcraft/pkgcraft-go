@@ -19,11 +19,11 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	defer C.free(unsafe.Pointer(atom_str))
 
 	var eapi_str *C.char
-	if eapi != "" {
+	if eapi == "" {
+		eapi_str = nil
+	} else {
 		eapi_str = C.CString(eapi)
 		defer C.free(unsafe.Pointer(eapi_str))
-	} else {
-		eapi_str = nil
 	}
 
 	atom := &Atom{C.pkgcraft_atom(atom_str, eapi_str)}
