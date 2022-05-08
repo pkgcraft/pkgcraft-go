@@ -10,6 +10,9 @@ git clone https://github.com/pkgcraft/pkgcraft.git
 git clone https://github.com/pkgcraft/pkgcraft-c.git
 git clone https://github.com/pkgcraft/pkgcraft-go.git
 
+# install cargo-c
+cargo install cargo-c
+
 # build pkgcraft-c library
 cd pkgcraft-go
 cargo cinstall --prefix="${PWD}/pkgcraft" --pkgconfigdir="${PWD}/pkgcraft" --manifest-path=../pkgcraft-c/Cargo.toml
