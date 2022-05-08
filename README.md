@@ -2,7 +2,9 @@
 
 Go bindings for pkgcraft.
 
-To building the bindings, run the following commands:
+## Development
+
+To build the bindings, run the following commands:
 
 ```bash
 git clone --recurse-submodules https://github.com/pkgcraft/scallop.git
