@@ -81,6 +81,12 @@ func (a *Atom) subslot() string {
 	return C.GoString(s)
 }
 
+// Compare an atom with another atom returning -1, 0, or 1 if the first atom is
+// less than, equal to, or greater than the second atom, respectively.
+func (a *Atom) cmp(b *Atom) int {
+	return int(C.pkgcraft_atom_cmp(a.atom, b.atom))
+}
+
 type Version struct {
 	version *C.Version
 }
@@ -104,4 +110,11 @@ func (v *Version) revision() string {
 	s := C.pkgcraft_version_revision(v.version)
 	defer C.pkgcraft_free_str(s)
 	return C.GoString(s)
+}
+
+// Compare a version with another version returning -1, 0, or 1 if the first
+// version is less than, equal to, or greater than the second version,
+// respectively.
+func (a *Version) cmp(b *Version) int {
+	return int(C.pkgcraft_version_cmp(a.version, b.version))
 }
