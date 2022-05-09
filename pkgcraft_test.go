@@ -7,36 +7,30 @@ import (
 	"testing"
 )
 
-func assertEqual(t *testing.T, a interface{}, b interface{}) {
-	if a != b {
-		t.Fatalf("%q != %q", a, b)
-	}
-}
-
 func TestAtom(t *testing.T) {
 	var atom *Atom
 
 	// unversioned
 	atom, _ = NewAtom("cat/pkg")
-	assertEqual(t, atom.category(), "cat")
-	assertEqual(t, atom.pn(), "pkg")
-	assertEqual(t, atom.version(), "")
+	assert.Equal(t, atom.category(), "cat")
+	assert.Equal(t, atom.pn(), "pkg")
+	assert.Equal(t, atom.version(), "")
 
 	// versioned
 	atom, _ = NewAtom("=cat/pkg-2")
-	assertEqual(t, atom.category(), "cat")
-	assertEqual(t, atom.pn(), "pkg")
-	assertEqual(t, atom.version(), "2")
+	assert.Equal(t, atom.category(), "cat")
+	assert.Equal(t, atom.pn(), "pkg")
+	assert.Equal(t, atom.version(), "2")
 
 	// slotted
 	atom, _ = NewAtom("cat/pkg:1")
-	assertEqual(t, atom.slot(), "1")
-	assertEqual(t, atom.subslot(), "")
+	assert.Equal(t, atom.slot(), "1")
+	assert.Equal(t, atom.subslot(), "")
 
 	// subslotted
 	atom, _ = NewAtom("cat/pkg:1/2")
-	assertEqual(t, atom.slot(), "1")
-	assertEqual(t, atom.subslot(), "2")
+	assert.Equal(t, atom.slot(), "1")
+	assert.Equal(t, atom.subslot(), "2")
 
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")
@@ -65,15 +59,15 @@ func TestVersion(t *testing.T) {
 
 	// non-revision
 	version, _ = NewVersion("1")
-	assertEqual(t, version.revision(), "")
+	assert.Equal(t, version.revision(), "")
 
 	// revisioned
 	version, _ = NewVersion("1-r1")
-	assertEqual(t, version.revision(), "1")
+	assert.Equal(t, version.revision(), "1")
 
 	// explicit '0' revision
 	version, _ = NewVersion("1-r0")
-	assertEqual(t, version.revision(), "0")
+	assert.Equal(t, version.revision(), "0")
 
 	// v1 < v2
 	v1, _ := NewVersion("1")
