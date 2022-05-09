@@ -124,3 +124,9 @@ func (v *Version) revision() string {
 func (a *Version) cmp(b *Version) int {
 	return int(C.pkgcraft_version_cmp(a.version, b.version))
 }
+
+func (v *Version) String() string {
+	s := C.pkgcraft_version_str(v.version)
+	defer C.pkgcraft_free_str(s)
+	return C.GoString(s)
+}
