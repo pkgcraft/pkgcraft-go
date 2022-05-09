@@ -3,6 +3,7 @@ package pkgcraft
 // #cgo pkg-config: pkgcraft
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -15,22 +16,26 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Equal(t, atom.version(), "")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg")
 
 	// versioned
 	atom, _ = NewAtom("=cat/pkg-2")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Equal(t, atom.version(), "2")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-2")
 
 	// slotted
 	atom, _ = NewAtom("cat/pkg:1")
 	assert.Equal(t, atom.slot(), "1")
 	assert.Equal(t, atom.subslot(), "")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:1")
 
 	// subslotted
 	atom, _ = NewAtom("cat/pkg:1/2")
 	assert.Equal(t, atom.slot(), "1")
 	assert.Equal(t, atom.subslot(), "2")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:1/2")
 
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")

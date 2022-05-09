@@ -87,6 +87,12 @@ func (a *Atom) cmp(b *Atom) int {
 	return int(C.pkgcraft_atom_cmp(a.atom, b.atom))
 }
 
+func (a *Atom) String() string {
+	s := C.pkgcraft_atom_str(a.atom)
+	defer C.pkgcraft_free_str(s)
+	return C.GoString(s)
+}
+
 type Version struct {
 	version *C.Version
 }
