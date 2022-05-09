@@ -4,7 +4,7 @@ Go bindings for pkgcraft.
 
 ## Development
 
-To build the bindings, run the following commands:
+Use the following commands to set up a dev environment:
 
 ```bash
 git clone --recurse-submodules https://github.com/pkgcraft/scallop.git
@@ -21,6 +21,8 @@ cargo cinstall --prefix="${PWD}/pkgcraft" --pkgconfigdir="${PWD}/pkgcraft" --man
 export PKG_CONFIG_PATH="${PWD}/pkgcraft"
 export LD_LIBRARY_PATH="${PWD}/pkgcraft/lib"
 
-# build go bindings
-go build
+# build and test
+go test -v
+# benchmark
+go test -bench=.
 ```
