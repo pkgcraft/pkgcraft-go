@@ -36,8 +36,30 @@ func TestAtom(t *testing.T) {
 	assertEqual(t, atom.subslot(), "2")
 }
 
-func BenchmarkAtom(b *testing.B) {
+func BenchmarkNewAtom(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		NewAtom("=cat/pkg-1-r2:3/4=[a,b,c]")
+	}
+}
+
+func TestVersion(t *testing.T) {
+	var version *Version
+
+	// non-revision
+	version, _ = NewVersion("1")
+	assertEqual(t, version.revision(), "")
+
+	// revisioned
+	version, _ = NewVersion("1-r1")
+	assertEqual(t, version.revision(), "1")
+
+	// explicit '0' revision
+	version, _ = NewVersion("1-r0")
+	assertEqual(t, version.revision(), "0")
+}
+
+func BenchmarkNewVersion(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		NewVersion("1.2.3_alpha4-r5")
 	}
 }

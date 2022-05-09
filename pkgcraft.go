@@ -80,3 +80,28 @@ func (a *Atom) subslot() string {
 	defer C.pkgcraft_free_str(s)
 	return C.GoString(s)
 }
+
+type Version struct {
+	version *C.Version
+}
+
+// Parse a string into a version.
+func NewVersion(s string) (*Version, error) {
+	ver_str := C.CString(s)
+	defer C.free(unsafe.Pointer(ver_str))
+	ver := &Version{C.pkgcraft_version(ver_str)}
+
+	if ver.version != nil {
+		runtime.SetFinalizer(ver, func(v *Version) { C.pkgcraft_version_free(v.version) })
+		return ver, nil
+	} else {
+		return ver, errors.New(C.GoString(C.pkgcraft_last_error()))
+	}
+}
+
+// Return a version's revision.
+func (v *Version) revision() string {
+	s := C.pkgcraft_version_revision(v.version)
+	defer C.pkgcraft_free_str(s)
+	return C.GoString(s)
+}
