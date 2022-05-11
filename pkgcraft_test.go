@@ -5,6 +5,8 @@ package pkgcraft
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"sort"
+	"strconv"
 	"testing"
 )
 
@@ -59,6 +61,23 @@ func BenchmarkNewAtom(b *testing.B) {
 	}
 }
 
+func BenchmarkAtomSort(b *testing.B) {
+	var atoms []*Atom
+	for i := 100; i > 0; i-- {
+		a, _ := NewAtom(fmt.Sprintf("=cat/pkg-%d", i))
+		atoms = append(atoms, a)
+	}
+	assert.Equal(b, fmt.Sprintf("%s", atoms[0]), "=cat/pkg-100")
+
+	for n := 0; n < b.N; n++ {
+		sort.Slice(atoms, func(i, j int) bool {
+			return atoms[i].cmp(atoms[j]) == -1
+		})
+	}
+
+	assert.Equal(b, fmt.Sprintf("%s", atoms[0]), "=cat/pkg-1")
+}
+
 func TestVersion(t *testing.T) {
 	var version *Version
 
@@ -97,4 +116,21 @@ func BenchmarkNewVersion(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		NewVersion("1.2.3_alpha4-r5")
 	}
+}
+
+func BenchmarkVersionSort(b *testing.B) {
+	var versions []*Version
+	for i := 100; i > 0; i-- {
+		v, _ := NewVersion(strconv.Itoa(i))
+		versions = append(versions, v)
+	}
+	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "100")
+
+	for n := 0; n < b.N; n++ {
+		sort.Slice(versions, func(i, j int) bool {
+			return versions[i].cmp(versions[j]) == -1
+		})
+	}
+
+	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "1")
 }
