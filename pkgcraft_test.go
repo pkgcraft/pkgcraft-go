@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"sort"
-	"strconv"
 	"testing"
 )
 
@@ -121,7 +120,7 @@ func BenchmarkNewVersion(b *testing.B) {
 func BenchmarkVersionSort(b *testing.B) {
 	var versions []*Version
 	for i := 100; i > 0; i-- {
-		v, _ := NewVersion(strconv.Itoa(i))
+		v, _ := NewVersion(fmt.Sprintf("%d", i))
 		versions = append(versions, v)
 	}
 	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "100")
