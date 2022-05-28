@@ -82,7 +82,7 @@ func TestVersion(t *testing.T) {
 
 	// non-revision
 	version, _ = NewVersion("1")
-	assert.Equal(t, version.revision(), "")
+	assert.Equal(t, version.revision(), "0")
 	assert.Equal(t, fmt.Sprintf("%s", version), "1")
 
 	// revisioned
