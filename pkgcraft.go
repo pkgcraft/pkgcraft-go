@@ -49,35 +49,43 @@ func NewAtomWithEapi(s string, eapi string) (*Atom, error) {
 // Return an atom's category.
 func (a *Atom) category() string {
 	s := C.pkgcraft_atom_category(a.atom)
-	defer C.pkgcraft_free_str(s)
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's package name.
 func (a *Atom) pn() string {
 	s := C.pkgcraft_atom_package(a.atom)
-	defer C.pkgcraft_free_str(s)
+	if s != nil {
+		defer C.pkgcraft_str_free(s)
+	}
 	return C.GoString(s)
 }
 
 // Return an atom's version.
 func (a *Atom) version() string {
 	s := C.pkgcraft_atom_version(a.atom)
-	defer C.pkgcraft_free_str(s)
+	if s != nil {
+		defer C.pkgcraft_str_free(s)
+	}
 	return C.GoString(s)
 }
 
 // Return an atom's slot.
 func (a *Atom) slot() string {
 	s := C.pkgcraft_atom_slot(a.atom)
-	defer C.pkgcraft_free_str(s)
+	if s != nil {
+		defer C.pkgcraft_str_free(s)
+	}
 	return C.GoString(s)
 }
 
 // Return an atom's subslot.
 func (a *Atom) subslot() string {
 	s := C.pkgcraft_atom_subslot(a.atom)
-	defer C.pkgcraft_free_str(s)
+	if s != nil {
+		defer C.pkgcraft_str_free(s)
+	}
 	return C.GoString(s)
 }
 
@@ -89,7 +97,7 @@ func (a *Atom) cmp(b *Atom) int {
 
 func (a *Atom) String() string {
 	s := C.pkgcraft_atom_str(a.atom)
-	defer C.pkgcraft_free_str(s)
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
@@ -114,7 +122,7 @@ func NewVersion(s string) (*Version, error) {
 // Return a version's revision.
 func (v *Version) revision() string {
 	s := C.pkgcraft_version_revision(v.version)
-	defer C.pkgcraft_free_str(s)
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
@@ -127,6 +135,6 @@ func (a *Version) cmp(b *Version) int {
 
 func (v *Version) String() string {
 	s := C.pkgcraft_version_str(v.version)
-	defer C.pkgcraft_free_str(s)
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
