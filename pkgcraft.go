@@ -56,36 +56,28 @@ func (a *Atom) category() string {
 // Return an atom's package name.
 func (a *Atom) pn() string {
 	s := C.pkgcraft_atom_package(a.atom)
-	if s != nil {
-		defer C.pkgcraft_str_free(s)
-	}
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's version.
 func (a *Atom) version() string {
 	s := C.pkgcraft_atom_version(a.atom)
-	if s != nil {
-		defer C.pkgcraft_str_free(s)
-	}
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's slot.
 func (a *Atom) slot() string {
 	s := C.pkgcraft_atom_slot(a.atom)
-	if s != nil {
-		defer C.pkgcraft_str_free(s)
-	}
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's subslot.
 func (a *Atom) subslot() string {
 	s := C.pkgcraft_atom_subslot(a.atom)
-	if s != nil {
-		defer C.pkgcraft_str_free(s)
-	}
+	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
