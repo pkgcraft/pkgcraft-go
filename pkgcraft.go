@@ -14,6 +14,10 @@ type Atom struct {
 	atom *C.Atom
 }
 
+func atom_free(a *Atom) {
+	C.pkgcraft_atom_free(a.atom)
+}
+
 func new_atom(s string, eapi string) (*Atom, error) {
 	atom_str := C.CString(s)
 	defer C.free(unsafe.Pointer(atom_str))
@@ -26,10 +30,11 @@ func new_atom(s string, eapi string) (*Atom, error) {
 		defer C.free(unsafe.Pointer(eapi_str))
 	}
 
-	atom := &Atom{C.pkgcraft_atom(atom_str, eapi_str)}
+	ptr := C.pkgcraft_atom(atom_str, eapi_str)
 
-	if atom.atom != nil {
-		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
+	if ptr != nil {
+		atom := &Atom{ptr}
+		runtime.SetFinalizer(atom, atom_free)
 		return atom, nil
 	} else {
 		s := C.pkgcraft_last_error()
@@ -140,14 +145,19 @@ type Version struct {
 	version *C.Version
 }
 
+func version_free(v *Version) {
+	C.pkgcraft_version_free(v.version)
+}
+
 // Parse a string into a version.
 func NewVersion(s string) (*Version, error) {
 	ver_str := C.CString(s)
 	defer C.free(unsafe.Pointer(ver_str))
-	ver := &Version{C.pkgcraft_version(ver_str)}
+	ptr := C.pkgcraft_version(ver_str)
 
-	if ver.version != nil {
-		runtime.SetFinalizer(ver, func(v *Version) { C.pkgcraft_version_free(v.version) })
+	if ptr != nil {
+		ver := &Version{ptr}
+		runtime.SetFinalizer(ver, version_free)
 		return ver, nil
 	} else {
 		s := C.pkgcraft_last_error()
