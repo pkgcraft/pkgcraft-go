@@ -17,14 +17,16 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Equal(t, atom.version(), "")
+	assert.Equal(t, atom.revision(), "")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg")
 
 	// versioned
-	atom, _ = NewAtom("=cat/pkg-2")
+	atom, _ = NewAtom("=cat/pkg-1-r2")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
-	assert.Equal(t, atom.version(), "2")
-	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-2")
+	assert.Equal(t, atom.version(), "1-r2")
+	assert.Equal(t, atom.revision(), "2")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-1-r2")
 
 	// slotted
 	atom, _ = NewAtom("cat/pkg:1")

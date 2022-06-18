@@ -67,6 +67,13 @@ func (a *Atom) version() string {
 	return C.GoString(s)
 }
 
+// Return an atom's revision.
+func (a *Atom) revision() string {
+	s := C.pkgcraft_atom_revision(a.atom)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
 // Return an atom's slot.
 func (a *Atom) slot() string {
 	s := C.pkgcraft_atom_slot(a.atom)
