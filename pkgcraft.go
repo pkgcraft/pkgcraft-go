@@ -32,7 +32,9 @@ func new_atom(s string, eapi string) (*Atom, error) {
 		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 		return atom, nil
 	} else {
-		return atom, errors.New(C.GoString(C.pkgcraft_last_error()))
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return nil, errors.New(C.GoString(s))
 	}
 }
 
@@ -148,7 +150,9 @@ func NewVersion(s string) (*Version, error) {
 		runtime.SetFinalizer(ver, func(v *Version) { C.pkgcraft_version_free(v.version) })
 		return ver, nil
 	} else {
-		return ver, errors.New(C.GoString(C.pkgcraft_last_error()))
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return nil, errors.New(C.GoString(s))
 	}
 }
 
