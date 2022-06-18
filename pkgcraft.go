@@ -102,6 +102,19 @@ func (a *Atom) slot_op() string {
 	return C.GoString(s)
 }
 
+// Return an atom's USE deps.
+func (a *Atom) use_deps() []string {
+	var length C.size_t
+	array := C.pkgcraft_atom_use_deps(a.atom, &length)
+	use_slice := unsafe.Slice(array, length)
+	use := []string{}
+	for _, s := range use_slice {
+		use = append(use, C.GoString(s))
+	}
+	defer C.pkgcraft_str_array_free(array, length)
+	return use
+}
+
 // Return an atom's repo.
 func (a *Atom) repo() string {
 	s := C.pkgcraft_atom_repo(a.atom)
