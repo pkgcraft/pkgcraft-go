@@ -55,7 +55,7 @@ func TestAtom(t *testing.T) {
 }
 
 func BenchmarkNewAtom(b *testing.B) {
-	for n := 0; n < b.N; n++ {
+	for i := 0; i < b.N; i++ {
 		NewAtom("=cat/pkg-1-r2:3/4=[a,b,c]")
 	}
 }
@@ -67,13 +67,9 @@ func BenchmarkAtomSort(b *testing.B) {
 		atoms = append(atoms, a)
 	}
 	assert.Equal(b, fmt.Sprintf("%s", atoms[0]), "=cat/pkg-100")
-
-	for n := 0; n < b.N; n++ {
-		sort.Slice(atoms, func(i, j int) bool {
-			return atoms[i].cmp(atoms[j]) == -1
-		})
+	for i := 0; i < b.N; i++ {
+		sort.Sort(Atoms(atoms))
 	}
-
 	assert.Equal(b, fmt.Sprintf("%s", atoms[0]), "=cat/pkg-1")
 }
 
@@ -112,7 +108,7 @@ func TestVersion(t *testing.T) {
 }
 
 func BenchmarkNewVersion(b *testing.B) {
-	for n := 0; n < b.N; n++ {
+	for i := 0; i < b.N; i++ {
 		NewVersion("1.2.3_alpha4-r5")
 	}
 }
@@ -124,12 +120,8 @@ func BenchmarkVersionSort(b *testing.B) {
 		versions = append(versions, v)
 	}
 	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "100")
-
-	for n := 0; n < b.N; n++ {
-		sort.Slice(versions, func(i, j int) bool {
-			return versions[i].cmp(versions[j]) == -1
-		})
+	for i := 0; i < b.N; i++ {
+		sort.Sort(Versions(versions))
 	}
-
 	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "1")
 }

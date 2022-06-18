@@ -87,6 +87,12 @@ func (a *Atom) cmp(b *Atom) int {
 	return int(C.pkgcraft_atom_cmp(a.atom, b.atom))
 }
 
+type Atoms []*Atom
+
+func (s Atoms) Len() int           { return len(s) }
+func (s Atoms) Less(i, j int) bool { return s[i].cmp(s[j]) == -1 }
+func (s Atoms) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+
 func (a *Atom) String() string {
 	s := C.pkgcraft_atom_str(a.atom)
 	defer C.pkgcraft_str_free(s)
@@ -124,6 +130,12 @@ func (v *Version) revision() string {
 func (a *Version) cmp(b *Version) int {
 	return int(C.pkgcraft_version_cmp(a.version, b.version))
 }
+
+type Versions []*Version
+
+func (s Versions) Len() int           { return len(s) }
+func (s Versions) Less(i, j int) bool { return s[i].cmp(s[j]) == -1 }
+func (s Versions) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 func (v *Version) String() string {
 	s := C.pkgcraft_version_str(v.version)
