@@ -63,8 +63,8 @@ jobs:
           ~/.cargo/registry/cache
           ~/.cargo/git/db
           target
-        key: v2-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }}
-        restore-keys: v2-${{ github.job }}-${{ runner.os }}-rust-
+        key: v3-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }}
+        restore-keys: v3-${{ github.job }}-${{ runner.os }}-rust-
 
     - name: Update deps
       run: cargo update --manifest-path=../pkgcraft-c/Cargo.toml
