@@ -22,6 +22,8 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.subslot(), "")
 	assert.Equal(t, atom.slot_op(), "")
 	assert.Equal(t, atom.repo(), "")
+	assert.Equal(t, atom.key(), "cat/pkg")
+	assert.Equal(t, atom.cpv(), "cat/pkg")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg")
 
 	// versioned
@@ -30,6 +32,8 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Equal(t, atom.version(), "1-r2")
 	assert.Equal(t, atom.revision(), "2")
+	assert.Equal(t, atom.key(), "cat/pkg")
+	assert.Equal(t, atom.cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-1-r2")
 
 	// slotted
