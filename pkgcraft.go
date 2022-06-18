@@ -88,6 +88,20 @@ func (a *Atom) subslot() string {
 	return C.GoString(s)
 }
 
+// Return an atom's slot operator.
+func (a *Atom) slot_op() string {
+	s := C.pkgcraft_atom_slot_op(a.atom)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+// Return an atom's repo.
+func (a *Atom) repo() string {
+	s := C.pkgcraft_atom_repo(a.atom)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
 func (a *Atom) cmp(b *Atom) int {

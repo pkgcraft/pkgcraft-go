@@ -18,6 +18,10 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Equal(t, atom.version(), "")
 	assert.Equal(t, atom.revision(), "")
+	assert.Equal(t, atom.slot(), "")
+	assert.Equal(t, atom.subslot(), "")
+	assert.Equal(t, atom.slot_op(), "")
+	assert.Equal(t, atom.repo(), "")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg")
 
 	// versioned
@@ -39,6 +43,17 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.slot(), "1")
 	assert.Equal(t, atom.subslot(), "2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:1/2")
+
+	// slot operator
+	atom, _ = NewAtom("cat/pkg:0=")
+	assert.Equal(t, atom.slot(), "0")
+	assert.Equal(t, atom.slot_op(), "=")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:0=")
+
+	// repo
+	atom, _ = NewAtom("cat/pkg::repo")
+	assert.Equal(t, atom.repo(), "repo")
+	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg::repo")
 
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")
