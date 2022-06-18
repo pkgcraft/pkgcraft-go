@@ -154,6 +154,10 @@ func (a *Atom) String() string {
 	return C.GoString(s)
 }
 
+func (a *Atom) hash() uint64 {
+	return uint64(C.pkgcraft_atom_hash(a.atom))
+}
+
 type Version struct {
 	version *C.Version
 }
@@ -203,4 +207,8 @@ func (v *Version) String() string {
 	s := C.pkgcraft_version_str(v.version)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
+}
+
+func (v *Version) hash() uint64 {
+	return uint64(C.pkgcraft_version_hash(v.version))
 }

@@ -89,6 +89,28 @@ func TestAtom(t *testing.T) {
 	a1, _ = NewAtom("=cat/pkg-2")
 	a2, _ = NewAtom("=cat/pkg-1")
 	assert.Equal(t, a1.cmp(a2), 1)
+
+	// hashing equal values
+	a1, _ = NewAtom("=cat/pkg-1.0.2")
+	a2, _ = NewAtom("=cat/pkg-1.0.2-r0")
+	a3, _ := NewAtom("=cat/pkg-1.000.2")
+	a4, _ := NewAtom("=cat/pkg-1.00.2-r0")
+	m := make(map[uint64]bool)
+	m[a1.hash()] = true
+	m[a2.hash()] = true
+	m[a3.hash()] = true
+	m[a4.hash()] = true
+	assert.Equal(t, len(m), 1)
+
+	// hashing unequal values
+	a1, _ = NewAtom("=cat/pkg-0.1")
+	a2, _ = NewAtom("=cat/pkg-0.01")
+	a3, _ = NewAtom("=cat/pkg-0.001")
+	m = make(map[uint64]bool)
+	m[a1.hash()] = true
+	m[a2.hash()] = true
+	m[a3.hash()] = true
+	assert.Equal(t, len(m), 3)
 }
 
 func BenchmarkNewAtom(b *testing.B) {
@@ -142,6 +164,28 @@ func TestVersion(t *testing.T) {
 	v1, _ = NewVersion("2")
 	v2, _ = NewVersion("1")
 	assert.Equal(t, v1.cmp(v2), 1)
+
+	// hashing equal values
+	v1, _ = NewVersion("1.0.2")
+	v2, _ = NewVersion("1.0.2-r0")
+	v3, _ := NewVersion("1.000.2")
+	v4, _ := NewVersion("1.00.2-r0")
+	m := make(map[uint64]bool)
+	m[v1.hash()] = true
+	m[v2.hash()] = true
+	m[v3.hash()] = true
+	m[v4.hash()] = true
+	assert.Equal(t, len(m), 1)
+
+	// hashing unequal values
+	v1, _ = NewVersion("0.1")
+	v2, _ = NewVersion("0.01")
+	v3, _ = NewVersion("0.001")
+	m = make(map[uint64]bool)
+	m[v1.hash()] = true
+	m[v2.hash()] = true
+	m[v3.hash()] = true
+	assert.Equal(t, len(m), 3)
 }
 
 func BenchmarkNewVersion(b *testing.B) {
