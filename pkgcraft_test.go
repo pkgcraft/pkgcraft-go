@@ -11,12 +11,13 @@ import (
 
 func TestAtom(t *testing.T) {
 	var atom *Atom
+	var ver *Version
 
 	// unversioned
 	atom, _ = NewAtom("cat/pkg")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
-	assert.Equal(t, atom.version(), "")
+	assert.Nil(t, atom.version())
 	assert.Equal(t, atom.revision(), "")
 	assert.Equal(t, atom.slot(), "")
 	assert.Equal(t, atom.subslot(), "")
@@ -31,7 +32,8 @@ func TestAtom(t *testing.T) {
 	atom, _ = NewAtom("=cat/pkg-1-r2")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
-	assert.Equal(t, atom.version(), "1-r2")
+	ver, _ = NewVersionWithOp("=1-r2")
+	assert.Equal(t, atom.version(), ver)
 	assert.Equal(t, atom.revision(), "2")
 	assert.Equal(t, atom.key(), "cat/pkg")
 	assert.Equal(t, atom.cpv(), "cat/pkg-1-r2")
@@ -64,7 +66,8 @@ func TestAtom(t *testing.T) {
 	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
-	assert.Equal(t, atom.version(), "1-r2")
+	ver, _ = NewVersionWithOp("=1-r2")
+	assert.Equal(t, atom.version(), ver)
 	assert.Equal(t, atom.revision(), "2")
 	assert.Equal(t, atom.slot(), "3")
 	assert.Equal(t, atom.subslot(), "4")

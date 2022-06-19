@@ -68,10 +68,13 @@ func (a *Atom) pn() string {
 }
 
 // Return an atom's version.
-func (a *Atom) version() string {
-	s := C.pkgcraft_atom_version(a.atom)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+func (a *Atom) version() *Version {
+	ptr := C.pkgcraft_atom_version(a.atom)
+	var ver *Version
+	if ptr != nil {
+		ver = &Version{ptr}
+	}
+	return ver
 }
 
 // Return an atom's revision.
@@ -166,12 +169,7 @@ func version_free(v *Version) {
 	C.pkgcraft_version_free(v.version)
 }
 
-// Parse a string into a version.
-func NewVersion(s string) (*Version, error) {
-	ver_str := C.CString(s)
-	defer C.free(unsafe.Pointer(ver_str))
-	ptr := C.pkgcraft_version(ver_str)
-
+func new_version(ptr *C.Version) (*Version, error) {
 	if ptr != nil {
 		ver := &Version{ptr}
 		runtime.SetFinalizer(ver, version_free)
@@ -181,6 +179,22 @@ func NewVersion(s string) (*Version, error) {
 		defer C.pkgcraft_str_free(s)
 		return nil, errors.New(C.GoString(s))
 	}
+}
+
+// Parse a string into a version.
+func NewVersion(s string) (*Version, error) {
+	ver_str := C.CString(s)
+	defer C.free(unsafe.Pointer(ver_str))
+	ptr := C.pkgcraft_version(ver_str)
+	return new_version(ptr)
+}
+
+// Parse a string into a version with an operator.
+func NewVersionWithOp(s string) (*Version, error) {
+	ver_str := C.CString(s)
+	defer C.free(unsafe.Pointer(ver_str))
+	ptr := C.pkgcraft_version_with_op(ver_str)
+	return new_version(ptr)
 }
 
 // Return a version's revision.
