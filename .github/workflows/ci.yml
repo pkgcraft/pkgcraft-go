@@ -62,8 +62,10 @@ jobs:
           ~/.cargo/registry/index
           ~/.cargo/registry/cache
           ~/.cargo/git/db
+          ~/.cache/go-build
+          ~/go/pkg/mod
           target
-        key: v3-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }}
+        key: v3-${{ github.job }}-${{ runner.os }}-rust-${{ steps.rust.outputs.rustc_hash }-go-${{ hashFiles('**/go.sum') }}
         restore-keys: v3-${{ github.job }}-${{ runner.os }}-rust-
 
     - name: Update deps
