@@ -120,6 +120,30 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, len(m), 3)
 }
 
+// test sending Atoms over a channel
+func TestAtomChannels(t *testing.T) {
+	var atom *Atom
+
+	atom_strs := make(chan string)
+	atoms := make(chan *Atom)
+
+	go func() {
+		for {
+			s := <-atom_strs
+			atom, _ = NewAtom(s)
+			atoms <- atom
+		}
+	}()
+
+	var s string
+	for i := 0; i < 1000; i++ {
+		s = fmt.Sprintf("=cat/pkg-%d-r2:3/4=[a,b,c]", i)
+		atom_strs <- s
+		atom = <-atoms
+		assert.Equal(t, fmt.Sprintf("%s", atom), s)
+	}
+}
+
 func BenchmarkNewAtom(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		NewAtom(fmt.Sprintf("=cat/pkg-%d-r2:3/4=[a,b,c]", i))
