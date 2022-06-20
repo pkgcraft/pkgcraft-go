@@ -62,6 +62,10 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.repo(), "repo")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg::repo")
 
+	// repo dep invalid on official EAPIs
+	atom, _ = NewAtomWithEapi("cat/pkg::repo", "8")
+	assert.Nil(t, atom)
+
 	// all fields
 	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.category(), "cat")
