@@ -122,6 +122,12 @@ func TestAtom(t *testing.T) {
 
 func BenchmarkNewAtom(b *testing.B) {
 	for i := 0; i < b.N; i++ {
+		NewAtom(fmt.Sprintf("=cat/pkg-%d-r2:3/4=[a,b,c]", i))
+	}
+}
+
+func BenchmarkNewAtomStatic(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		NewAtom("=cat/pkg-1-r2:3/4=[a,b,c]")
 	}
 }
