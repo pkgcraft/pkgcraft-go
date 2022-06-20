@@ -90,10 +90,7 @@ jobs:
     - name: Build and test
       run: |
         go build
-        go test -v -race -coverprofile=coverage.out
-
-    - name: Run benchmarks
-      run: go test -bench=.
+        go test -v -race -coverprofile=coverage.out -bench=.
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
