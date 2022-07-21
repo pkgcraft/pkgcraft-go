@@ -10,6 +10,14 @@ import (
 	"unsafe"
 )
 
+type SlotOperator int
+
+const (
+	SlotOpNone SlotOperator = iota
+	SlotOpEqual
+	SlotOpStar
+)
+
 type Atom struct {
 	atom *C.Atom
 }
@@ -99,10 +107,9 @@ func (a *Atom) subslot() string {
 }
 
 // Return an atom's slot operator.
-func (a *Atom) slot_op() string {
-	s := C.pkgcraft_atom_slot_op(a.atom)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+func (a *Atom) slot_op() SlotOperator {
+	i := C.pkgcraft_atom_slot_op(a.atom)
+	return SlotOperator(i + 1)
 }
 
 // Return an atom's USE deps.

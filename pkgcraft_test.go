@@ -21,7 +21,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.revision(), "")
 	assert.Equal(t, atom.slot(), "")
 	assert.Equal(t, atom.subslot(), "")
-	assert.Equal(t, atom.slot_op(), "")
+	assert.Equal(t, atom.slot_op(), SlotOpNone)
 	assert.Equal(t, atom.use_deps(), []string{})
 	assert.Equal(t, atom.repo(), "")
 	assert.Equal(t, atom.key(), "cat/pkg")
@@ -54,7 +54,7 @@ func TestAtom(t *testing.T) {
 	// slot operator
 	atom, _ = NewAtom("cat/pkg:0=")
 	assert.Equal(t, atom.slot(), "0")
-	assert.Equal(t, atom.slot_op(), "=")
+	assert.Equal(t, atom.slot_op(), SlotOpEqual)
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:0=")
 
 	// repo
@@ -75,7 +75,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.revision(), "2")
 	assert.Equal(t, atom.slot(), "3")
 	assert.Equal(t, atom.subslot(), "4")
-	assert.Equal(t, atom.slot_op(), "=")
+	assert.Equal(t, atom.slot_op(), SlotOpEqual)
 	assert.Equal(t, atom.use_deps(), []string{"a", "b", "c"})
 	assert.Equal(t, atom.repo(), "repo")
 	assert.Equal(t, atom.key(), "cat/pkg")
