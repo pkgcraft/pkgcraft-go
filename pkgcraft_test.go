@@ -19,6 +19,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Nil(t, atom.version())
 	assert.Equal(t, atom.revision(), "")
+	assert.Equal(t, atom.blocker(), BlockerNone)
 	assert.Equal(t, atom.slot(), "")
 	assert.Equal(t, atom.subslot(), "")
 	assert.Equal(t, atom.slot_op(), SlotOpNone)
@@ -39,11 +40,10 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-1-r2")
 
-	// slotted
-	atom, _ = NewAtom("cat/pkg:1")
-	assert.Equal(t, atom.slot(), "1")
-	assert.Equal(t, atom.subslot(), "")
-	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:1")
+	// blocker
+	atom, _ = NewAtom("!cat/pkg")
+	assert.Equal(t, atom.blocker(), BlockerWeak)
+	assert.Equal(t, fmt.Sprintf("%s", atom), "!cat/pkg")
 
 	// subslotted
 	atom, _ = NewAtom("cat/pkg:1/2")
@@ -73,6 +73,7 @@ func TestAtom(t *testing.T) {
 	ver, _ = NewVersionWithOp("=1-r2")
 	assert.Equal(t, atom.version(), ver)
 	assert.Equal(t, atom.revision(), "2")
+	assert.Equal(t, atom.blocker(), BlockerStrong)
 	assert.Equal(t, atom.slot(), "3")
 	assert.Equal(t, atom.subslot(), "4")
 	assert.Equal(t, atom.slot_op(), SlotOpEqual)

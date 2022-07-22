@@ -10,10 +10,18 @@ import (
 	"unsafe"
 )
 
+type Blocker int
+
+const (
+	BlockerNone Blocker = iota - 1
+	BlockerStrong
+	BlockerWeak
+)
+
 type SlotOperator int
 
 const (
-	SlotOpNone SlotOperator = iota
+	SlotOpNone SlotOperator = iota - 1
 	SlotOpEqual
 	SlotOpStar
 )
@@ -92,6 +100,12 @@ func (a *Atom) revision() string {
 	return C.GoString(s)
 }
 
+// Return an atom's blocker.
+func (a *Atom) blocker() Blocker {
+	i := C.pkgcraft_atom_blocker(a.atom)
+	return Blocker(i)
+}
+
 // Return an atom's slot.
 func (a *Atom) slot() string {
 	s := C.pkgcraft_atom_slot(a.atom)
@@ -109,7 +123,7 @@ func (a *Atom) subslot() string {
 // Return an atom's slot operator.
 func (a *Atom) slot_op() SlotOperator {
 	i := C.pkgcraft_atom_slot_op(a.atom)
-	return SlotOperator(i + 1)
+	return SlotOperator(i)
 }
 
 // Return an atom's USE deps.
