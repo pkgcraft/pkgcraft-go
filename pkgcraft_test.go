@@ -195,7 +195,7 @@ func TestVersion(t *testing.T) {
 	// Version with op
 	version, _ = NewVersionWithOp(">1-r2")
 	assert.Equal(t, version.revision(), "2")
-	assert.Equal(t, fmt.Sprintf("%s", version), "1-r2")
+	assert.Equal(t, fmt.Sprintf("%s", version), ">1-r2")
 
 	// v1 < v2
 	v1, _ := NewVersion("1")
