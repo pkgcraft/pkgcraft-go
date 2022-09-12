@@ -183,14 +183,14 @@ func (a *Atom) hash() uint64 {
 }
 
 type Version struct {
-	version *C.Version
+	version *C.AtomVersion
 }
 
 func version_free(v *Version) {
 	C.pkgcraft_version_free(v.version)
 }
 
-func new_version(ptr *C.Version) (*Version, error) {
+func new_version(ptr *C.AtomVersion) (*Version, error) {
 	if ptr != nil {
 		ver := &Version{ptr}
 		runtime.SetFinalizer(ver, version_free)
