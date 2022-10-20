@@ -46,7 +46,7 @@ func new_atom(s string, eapi string) (*Atom, error) {
 		defer C.free(unsafe.Pointer(eapi_str))
 	}
 
-	ptr := C.pkgcraft_atom(atom_str, eapi_str)
+	ptr := C.pkgcraft_atom_new(atom_str, eapi_str)
 
 	if ptr != nil {
 		atom := &Atom{ptr}
@@ -206,7 +206,7 @@ func new_version(ptr *C.AtomVersion) (*Version, error) {
 func NewVersion(s string) (*Version, error) {
 	ver_str := C.CString(s)
 	defer C.free(unsafe.Pointer(ver_str))
-	ptr := C.pkgcraft_version(ver_str)
+	ptr := C.pkgcraft_version_new(ver_str)
 	return new_version(ptr)
 }
 
