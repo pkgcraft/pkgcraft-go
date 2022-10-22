@@ -5,6 +5,7 @@ package atom
 import "C"
 
 import (
+	"github.com/hashicorp/golang-lru"
 	"errors"
 	"runtime"
 	"unsafe"
@@ -29,6 +30,8 @@ const (
 // sentinel value for atoms with uncached version fields
 var version_sentinel = &Version{nil}
 
+var atom_cache, _ = lru.New(10000)
+
 type Atom struct {
 	atom *C.Atom
 	// cached fields
@@ -36,6 +39,11 @@ type Atom struct {
 	_package string
 	_version *Version
 	_hash uint64
+}
+
+type Pair[T, U any] struct {
+	First  T
+	Second U
 }
 
 func new_atom(s string, eapi string) (*Atom, error) {
@@ -68,9 +76,39 @@ func NewAtom(s string) (*Atom, error) {
 	return new_atom(s, "")
 }
 
+// Return a cached Atom if one exists, otherwise return a new instance.
+func NewCachedAtom(s string) (*Atom, error) {
+	key := Pair[string, string]{s, ""}
+	v, ok := atom_cache.Get(key)
+	if ok {
+		return v.(*Atom), nil
+	} else {
+		atom, err := new_atom(s, "")
+		if err == nil {
+			atom_cache.Add(key, atom)
+		}
+		return atom, err
+	}
+}
+
 // Parse a string into an atom using a specific EAPI.
 func NewAtomWithEapi(s string, eapi string) (*Atom, error) {
 	return new_atom(s, eapi)
+}
+
+// Return a cached Atom if one exists, otherwise parse using a specific EAPI.
+func NewCachedAtomWithEapi(s string, eapi string) (*Atom, error) {
+	key := Pair[string, string]{s, eapi}
+	v, ok := atom_cache.Get(key)
+	if ok {
+		return v.(*Atom), nil
+	} else {
+		atom, err := new_atom(s, eapi)
+		if err == nil {
+			atom_cache.Add(key, atom)
+		}
+		return atom, err
+	}
 }
 
 // Return an atom's category.

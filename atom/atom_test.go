@@ -8,7 +8,7 @@ import (
 )
 
 func TestAtom(t *testing.T) {
-	var atom *Atom
+	var atom, c1, c2 *Atom
 	var ver *Version
 
 	// unversioned
@@ -81,6 +81,13 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 
+	// verify cached atoms reuse objects
+	c1, _ = NewCachedAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	assert.Equal(t, atom.cmp(c1), 0)
+	assert.NotEqual(t, atom, c1)
+	c2, _ = NewCachedAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	assert.Equal(t, c1, c2)
+
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")
 	a2, _ := NewAtom("=cat/pkg-2")
@@ -152,6 +159,12 @@ func BenchmarkNewAtom(b *testing.B) {
 func BenchmarkNewAtomStatic(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		NewAtom("=cat/pkg-1-r2:3/4=[a,b,c]")
+	}
+}
+
+func BenchmarkNewCachedAtomStatic(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewCachedAtom("=cat/pkg-1-r2:3/4=[a,b,c]")
 	}
 }
 
