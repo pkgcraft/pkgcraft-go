@@ -30,10 +30,6 @@ type Atom struct {
 	atom *C.Atom
 }
 
-func atom_free(a *Atom) {
-	C.pkgcraft_atom_free(a.atom)
-}
-
 func new_atom(s string, eapi string) (*Atom, error) {
 	atom_str := C.CString(s)
 	defer C.free(unsafe.Pointer(atom_str))
@@ -50,7 +46,7 @@ func new_atom(s string, eapi string) (*Atom, error) {
 
 	if ptr != nil {
 		atom := &Atom{ptr}
-		runtime.SetFinalizer(atom, atom_free)
+		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 		return atom, nil
 	} else {
 		s := C.pkgcraft_last_error()
@@ -182,3 +178,23 @@ func (a *Atom) hash() uint64 {
 	return uint64(C.pkgcraft_atom_hash(a.atom))
 }
 
+type Cpv struct {
+    Atom
+}
+
+// Parse a CPV string into an atom.
+func NewCpv(s string) (*Cpv, error) {
+	cpv_str := C.CString(s)
+	defer C.free(unsafe.Pointer(cpv_str))
+	ptr := C.pkgcraft_cpv_new(cpv_str)
+
+	if ptr != nil {
+		cpv := &Cpv{Atom{ptr}}
+		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.atom) })
+		return cpv, nil
+	} else {
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return nil, errors.New(C.GoString(s))
+	}
+}

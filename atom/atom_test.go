@@ -167,3 +167,23 @@ func BenchmarkAtomSort(b *testing.B) {
 	}
 	assert.Equal(b, fmt.Sprintf("%s", atoms[0]), "=cat/pkg-1")
 }
+
+func TestCpv(t *testing.T) {
+	var cpv *Cpv
+	var ver *Version
+
+	// valid
+	cpv, _ = NewCpv("cat/pkg-1-r2")
+	assert.Equal(t, cpv.category(), "cat")
+	assert.Equal(t, cpv.pn(), "pkg")
+	ver, _ = NewVersion("1-r2")
+	assert.Equal(t, cpv.version(), ver)
+	assert.Equal(t, cpv.revision(), "2")
+	assert.Equal(t, cpv.key(), "cat/pkg")
+	assert.Equal(t, cpv.cpv(), "cat/pkg-1-r2")
+	assert.Equal(t, fmt.Sprintf("%s", cpv), "cat/pkg-1-r2")
+
+	// invalid
+	cpv, _ = NewCpv("=cat/pkg-1-r2")
+	assert.Nil(t, cpv)
+}
