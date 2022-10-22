@@ -183,6 +183,12 @@ func TestCpv(t *testing.T) {
 	assert.Equal(t, cpv.cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", cpv), "cat/pkg-1-r2")
 
+	cpv, _ = NewCpv("cat/pkg-0-r0")
+	ver, _ = NewVersion("0-r0")
+	assert.Equal(t, cpv.version(), ver)
+	assert.Equal(t, cpv.revision(), "0")
+	assert.Equal(t, fmt.Sprintf("%s", cpv), "cat/pkg-0-r0")
+
 	// invalid
 	cpv, _ = NewCpv("=cat/pkg-1-r2")
 	assert.Nil(t, cpv)

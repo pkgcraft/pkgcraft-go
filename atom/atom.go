@@ -26,8 +26,15 @@ const (
 	SlotOpStar
 )
 
+// sentinel value for atoms with uncached version fields
+var uncached_ver, _ = NewVersion("0")
+
 type Atom struct {
 	atom *C.Atom
+	// cached fields
+	_category string
+	_package string
+	_version *Version
 }
 
 func new_atom(s string, eapi string) (*Atom, error) {
@@ -45,7 +52,7 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	ptr := C.pkgcraft_atom_new(atom_str, eapi_str)
 
 	if ptr != nil {
-		atom := &Atom{ptr}
+		atom := &Atom{atom: ptr, _version: uncached_ver}
 		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 		return atom, nil
 	} else {
@@ -67,26 +74,36 @@ func NewAtomWithEapi(s string, eapi string) (*Atom, error) {
 
 // Return an atom's category.
 func (a *Atom) category() string {
-	s := C.pkgcraft_atom_category(a.atom)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+	if a._category == "" {
+		s := C.pkgcraft_atom_category(a.atom)
+		defer C.pkgcraft_str_free(s)
+		a._category = C.GoString(s)
+	}
+	return a._category
 }
 
 // Return an atom's package name.
 func (a *Atom) pn() string {
-	s := C.pkgcraft_atom_package(a.atom)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+	if a._package == "" {
+		s := C.pkgcraft_atom_package(a.atom)
+		defer C.pkgcraft_str_free(s)
+		a._package = C.GoString(s)
+	}
+	return a._package
 }
 
 // Return an atom's version.
 func (a *Atom) version() *Version {
-	ptr := C.pkgcraft_atom_version(a.atom)
-	var ver *Version
-	if ptr != nil {
-		ver = &Version{ptr}
+	if a._version == uncached_ver {
+		ptr := C.pkgcraft_atom_version(a.atom)
+		var ver *Version
+		if ptr != nil {
+			a._version = &Version{ptr}
+		} else {
+			a._version = ver
+		}
 	}
-	return ver
+	return a._version
 }
 
 // Return an atom's revision.
@@ -189,7 +206,7 @@ func NewCpv(s string) (*Cpv, error) {
 	ptr := C.pkgcraft_cpv_new(cpv_str)
 
 	if ptr != nil {
-		cpv := &Cpv{Atom{ptr}}
+		cpv := &Cpv{Atom{atom: ptr, _version: uncached_ver}}
 		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.atom) })
 		return cpv, nil
 	} else {
