@@ -26,6 +26,13 @@ const (
 	SlotOpStar
 )
 
+// Return the pkgcraft library version.
+func pkgcraft_lib_version() string {
+	s := C.pkgcraft_lib_version()
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
 type Atom struct {
 	atom *C.Atom
 }
