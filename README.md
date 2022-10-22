@@ -23,7 +23,7 @@ source ./build pkgcraft-c
 
 cd pkgcraft-go
 # build and test
-go test -v
+go test -v ./...
 # benchmark
-go test -bench=.
+go test -bench=. ./...
 ```
