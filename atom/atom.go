@@ -27,7 +27,7 @@ const (
 )
 
 // sentinel value for atoms with uncached version fields
-var uncached_ver, _ = NewVersion("0")
+var version_sentinel = &Version{nil}
 
 type Atom struct {
 	atom *C.Atom
@@ -52,7 +52,7 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	ptr := C.pkgcraft_atom_new(atom_str, eapi_str)
 
 	if ptr != nil {
-		atom := &Atom{atom: ptr, _version: uncached_ver}
+		atom := &Atom{atom: ptr, _version: version_sentinel}
 		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 		return atom, nil
 	} else {
@@ -94,7 +94,7 @@ func (a *Atom) pn() string {
 
 // Return an atom's version.
 func (a *Atom) version() *Version {
-	if a._version == uncached_ver {
+	if a._version == version_sentinel {
 		ptr := C.pkgcraft_atom_version(a.atom)
 		var ver *Version
 		if ptr != nil {
@@ -206,7 +206,7 @@ func NewCpv(s string) (*Cpv, error) {
 	ptr := C.pkgcraft_cpv_new(cpv_str)
 
 	if ptr != nil {
-		cpv := &Cpv{Atom{atom: ptr, _version: uncached_ver}}
+		cpv := &Cpv{Atom{atom: ptr, _version: version_sentinel}}
 		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.atom) })
 		return cpv, nil
 	} else {
