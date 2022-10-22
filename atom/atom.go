@@ -35,6 +35,7 @@ type Atom struct {
 	_category string
 	_package string
 	_version *Version
+	_hash uint64
 }
 
 func new_atom(s string, eapi string) (*Atom, error) {
@@ -192,7 +193,10 @@ func (a *Atom) String() string {
 }
 
 func (a *Atom) hash() uint64 {
-	return uint64(C.pkgcraft_atom_hash(a.atom))
+	if a._hash == 0 {
+		a._hash = uint64(C.pkgcraft_atom_hash(a.atom))
+	}
+	return a._hash
 }
 
 type Cpv struct {
