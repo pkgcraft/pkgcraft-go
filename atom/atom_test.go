@@ -84,9 +84,12 @@ func TestAtom(t *testing.T) {
 	// verify cached atoms reuse objects
 	c1, _ = NewCachedAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.cmp(c1), 0)
-	assert.NotEqual(t, atom, c1)
+	assert.True(t, atom != c1)
 	c2, _ = NewCachedAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
-	assert.Equal(t, c1, c2)
+	assert.True(t, c1 == c2)
+	c1, _ = NewCachedAtomWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", "8")
+	c2, _ = NewCachedAtomWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", "8")
+	assert.True(t, c1 == c2)
 
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")
