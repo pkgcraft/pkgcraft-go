@@ -203,6 +203,6 @@ func TestCpv(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s", cpv), "cat/pkg-0-r0")
 
 	// invalid
-	cpv, _ = NewCpv("=cat/pkg-1-r2")
-	assert.Nil(t, cpv)
+	_, err := NewCpv("=cat/pkg-1-r2")
+	assert.NotNil(t, err)
 }
