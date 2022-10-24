@@ -5,8 +5,8 @@ package atom
 import "C"
 
 import (
-	"github.com/hashicorp/golang-lru"
 	"errors"
+	"github.com/hashicorp/golang-lru"
 	"runtime"
 	"unsafe"
 )
@@ -36,9 +36,9 @@ type Atom struct {
 	atom *C.Atom
 	// cached fields
 	_category string
-	_package string
-	_version *Version
-	_hash uint64
+	_package  string
+	_version  *Version
+	_hash     uint64
 }
 
 type Pair[T, U any] struct {
@@ -74,28 +74,12 @@ func NewAtom(s string) (*Atom, error) {
 	return new_atom(s, "")
 }
 
-// Return a cached Atom if one exists, otherwise return a new instance.
-func NewCachedAtom(s string) (*Atom, error) {
-	key := Pair[string, string]{s, ""}
-	v, ok := atom_cache.Get(key)
-	if ok {
-		return v.(*Atom), nil
-	} else {
-		atom, err := new_atom(s, "")
-		if err == nil {
-			atom_cache.Add(key, atom)
-		}
-		return atom, err
-	}
-}
-
 // Parse a string into an atom using a specific EAPI.
 func NewAtomWithEapi(s string, eapi string) (*Atom, error) {
 	return new_atom(s, eapi)
 }
 
-// Return a cached Atom if one exists, otherwise parse using a specific EAPI.
-func NewCachedAtomWithEapi(s string, eapi string) (*Atom, error) {
+func new_cached_atom(s string, eapi string) (*Atom, error) {
 	key := Pair[string, string]{s, eapi}
 	v, ok := atom_cache.Get(key)
 	if ok {
@@ -107,6 +91,16 @@ func NewCachedAtomWithEapi(s string, eapi string) (*Atom, error) {
 		}
 		return atom, err
 	}
+}
+
+// Return a cached Atom if one exists, otherwise return a new instance.
+func NewCachedAtom(s string) (*Atom, error) {
+	return new_cached_atom(s, "")
+}
+
+// Return a cached Atom if one exists, otherwise parse using a specific EAPI.
+func NewCachedAtomWithEapi(s string, eapi string) (*Atom, error) {
+	return new_cached_atom(s, eapi)
 }
 
 // Return an atom's category.
@@ -235,7 +229,7 @@ func (a *Atom) hash() uint64 {
 }
 
 type Cpv struct {
-    Atom
+	Atom
 }
 
 // Parse a CPV string into an atom.
