@@ -51,9 +51,7 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	defer C.free(unsafe.Pointer(atom_str))
 
 	var eapi_str *C.char
-	if eapi == "" {
-		eapi_str = nil
-	} else {
+	if eapi != "" {
 		eapi_str = C.CString(eapi)
 		defer C.free(unsafe.Pointer(eapi_str))
 	}
@@ -135,11 +133,10 @@ func (a *Atom) pn() string {
 func (a *Atom) version() *Version {
 	if a._version == version_sentinel {
 		ptr := C.pkgcraft_atom_version(a.atom)
-		var ver *Version
 		if ptr != nil {
 			a._version = &Version{ptr}
 		} else {
-			a._version = ver
+			a._version = nil
 		}
 	}
 	return a._version
