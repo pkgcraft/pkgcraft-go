@@ -49,4 +49,4 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        files: pkgcraft-go/coverage.out
+        files: coverage.out
