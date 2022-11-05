@@ -77,12 +77,12 @@ func new_atom(s string, eapi string) (*Atom, error) {
 }
 
 // Parse a string into an atom using the latest EAPI.
-func NewAtom(s string) (*Atom, error) {
+func New(s string) (*Atom, error) {
 	return new_atom(s, "")
 }
 
 // Parse a string into an atom using a specific EAPI.
-func NewAtomWithEapi(s string, eapi string) (*Atom, error) {
+func NewWithEapi(s string, eapi string) (*Atom, error) {
 	return new_atom(s, eapi)
 }
 
@@ -101,12 +101,12 @@ func new_cached_atom(s string, eapi string) (*Atom, error) {
 }
 
 // Return a cached Atom if one exists, otherwise return a new instance.
-func NewCachedAtom(s string) (*Atom, error) {
+func NewCached(s string) (*Atom, error) {
 	return new_cached_atom(s, "")
 }
 
 // Return a cached Atom if one exists, otherwise parse using a specific EAPI.
-func NewCachedAtomWithEapi(s string, eapi string) (*Atom, error) {
+func NewCachedWithEapi(s string, eapi string) (*Atom, error) {
 	return new_cached_atom(s, eapi)
 }
 
