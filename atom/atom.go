@@ -50,13 +50,19 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	atom_str := C.CString(s)
 	defer C.free(unsafe.Pointer(atom_str))
 
-	var eapi_str *C.char
+	var eapi_p *C.Eapi
 	if eapi != "" {
-		eapi_str = C.CString(eapi)
+		eapi_str := C.CString(eapi)
 		defer C.free(unsafe.Pointer(eapi_str))
+		eapi_p = C.pkgcraft_eapi_from_str(eapi_str)
+		if eapi_p == nil {
+			s := C.pkgcraft_last_error()
+			defer C.pkgcraft_str_free(s)
+			return nil, errors.New(C.GoString(s))
+		}
 	}
 
-	ptr := C.pkgcraft_atom_new(atom_str, eapi_str)
+	ptr := C.pkgcraft_atom_new(atom_str, eapi_p)
 
 	if ptr != nil {
 		atom := &Atom{atom: ptr, _version: version_sentinel}
