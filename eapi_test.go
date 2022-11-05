@@ -7,15 +7,15 @@ import (
 )
 
 func TestEapiGlobals(t *testing.T) {
-	assert.True(t, len(Eapis) > len(EapisOfficial))
-	for id, eapi := range EapisOfficial {
-		assert.True(t, Eapis[id] == eapi)
+	assert.True(t, len(EAPIS) > len(EAPIS_OFFICIAL))
+	for id, eapi := range EAPIS_OFFICIAL {
+		assert.True(t, EAPIS[id] == eapi)
 	}
-	assert.True(t, Eapis[EapiLatest.String()] == EapiLatest)
+	assert.True(t, EAPIS[EAPI_LATEST.String()] == EAPI_LATEST)
 }
 
 func TestEapiHas(t *testing.T) {
-	eapi := Eapis["1"]
+	eapi := EAPIS["1"]
 	assert.False(t, eapi.has("nonexistent_feature"))
 	assert.True(t, eapi.has("slot_deps"))
 }
