@@ -6,9 +6,10 @@ import "C"
 
 import (
 	"errors"
-	"github.com/hashicorp/golang-lru"
 	"runtime"
 	"unsafe"
+
+	"github.com/hashicorp/golang-lru"
 )
 
 type Blocker int

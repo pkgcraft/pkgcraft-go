@@ -2,9 +2,10 @@ package pkgcraft
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/go-version"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // version requirements for pkgcraft C library
