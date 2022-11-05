@@ -1,4 +1,4 @@
-package eapi
+package pkgcraft
 
 // #cgo pkg-config: pkgcraft
 // #include <pkgcraft.h>

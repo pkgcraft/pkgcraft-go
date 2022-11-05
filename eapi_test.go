@@ -1,4 +1,4 @@
-package eapi
+package pkgcraft
 
 import (
 	"testing"
