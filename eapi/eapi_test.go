@@ -6,7 +6,7 @@ import (
 )
 
 func TestEapiGlobals(t *testing.T) {
-	assert.True(t, len(Eapis) > len(EapisOfficial)) 
+	assert.True(t, len(Eapis) > len(EapisOfficial))
 	for id, eapi := range EapisOfficial {
 		assert.True(t, Eapis[id] == eapi)
 	}
