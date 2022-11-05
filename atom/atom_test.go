@@ -65,6 +65,10 @@ func TestAtom(t *testing.T) {
 	atom, _ = NewAtomWithEapi("cat/pkg::repo", "8")
 	assert.Nil(t, atom)
 
+	// unknown EAPI
+	atom, _ = NewAtomWithEapi("cat/pkg", "unknown")
+	assert.Nil(t, atom)
+
 	// all fields
 	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.category(), "cat")
