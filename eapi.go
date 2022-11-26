@@ -13,7 +13,7 @@ var EAPIS_OFFICIAL = get_official_eapis()
 var EAPIS = get_eapis()
 var EAPI_LATEST = EAPIS_OFFICIAL[strconv.Itoa(len(EAPIS_OFFICIAL)-1)]
 
-// Convert an array of Eapi pointers to an (id, Eapi) mapping.
+// Convert an array of Eapi pointers to a mapping.
 func eapis_to_map(eapis []*C.Eapi) map[string]Eapi {
 	m := make(map[string]Eapi)
 	for _, eapi := range eapis {
