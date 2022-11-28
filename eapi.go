@@ -20,7 +20,7 @@ func eapis_to_map(eapis []*C.Eapi) map[string]Eapi {
 		s := C.pkgcraft_eapi_as_str(ptr)
 		id := C.GoString(s)
 		defer C.pkgcraft_str_free(s)
-		m[id] = Eapi{ptr: ptr, _id: id}
+		m[id] = Eapi{ptr, id}
 	}
 	return m
 }
@@ -46,12 +46,12 @@ func get_eapis() map[string]Eapi {
 type Eapi struct {
 	ptr *C.Eapi
 	// cached fields
-	_id string
+	id string
 }
 
 // Return the string for an EAPI.
 func (e *Eapi) String() string {
-	return e._id
+	return e.id
 }
 
 // Check if an EAPI has a given feature.
