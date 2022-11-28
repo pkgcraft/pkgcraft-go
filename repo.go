@@ -9,9 +9,9 @@ import (
 )
 
 type Repo interface {
-	id() string
-	path() string
-	is_empty() bool
+	Id() string
+	Path() string
+	IsEmpty() bool
 }
 
 type BaseRepo struct {
@@ -19,21 +19,21 @@ type BaseRepo struct {
 }
 
 // Return a repo's id.
-func (r *BaseRepo) id() string {
+func (r *BaseRepo) Id() string {
 	s := C.pkgcraft_repo_id(r.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return a repo's path.
-func (r *BaseRepo) path() string {
+func (r *BaseRepo) Path() string {
 	s := C.pkgcraft_repo_path(r.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return if a repo is empty.
-func (r *BaseRepo) is_empty() bool {
+func (r *BaseRepo) IsEmpty() bool {
 	return bool(C.pkgcraft_repo_is_empty(r.ptr))
 }
 
