@@ -31,7 +31,7 @@ const (
 var atom_cache, _ = lru.New(10000)
 
 type Atom struct {
-	atom *C.Atom
+	ptr *C.Atom
 	// cached fields
 	_category string
 	_package  string
@@ -49,7 +49,7 @@ func new_atom(s string, eapi *Eapi) (*Atom, error) {
 	if eapi == nil {
 		eapi_ptr = nil
 	} else {
-		eapi_ptr = eapi.eapi
+		eapi_ptr = eapi.ptr
 	}
 
 	atom_str := C.CString(s)
@@ -57,8 +57,8 @@ func new_atom(s string, eapi *Eapi) (*Atom, error) {
 	ptr := C.pkgcraft_atom_new(atom_str, eapi_ptr)
 
 	if ptr != nil {
-		atom := &Atom{atom: ptr, _version: nil}
-		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
+		atom := &Atom{ptr: ptr}
+		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.ptr) })
 		return atom, nil
 	} else {
 		s := C.pkgcraft_last_error()
@@ -104,7 +104,7 @@ func NewAtomCachedWithEapi(s string, eapi *Eapi) (*Atom, error) {
 // Return an atom's category.
 func (a *Atom) category() string {
 	if a._category == "" {
-		s := C.pkgcraft_atom_category(a.atom)
+		s := C.pkgcraft_atom_category(a.ptr)
 		defer C.pkgcraft_str_free(s)
 		a._category = C.GoString(s)
 	}
@@ -114,7 +114,7 @@ func (a *Atom) category() string {
 // Return an atom's package name.
 func (a *Atom) pn() string {
 	if a._package == "" {
-		s := C.pkgcraft_atom_package(a.atom)
+		s := C.pkgcraft_atom_package(a.ptr)
 		defer C.pkgcraft_str_free(s)
 		a._package = C.GoString(s)
 	}
@@ -124,7 +124,7 @@ func (a *Atom) pn() string {
 // Return an atom's version.
 func (a *Atom) version() *Version {
 	if a._version == nil {
-		ptr := C.pkgcraft_atom_version(a.atom)
+		ptr := C.pkgcraft_atom_version(a.ptr)
 		if ptr != nil {
 			a._version = &Version{ptr}
 		} else {
@@ -136,41 +136,41 @@ func (a *Atom) version() *Version {
 
 // Return an atom's revision.
 func (a *Atom) revision() string {
-	s := C.pkgcraft_atom_revision(a.atom)
+	s := C.pkgcraft_atom_revision(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's blocker.
 func (a *Atom) blocker() Blocker {
-	i := C.pkgcraft_atom_blocker(a.atom)
+	i := C.pkgcraft_atom_blocker(a.ptr)
 	return Blocker(i)
 }
 
 // Return an atom's slot.
 func (a *Atom) slot() string {
-	s := C.pkgcraft_atom_slot(a.atom)
+	s := C.pkgcraft_atom_slot(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's subslot.
 func (a *Atom) subslot() string {
-	s := C.pkgcraft_atom_subslot(a.atom)
+	s := C.pkgcraft_atom_subslot(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's slot operator.
 func (a *Atom) slot_op() SlotOperator {
-	i := C.pkgcraft_atom_slot_op(a.atom)
+	i := C.pkgcraft_atom_slot_op(a.ptr)
 	return SlotOperator(i)
 }
 
 // Return an atom's USE deps.
 func (a *Atom) use_deps() []string {
 	var length C.size_t
-	array := C.pkgcraft_atom_use_deps(a.atom, &length)
+	array := C.pkgcraft_atom_use_deps(a.ptr, &length)
 	use_slice := unsafe.Slice(array, length)
 	use := []string{}
 	for _, s := range use_slice {
@@ -182,29 +182,29 @@ func (a *Atom) use_deps() []string {
 
 // Return an atom's repo.
 func (a *Atom) repo() string {
-	s := C.pkgcraft_atom_repo(a.atom)
+	s := C.pkgcraft_atom_repo(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return the concatenated string of an atom's category and package.
 func (a *Atom) key() string {
-	s := C.pkgcraft_atom_key(a.atom)
+	s := C.pkgcraft_atom_key(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return the concatenated string of an atom's category, package, and version.
 func (a *Atom) cpv() string {
-	s := C.pkgcraft_atom_cpv(a.atom)
+	s := C.pkgcraft_atom_cpv(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
-func (a *Atom) cmp(b *Atom) int {
-	return int(C.pkgcraft_atom_cmp(a.atom, b.atom))
+func (a1 *Atom) cmp(a2 *Atom) int {
+	return int(C.pkgcraft_atom_cmp(a1.ptr, a2.ptr))
 }
 
 type Atoms []*Atom
@@ -214,14 +214,14 @@ func (s Atoms) Less(i, j int) bool { return s[i].cmp(s[j]) == -1 }
 func (s Atoms) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 func (a *Atom) String() string {
-	s := C.pkgcraft_atom_str(a.atom)
+	s := C.pkgcraft_atom_str(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 func (a *Atom) hash() uint64 {
 	if a._hash == 0 {
-		a._hash = uint64(C.pkgcraft_atom_hash(a.atom))
+		a._hash = uint64(C.pkgcraft_atom_hash(a.ptr))
 	}
 	return a._hash
 }
@@ -237,8 +237,8 @@ func NewCpv(s string) (*Cpv, error) {
 	ptr := C.pkgcraft_cpv_new(cpv_str)
 
 	if ptr != nil {
-		cpv := &Cpv{Atom{atom: ptr, _version: nil}}
-		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.atom) })
+		cpv := &Cpv{Atom{ptr: ptr}}
+		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.ptr) })
 		return cpv, nil
 	} else {
 		s := C.pkgcraft_last_error()

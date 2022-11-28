@@ -15,26 +15,26 @@ type Repo interface {
 }
 
 type BaseRepo struct {
-	repo *C.Repo
+	ptr *C.Repo
 }
 
 // Return a repo's id.
 func (r *BaseRepo) id() string {
-	s := C.pkgcraft_repo_id(r.repo)
+	s := C.pkgcraft_repo_id(r.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return a repo's path.
 func (r *BaseRepo) path() string {
-	s := C.pkgcraft_repo_path(r.repo)
+	s := C.pkgcraft_repo_path(r.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return if a repo is empty.
 func (r *BaseRepo) is_empty() bool {
-	return bool(C.pkgcraft_repo_is_empty(r.repo))
+	return bool(C.pkgcraft_repo_is_empty(r.ptr))
 }
 
 type EbuildRepo struct {
@@ -57,8 +57,8 @@ const (
 func repo_from_ptr(r *C.Repo) (Repo) {
 	var repo Repo
 
-	base := &BaseRepo{repo: r}
-	runtime.SetFinalizer(base, func(r *BaseRepo) { C.pkgcraft_repo_free(r.repo) })
+	base := &BaseRepo{ptr: r}
+	runtime.SetFinalizer(base, func(r *BaseRepo) { C.pkgcraft_repo_free(r.ptr) })
 
 	format := RepoFormat(C.pkgcraft_repo_format(r))
 	if format == RepoFormatEbuild {

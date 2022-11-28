@@ -11,7 +11,7 @@ import (
 )
 
 type Config struct {
-	config *C.Config
+	ptr *C.Config
 	// cached fields
 	_repos *Repos
 }
@@ -20,8 +20,8 @@ type Config struct {
 func NewConfig() (*Config, error) {
 	ptr := C.pkgcraft_config_new()
 	if ptr != nil {
-		config := &Config{config: ptr, _repos: nil}
-		runtime.SetFinalizer(config, func(c *Config) { C.pkgcraft_config_free(c.config) })
+		config := &Config{ptr: ptr}
+		runtime.SetFinalizer(config, func(c *Config) { C.pkgcraft_config_free(c.ptr) })
 		return config, nil
 	} else {
 		s := C.pkgcraft_last_error()
@@ -33,7 +33,7 @@ func NewConfig() (*Config, error) {
 // Return the config's repo mapping.
 func (c *Config) repos() (*Repos) {
 	if c._repos == nil {
-		c._repos = repos_from_config(c.config)
+		c._repos = repos_from_config(c)
 	}
 	return c._repos
 }
@@ -44,7 +44,7 @@ func (c *Config) load_repos_conf(path string) (map[string]Repo, error) {
 
 	path_str := C.CString(path)
 	defer C.free(unsafe.Pointer(path_str))
-	repos := C.pkgcraft_config_load_repos_conf(c.config, path_str, &length)
+	repos := C.pkgcraft_config_load_repos_conf(c.ptr, path_str, &length)
 
 	if repos != nil {
 		// force config repos refresh
@@ -61,15 +61,15 @@ func (c *Config) load_repos_conf(path string) (map[string]Repo, error) {
 }
 
 type Repos struct {
-	config *C.Config
+	config *Config
 	// cached fields
 	_repos map[string]Repo
 }
 
 // Return a Repos object for a given config.
-func repos_from_config(config *C.Config) (*Repos) {
+func repos_from_config(config *Config) (*Repos) {
 	var length C.size_t
-	repos := C.pkgcraft_config_repos(config, &length)
+	repos := C.pkgcraft_config_repos(config.ptr, &length)
 	m := repos_to_map(unsafe.Slice(repos, length))
 	defer C.pkgcraft_repos_free(repos, length)
 	return &Repos{config: config, _repos: m}

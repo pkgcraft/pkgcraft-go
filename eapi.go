@@ -16,11 +16,11 @@ var EAPI_LATEST = EAPIS_OFFICIAL[strconv.Itoa(len(EAPIS_OFFICIAL)-1)]
 // Convert an array of Eapi pointers to a mapping.
 func eapis_to_map(eapis []*C.Eapi) map[string]Eapi {
 	m := make(map[string]Eapi)
-	for _, eapi := range eapis {
-		s := C.pkgcraft_eapi_as_str(eapi)
+	for _, ptr := range eapis {
+		s := C.pkgcraft_eapi_as_str(ptr)
 		id := C.GoString(s)
 		defer C.pkgcraft_str_free(s)
-		m[id] = Eapi{eapi: eapi, _id: id}
+		m[id] = Eapi{ptr: ptr, _id: id}
 	}
 	return m
 }
@@ -44,7 +44,7 @@ func get_eapis() map[string]Eapi {
 }
 
 type Eapi struct {
-	eapi *C.Eapi
+	ptr *C.Eapi
 	// cached fields
 	_id string
 }
@@ -58,5 +58,5 @@ func (e *Eapi) String() string {
 func (e *Eapi) has(s string) bool {
 	cstr := C.CString(s)
 	defer C.free(unsafe.Pointer(cstr))
-	return C.pkgcraft_eapi_has(e.eapi, cstr) == true
+	return C.pkgcraft_eapi_has(e.ptr, cstr) == true
 }
