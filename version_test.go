@@ -1,4 +1,4 @@
-package pkgcraft
+package pkgcraft_test
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/pkgcraft/pkgcraft-go"
 )
 
 func TestVersion(t *testing.T) {
@@ -13,17 +15,17 @@ func TestVersion(t *testing.T) {
 
 	// non-revision
 	version, _ = NewVersion("1")
-	assert.Equal(t, version.revision(), "0")
+	assert.Equal(t, version.Revision(), "0")
 	assert.Equal(t, fmt.Sprintf("%s", version), "1")
 
 	// revisioned
 	version, _ = NewVersion("1-r1")
-	assert.Equal(t, version.revision(), "1")
+	assert.Equal(t, version.Revision(), "1")
 	assert.Equal(t, fmt.Sprintf("%s", version), "1-r1")
 
 	// explicit '0' revision
 	version, _ = NewVersion("1-r0")
-	assert.Equal(t, version.revision(), "0")
+	assert.Equal(t, version.Revision(), "0")
 	assert.Equal(t, fmt.Sprintf("%s", version), "1-r0")
 
 	// invalid
@@ -32,23 +34,23 @@ func TestVersion(t *testing.T) {
 
 	// Version with op
 	version, _ = NewVersionWithOp(">1-r2")
-	assert.Equal(t, version.revision(), "2")
+	assert.Equal(t, version.Revision(), "2")
 	assert.Equal(t, fmt.Sprintf("%s", version), ">1-r2")
 
 	// v1 < v2
 	v1, _ := NewVersion("1")
 	v2, _ := NewVersion("2")
-	assert.Equal(t, v1.cmp(v2), -1)
+	assert.Equal(t, v1.Cmp(v2), -1)
 
 	// v1 == v2
 	v1, _ = NewVersion("2")
 	v2, _ = NewVersion("2")
-	assert.Equal(t, v1.cmp(v2), 0)
+	assert.Equal(t, v1.Cmp(v2), 0)
 
 	// v1 > v2
 	v1, _ = NewVersion("2")
 	v2, _ = NewVersion("1")
-	assert.Equal(t, v1.cmp(v2), 1)
+	assert.Equal(t, v1.Cmp(v2), 1)
 
 	// hashing equal values
 	v1, _ = NewVersion("1.0.2")
@@ -56,10 +58,10 @@ func TestVersion(t *testing.T) {
 	v3, _ := NewVersion("1.000.2")
 	v4, _ := NewVersion("1.00.2-r0")
 	m := make(map[uint64]bool)
-	m[v1.hash()] = true
-	m[v2.hash()] = true
-	m[v3.hash()] = true
-	m[v4.hash()] = true
+	m[v1.Hash()] = true
+	m[v2.Hash()] = true
+	m[v3.Hash()] = true
+	m[v4.Hash()] = true
 	assert.Equal(t, len(m), 1)
 
 	// hashing unequal values
@@ -67,9 +69,9 @@ func TestVersion(t *testing.T) {
 	v2, _ = NewVersion("0.01")
 	v3, _ = NewVersion("0.001")
 	m = make(map[uint64]bool)
-	m[v1.hash()] = true
-	m[v2.hash()] = true
-	m[v3.hash()] = true
+	m[v1.Hash()] = true
+	m[v2.Hash()] = true
+	m[v3.Hash()] = true
 	assert.Equal(t, len(m), 3)
 }
 

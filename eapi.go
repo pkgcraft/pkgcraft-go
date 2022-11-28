@@ -55,7 +55,7 @@ func (e *Eapi) String() string {
 }
 
 // Check if an EAPI has a given feature.
-func (e *Eapi) has(s string) bool {
+func (e *Eapi) Has(s string) bool {
 	cstr := C.CString(s)
 	defer C.free(unsafe.Pointer(cstr))
 	return C.pkgcraft_eapi_has(e.ptr, cstr) == true

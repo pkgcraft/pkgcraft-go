@@ -47,7 +47,7 @@ func NewVersionWithOp(s string) (*Version, error) {
 }
 
 // Return a version's revision.
-func (v *Version) revision() string {
+func (v *Version) Revision() string {
 	s := C.pkgcraft_version_revision(v.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
@@ -56,14 +56,14 @@ func (v *Version) revision() string {
 // Compare a version with another version returning -1, 0, or 1 if the first
 // version is less than, equal to, or greater than the second version,
 // respectively.
-func (v1 *Version) cmp(v2 *Version) int {
+func (v1 *Version) Cmp(v2 *Version) int {
 	return int(C.pkgcraft_version_cmp(v1.ptr, v2.ptr))
 }
 
 type Versions []*Version
 
 func (s Versions) Len() int           { return len(s) }
-func (s Versions) Less(i, j int) bool { return s[i].cmp(s[j]) == -1 }
+func (s Versions) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
 func (s Versions) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 func (v *Version) String() string {
@@ -72,6 +72,6 @@ func (v *Version) String() string {
 	return C.GoString(s)
 }
 
-func (v *Version) hash() uint64 {
+func (v *Version) Hash() uint64 {
 	return uint64(C.pkgcraft_version_hash(v.ptr))
 }

@@ -31,7 +31,7 @@ func NewConfig() (*Config, error) {
 }
 
 // Return the config's repo mapping.
-func (c *Config) repos() (*Repos) {
+func (c *Config) Repos() (*Repos) {
 	if c._repos == nil {
 		c._repos = repos_from_config(c)
 	}
@@ -39,7 +39,7 @@ func (c *Config) repos() (*Repos) {
 }
 
 // Load repos from a portage-compatible repos.conf directory or file.
-func (c *Config) load_repos_conf(path string) (map[string]Repo, error) {
+func (c *Config) LoadReposConf(path string) (map[string]Repo, error) {
 	var length C.size_t
 
 	path_str := C.CString(path)
@@ -88,6 +88,6 @@ func repos_to_map(repos []*C.Repo) map[string]Repo {
 }
 
 // Return a Repos object length.
-func (r *Repos) len() int {
+func (r *Repos) Len() int {
 	return len(r._repos)
 }

@@ -102,7 +102,7 @@ func NewAtomCachedWithEapi(s string, eapi *Eapi) (*Atom, error) {
 }
 
 // Return an atom's category.
-func (a *Atom) category() string {
+func (a *Atom) Category() string {
 	if a._category == "" {
 		s := C.pkgcraft_atom_category(a.ptr)
 		defer C.pkgcraft_str_free(s)
@@ -112,7 +112,7 @@ func (a *Atom) category() string {
 }
 
 // Return an atom's package name.
-func (a *Atom) pn() string {
+func (a *Atom) PN() string {
 	if a._package == "" {
 		s := C.pkgcraft_atom_package(a.ptr)
 		defer C.pkgcraft_str_free(s)
@@ -122,7 +122,7 @@ func (a *Atom) pn() string {
 }
 
 // Return an atom's version.
-func (a *Atom) version() *Version {
+func (a *Atom) Version() *Version {
 	if a._version == nil {
 		ptr := C.pkgcraft_atom_version(a.ptr)
 		if ptr != nil {
@@ -135,40 +135,40 @@ func (a *Atom) version() *Version {
 }
 
 // Return an atom's revision.
-func (a *Atom) revision() string {
+func (a *Atom) Revision() string {
 	s := C.pkgcraft_atom_revision(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's blocker.
-func (a *Atom) blocker() Blocker {
+func (a *Atom) Blocker() Blocker {
 	i := C.pkgcraft_atom_blocker(a.ptr)
 	return Blocker(i)
 }
 
 // Return an atom's slot.
-func (a *Atom) slot() string {
+func (a *Atom) Slot() string {
 	s := C.pkgcraft_atom_slot(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's subslot.
-func (a *Atom) subslot() string {
+func (a *Atom) Subslot() string {
 	s := C.pkgcraft_atom_subslot(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's slot operator.
-func (a *Atom) slot_op() SlotOperator {
+func (a *Atom) SlotOp() SlotOperator {
 	i := C.pkgcraft_atom_slot_op(a.ptr)
 	return SlotOperator(i)
 }
 
 // Return an atom's USE deps.
-func (a *Atom) use_deps() []string {
+func (a *Atom) UseDeps() []string {
 	var length C.size_t
 	array := C.pkgcraft_atom_use_deps(a.ptr, &length)
 	use_slice := unsafe.Slice(array, length)
@@ -181,21 +181,21 @@ func (a *Atom) use_deps() []string {
 }
 
 // Return an atom's repo.
-func (a *Atom) repo() string {
+func (a *Atom) Repo() string {
 	s := C.pkgcraft_atom_repo(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return the concatenated string of an atom's category and package.
-func (a *Atom) key() string {
+func (a *Atom) Key() string {
 	s := C.pkgcraft_atom_key(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return the concatenated string of an atom's category, package, and version.
-func (a *Atom) cpv() string {
+func (a *Atom) CPV() string {
 	s := C.pkgcraft_atom_cpv(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
@@ -203,14 +203,14 @@ func (a *Atom) cpv() string {
 
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
-func (a1 *Atom) cmp(a2 *Atom) int {
+func (a1 *Atom) Cmp(a2 *Atom) int {
 	return int(C.pkgcraft_atom_cmp(a1.ptr, a2.ptr))
 }
 
 type Atoms []*Atom
 
 func (s Atoms) Len() int           { return len(s) }
-func (s Atoms) Less(i, j int) bool { return s[i].cmp(s[j]) == -1 }
+func (s Atoms) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
 func (s Atoms) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 func (a *Atom) String() string {
@@ -219,7 +219,7 @@ func (a *Atom) String() string {
 	return C.GoString(s)
 }
 
-func (a *Atom) hash() uint64 {
+func (a *Atom) Hash() uint64 {
 	if a._hash == 0 {
 		a._hash = uint64(C.pkgcraft_atom_hash(a.ptr))
 	}

@@ -1,4 +1,4 @@
-package pkgcraft
+package pkgcraft_test
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/pkgcraft/pkgcraft-go"
 )
 
 func TestAtom(t *testing.T) {
@@ -14,51 +16,51 @@ func TestAtom(t *testing.T) {
 
 	// unversioned
 	atom, _ = NewAtom("cat/pkg")
-	assert.Equal(t, atom.category(), "cat")
-	assert.Equal(t, atom.pn(), "pkg")
-	assert.Equal(t, atom.version(), &Version{})
-	assert.Equal(t, atom.revision(), "")
-	assert.Equal(t, atom.blocker(), BlockerNone)
-	assert.Equal(t, atom.slot(), "")
-	assert.Equal(t, atom.subslot(), "")
-	assert.Equal(t, atom.slot_op(), SlotOpNone)
-	assert.Equal(t, atom.use_deps(), []string{})
-	assert.Equal(t, atom.repo(), "")
-	assert.Equal(t, atom.key(), "cat/pkg")
-	assert.Equal(t, atom.cpv(), "cat/pkg")
+	assert.Equal(t, atom.Category(), "cat")
+	assert.Equal(t, atom.PN(), "pkg")
+	assert.Equal(t, atom.Version(), &Version{})
+	assert.Equal(t, atom.Revision(), "")
+	assert.Equal(t, atom.Blocker(), BlockerNone)
+	assert.Equal(t, atom.Slot(), "")
+	assert.Equal(t, atom.Subslot(), "")
+	assert.Equal(t, atom.SlotOp(), SlotOpNone)
+	assert.Equal(t, atom.UseDeps(), []string{})
+	assert.Equal(t, atom.Repo(), "")
+	assert.Equal(t, atom.Key(), "cat/pkg")
+	assert.Equal(t, atom.CPV(), "cat/pkg")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg")
 
 	// versioned
 	atom, _ = NewAtom("=cat/pkg-1-r2")
-	assert.Equal(t, atom.category(), "cat")
-	assert.Equal(t, atom.pn(), "pkg")
+	assert.Equal(t, atom.Category(), "cat")
+	assert.Equal(t, atom.PN(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
-	assert.Equal(t, atom.version(), ver)
-	assert.Equal(t, atom.revision(), "2")
-	assert.Equal(t, atom.key(), "cat/pkg")
-	assert.Equal(t, atom.cpv(), "cat/pkg-1-r2")
+	assert.Equal(t, atom.Version(), ver)
+	assert.Equal(t, atom.Revision(), "2")
+	assert.Equal(t, atom.Key(), "cat/pkg")
+	assert.Equal(t, atom.CPV(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-1-r2")
 
 	// blocker
 	atom, _ = NewAtom("!cat/pkg")
-	assert.Equal(t, atom.blocker(), BlockerWeak)
+	assert.Equal(t, atom.Blocker(), BlockerWeak)
 	assert.Equal(t, fmt.Sprintf("%s", atom), "!cat/pkg")
 
 	// subslotted
 	atom, _ = NewAtom("cat/pkg:1/2")
-	assert.Equal(t, atom.slot(), "1")
-	assert.Equal(t, atom.subslot(), "2")
+	assert.Equal(t, atom.Slot(), "1")
+	assert.Equal(t, atom.Subslot(), "2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:1/2")
 
 	// slot operator
 	atom, _ = NewAtom("cat/pkg:0=")
-	assert.Equal(t, atom.slot(), "0")
-	assert.Equal(t, atom.slot_op(), SlotOpEqual)
+	assert.Equal(t, atom.Slot(), "0")
+	assert.Equal(t, atom.SlotOp(), SlotOpEqual)
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:0=")
 
 	// repo
 	atom, _ = NewAtom("cat/pkg::repo")
-	assert.Equal(t, atom.repo(), "repo")
+	assert.Equal(t, atom.Repo(), "repo")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg::repo")
 
 	// repo dep invalid on official EAPIs
@@ -67,24 +69,24 @@ func TestAtom(t *testing.T) {
 
 	// all fields
 	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
-	assert.Equal(t, atom.category(), "cat")
-	assert.Equal(t, atom.pn(), "pkg")
+	assert.Equal(t, atom.Category(), "cat")
+	assert.Equal(t, atom.PN(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
-	assert.Equal(t, atom.version(), ver)
-	assert.Equal(t, atom.revision(), "2")
-	assert.Equal(t, atom.blocker(), BlockerStrong)
-	assert.Equal(t, atom.slot(), "3")
-	assert.Equal(t, atom.subslot(), "4")
-	assert.Equal(t, atom.slot_op(), SlotOpEqual)
-	assert.Equal(t, atom.use_deps(), []string{"a", "b", "c"})
-	assert.Equal(t, atom.repo(), "repo")
-	assert.Equal(t, atom.key(), "cat/pkg")
-	assert.Equal(t, atom.cpv(), "cat/pkg-1-r2")
+	assert.Equal(t, atom.Version(), ver)
+	assert.Equal(t, atom.Revision(), "2")
+	assert.Equal(t, atom.Blocker(), BlockerStrong)
+	assert.Equal(t, atom.Slot(), "3")
+	assert.Equal(t, atom.Subslot(), "4")
+	assert.Equal(t, atom.SlotOp(), SlotOpEqual)
+	assert.Equal(t, atom.UseDeps(), []string{"a", "b", "c"})
+	assert.Equal(t, atom.Repo(), "repo")
+	assert.Equal(t, atom.Key(), "cat/pkg")
+	assert.Equal(t, atom.CPV(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 
 	// verify cached atoms reuse objects
 	c1, _ = NewAtomCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
-	assert.Equal(t, atom.cmp(c1), 0)
+	assert.Equal(t, atom.Cmp(c1), 0)
 	assert.True(t, atom != c1)
 	c2, _ = NewAtomCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.True(t, c1 == c2)
@@ -95,17 +97,17 @@ func TestAtom(t *testing.T) {
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")
 	a2, _ := NewAtom("=cat/pkg-2")
-	assert.Equal(t, a1.cmp(a2), -1)
+	assert.Equal(t, a1.Cmp(a2), -1)
 
 	// a1 == a2
 	a1, _ = NewAtom("=cat/pkg-2")
 	a2, _ = NewAtom("=cat/pkg-2")
-	assert.Equal(t, a1.cmp(a2), 0)
+	assert.Equal(t, a1.Cmp(a2), 0)
 
 	// a1 > a2
 	a1, _ = NewAtom("=cat/pkg-2")
 	a2, _ = NewAtom("=cat/pkg-1")
-	assert.Equal(t, a1.cmp(a2), 1)
+	assert.Equal(t, a1.Cmp(a2), 1)
 
 	// hashing equal values
 	a1, _ = NewAtom("=cat/pkg-1.0.2")
@@ -113,10 +115,10 @@ func TestAtom(t *testing.T) {
 	a3, _ := NewAtom("=cat/pkg-1.000.2")
 	a4, _ := NewAtom("=cat/pkg-1.00.2-r0")
 	m := make(map[uint64]bool)
-	m[a1.hash()] = true
-	m[a2.hash()] = true
-	m[a3.hash()] = true
-	m[a4.hash()] = true
+	m[a1.Hash()] = true
+	m[a2.Hash()] = true
+	m[a3.Hash()] = true
+	m[a4.Hash()] = true
 	assert.Equal(t, len(m), 1)
 
 	// hashing unequal values
@@ -124,9 +126,9 @@ func TestAtom(t *testing.T) {
 	a2, _ = NewAtom("=cat/pkg-0.01")
 	a3, _ = NewAtom("=cat/pkg-0.001")
 	m = make(map[uint64]bool)
-	m[a1.hash()] = true
-	m[a2.hash()] = true
-	m[a3.hash()] = true
+	m[a1.Hash()] = true
+	m[a2.Hash()] = true
+	m[a3.Hash()] = true
 	assert.Equal(t, len(m), 3)
 }
 
@@ -191,19 +193,19 @@ func TestCpv(t *testing.T) {
 
 	// valid
 	cpv, _ = NewCpv("cat/pkg-1-r2")
-	assert.Equal(t, cpv.category(), "cat")
-	assert.Equal(t, cpv.pn(), "pkg")
+	assert.Equal(t, cpv.Category(), "cat")
+	assert.Equal(t, cpv.PN(), "pkg")
 	ver, _ = NewVersion("1-r2")
-	assert.Equal(t, cpv.version(), ver)
-	assert.Equal(t, cpv.revision(), "2")
-	assert.Equal(t, cpv.key(), "cat/pkg")
-	assert.Equal(t, cpv.cpv(), "cat/pkg-1-r2")
+	assert.Equal(t, cpv.Version(), ver)
+	assert.Equal(t, cpv.Revision(), "2")
+	assert.Equal(t, cpv.Key(), "cat/pkg")
+	assert.Equal(t, cpv.CPV(), "cat/pkg-1-r2")
 	assert.Equal(t, fmt.Sprintf("%s", cpv), "cat/pkg-1-r2")
 
 	cpv, _ = NewCpv("cat/pkg-0-r0")
 	ver, _ = NewVersion("0-r0")
-	assert.Equal(t, cpv.version(), ver)
-	assert.Equal(t, cpv.revision(), "0")
+	assert.Equal(t, cpv.Version(), ver)
+	assert.Equal(t, cpv.Revision(), "0")
 	assert.Equal(t, fmt.Sprintf("%s", cpv), "cat/pkg-0-r0")
 
 	// invalid

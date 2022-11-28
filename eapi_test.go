@@ -1,9 +1,11 @@
-package pkgcraft
+package pkgcraft_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/pkgcraft/pkgcraft-go"
 )
 
 func TestEapiGlobals(t *testing.T) {
@@ -16,6 +18,6 @@ func TestEapiGlobals(t *testing.T) {
 
 func TestEapiHas(t *testing.T) {
 	eapi := EAPIS["1"]
-	assert.False(t, eapi.has("nonexistent_feature"))
-	assert.True(t, eapi.has("slot_deps"))
+	assert.False(t, eapi.Has("nonexistent_feature"))
+	assert.True(t, eapi.Has("slot_deps"))
 }

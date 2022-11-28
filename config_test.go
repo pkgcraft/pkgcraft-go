@@ -1,9 +1,11 @@
-package pkgcraft
+package pkgcraft_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/pkgcraft/pkgcraft-go"
 )
 
 func TestConfig(t *testing.T) {
@@ -11,5 +13,5 @@ func TestConfig(t *testing.T) {
 
 	// empty
 	config, _ = NewConfig()
-	assert.Equal(t, config.repos().len(), 0)
+	assert.Equal(t, config.Repos().Len(), 0)
 }
