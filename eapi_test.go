@@ -1,6 +1,7 @@
 package pkgcraft_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,12 @@ func TestEapiGlobals(t *testing.T) {
 }
 
 func TestEapiHas(t *testing.T) {
-	eapi := EAPIS["1"]
-	assert.False(t, eapi.Has("nonexistent_feature"))
-	assert.True(t, eapi.Has("slot_deps"))
+	assert.False(t, EAPIS["1"].Has("nonexistent_feature"))
+	assert.True(t, EAPIS["1"].Has("slot_deps"))
+}
+
+func TestEapiString(t *testing.T) {
+	for id, eapi := range EAPIS {
+		assert.Equal(t, fmt.Sprintf("%s", eapi), id)
+	}
 }
