@@ -1,4 +1,4 @@
-package atom
+package pkgcraft
 
 // #cgo pkg-config: pkgcraft
 // #include <pkgcraft.h>
@@ -44,23 +44,17 @@ type Pair[T, U any] struct {
 	Second U
 }
 
-func new_atom(s string, eapi string) (*Atom, error) {
-	atom_str := C.CString(s)
-	defer C.free(unsafe.Pointer(atom_str))
-
-	var eapi_p *C.Eapi
-	if eapi != "" {
-		eapi_str := C.CString(eapi)
-		defer C.free(unsafe.Pointer(eapi_str))
-		eapi_p = C.pkgcraft_eapi_from_str(eapi_str)
-		if eapi_p == nil {
-			s := C.pkgcraft_last_error()
-			defer C.pkgcraft_str_free(s)
-			return nil, errors.New(C.GoString(s))
-		}
+func new_atom(s string, eapi *Eapi) (*Atom, error) {
+	var eapi_ptr *C.Eapi
+	if eapi == nil {
+		eapi_ptr = nil
+	} else {
+		eapi_ptr = eapi.eapi
 	}
 
-	ptr := C.pkgcraft_atom_new(atom_str, eapi_p)
+	atom_str := C.CString(s)
+	defer C.free(unsafe.Pointer(atom_str))
+	ptr := C.pkgcraft_atom_new(atom_str, eapi_ptr)
 
 	if ptr != nil {
 		atom := &Atom{atom: ptr, _version: nil}
@@ -74,17 +68,17 @@ func new_atom(s string, eapi string) (*Atom, error) {
 }
 
 // Parse a string into an atom using the latest EAPI.
-func New(s string) (*Atom, error) {
-	return new_atom(s, "")
+func NewAtom(s string) (*Atom, error) {
+	return new_atom(s, nil)
 }
 
 // Parse a string into an atom using a specific EAPI.
-func NewWithEapi(s string, eapi string) (*Atom, error) {
+func NewAtomWithEapi(s string, eapi *Eapi) (*Atom, error) {
 	return new_atom(s, eapi)
 }
 
-func new_cached_atom(s string, eapi string) (*Atom, error) {
-	key := Pair[string, string]{s, eapi}
+func new_cached_atom(s string, eapi *Eapi) (*Atom, error) {
+	key := Pair[string, *Eapi]{s, eapi}
 	v, ok := atom_cache.Get(key)
 	if ok {
 		return v.(*Atom), nil
@@ -98,12 +92,12 @@ func new_cached_atom(s string, eapi string) (*Atom, error) {
 }
 
 // Return a cached Atom if one exists, otherwise return a new instance.
-func NewCached(s string) (*Atom, error) {
-	return new_cached_atom(s, "")
+func NewAtomCached(s string) (*Atom, error) {
+	return new_cached_atom(s, nil)
 }
 
 // Return a cached Atom if one exists, otherwise parse using a specific EAPI.
-func NewCachedWithEapi(s string, eapi string) (*Atom, error) {
+func NewAtomCachedWithEapi(s string, eapi *Eapi) (*Atom, error) {
 	return new_cached_atom(s, eapi)
 }
 

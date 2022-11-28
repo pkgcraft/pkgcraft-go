@@ -1,4 +1,4 @@
-package atom
+package pkgcraft
 
 import (
 	"fmt"

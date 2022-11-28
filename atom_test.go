@@ -1,4 +1,4 @@
-package atom
+package pkgcraft
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func TestAtom(t *testing.T) {
 	var ver *Version
 
 	// unversioned
-	atom, _ = New("cat/pkg")
+	atom, _ = NewAtom("cat/pkg")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
 	assert.Equal(t, atom.version(), &Version{})
@@ -29,7 +29,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg")
 
 	// versioned
-	atom, _ = New("=cat/pkg-1-r2")
+	atom, _ = NewAtom("=cat/pkg-1-r2")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
@@ -40,37 +40,33 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s", atom), "=cat/pkg-1-r2")
 
 	// blocker
-	atom, _ = New("!cat/pkg")
+	atom, _ = NewAtom("!cat/pkg")
 	assert.Equal(t, atom.blocker(), BlockerWeak)
 	assert.Equal(t, fmt.Sprintf("%s", atom), "!cat/pkg")
 
 	// subslotted
-	atom, _ = New("cat/pkg:1/2")
+	atom, _ = NewAtom("cat/pkg:1/2")
 	assert.Equal(t, atom.slot(), "1")
 	assert.Equal(t, atom.subslot(), "2")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:1/2")
 
 	// slot operator
-	atom, _ = New("cat/pkg:0=")
+	atom, _ = NewAtom("cat/pkg:0=")
 	assert.Equal(t, atom.slot(), "0")
 	assert.Equal(t, atom.slot_op(), SlotOpEqual)
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg:0=")
 
 	// repo
-	atom, _ = New("cat/pkg::repo")
+	atom, _ = NewAtom("cat/pkg::repo")
 	assert.Equal(t, atom.repo(), "repo")
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg::repo")
 
 	// repo dep invalid on official EAPIs
-	atom, _ = NewWithEapi("cat/pkg::repo", "8")
-	assert.Nil(t, atom)
-
-	// unknown EAPI
-	atom, _ = NewWithEapi("cat/pkg", "unknown")
+	atom, _ = NewAtomWithEapi("cat/pkg::repo", &EAPI_LATEST)
 	assert.Nil(t, atom)
 
 	// all fields
-	atom, _ = New("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
@@ -87,35 +83,35 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s", atom), "!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 
 	// verify cached atoms reuse objects
-	c1, _ = NewCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	c1, _ = NewAtomCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.cmp(c1), 0)
 	assert.True(t, atom != c1)
-	c2, _ = NewCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	c2, _ = NewAtomCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.True(t, c1 == c2)
-	c1, _ = NewCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", "8")
-	c2, _ = NewCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", "8")
+	c1, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", &EAPI_LATEST)
+	c2, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", &EAPI_LATEST)
 	assert.True(t, c1 == c2)
 
 	// a1 < a2
-	a1, _ := New("=cat/pkg-1")
-	a2, _ := New("=cat/pkg-2")
+	a1, _ := NewAtom("=cat/pkg-1")
+	a2, _ := NewAtom("=cat/pkg-2")
 	assert.Equal(t, a1.cmp(a2), -1)
 
 	// a1 == a2
-	a1, _ = New("=cat/pkg-2")
-	a2, _ = New("=cat/pkg-2")
+	a1, _ = NewAtom("=cat/pkg-2")
+	a2, _ = NewAtom("=cat/pkg-2")
 	assert.Equal(t, a1.cmp(a2), 0)
 
 	// a1 > a2
-	a1, _ = New("=cat/pkg-2")
-	a2, _ = New("=cat/pkg-1")
+	a1, _ = NewAtom("=cat/pkg-2")
+	a2, _ = NewAtom("=cat/pkg-1")
 	assert.Equal(t, a1.cmp(a2), 1)
 
 	// hashing equal values
-	a1, _ = New("=cat/pkg-1.0.2")
-	a2, _ = New("=cat/pkg-1.0.2-r0")
-	a3, _ := New("=cat/pkg-1.000.2")
-	a4, _ := New("=cat/pkg-1.00.2-r0")
+	a1, _ = NewAtom("=cat/pkg-1.0.2")
+	a2, _ = NewAtom("=cat/pkg-1.0.2-r0")
+	a3, _ := NewAtom("=cat/pkg-1.000.2")
+	a4, _ := NewAtom("=cat/pkg-1.00.2-r0")
 	m := make(map[uint64]bool)
 	m[a1.hash()] = true
 	m[a2.hash()] = true
@@ -124,9 +120,9 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, len(m), 1)
 
 	// hashing unequal values
-	a1, _ = New("=cat/pkg-0.1")
-	a2, _ = New("=cat/pkg-0.01")
-	a3, _ = New("=cat/pkg-0.001")
+	a1, _ = NewAtom("=cat/pkg-0.1")
+	a2, _ = NewAtom("=cat/pkg-0.01")
+	a3, _ = NewAtom("=cat/pkg-0.001")
 	m = make(map[uint64]bool)
 	m[a1.hash()] = true
 	m[a2.hash()] = true
@@ -144,7 +140,7 @@ func TestAtomChannels(t *testing.T) {
 	go func() {
 		for {
 			s := <-atom_strs
-			atom, _ = New(s)
+			atom, _ = NewAtom(s)
 			atoms <- atom
 		}
 	}()
@@ -158,28 +154,28 @@ func TestAtomChannels(t *testing.T) {
 	}
 }
 
-func BenchmarkNew(b *testing.B) {
+func BenchmarkNewAtom(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		New(fmt.Sprintf("=cat/pkg-%d-r2:3/4=[a,b,c]", i))
+		NewAtom(fmt.Sprintf("=cat/pkg-%d-r2:3/4=[a,b,c]", i))
 	}
 }
 
-func BenchmarkNewStatic(b *testing.B) {
+func BenchmarkNewAtomStatic(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		New("=cat/pkg-1-r2:3/4=[a,b,c]")
+		NewAtom("=cat/pkg-1-r2:3/4=[a,b,c]")
 	}
 }
 
-func BenchmarkNewCachedStatic(b *testing.B) {
+func BenchmarkNewAtomCachedStatic(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		NewCached("=cat/pkg-1-r2:3/4=[a,b,c]")
+		NewAtomCached("=cat/pkg-1-r2:3/4=[a,b,c]")
 	}
 }
 
 func BenchmarkAtomSort(b *testing.B) {
 	var atoms []*Atom
 	for i := 100; i > 0; i-- {
-		a, _ := New(fmt.Sprintf("=cat/pkg-%d", i))
+		a, _ := NewAtom(fmt.Sprintf("=cat/pkg-%d", i))
 		atoms = append(atoms, a)
 	}
 	assert.Equal(b, fmt.Sprintf("%s", atoms[0]), "=cat/pkg-100")

@@ -1,4 +1,4 @@
-package atom
+package pkgcraft
 
 // #cgo pkg-config: pkgcraft
 // #include <pkgcraft.h>
