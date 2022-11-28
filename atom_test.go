@@ -64,7 +64,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s", atom), "cat/pkg::repo")
 
 	// repo dep invalid on official EAPIs
-	atom, _ = NewAtomWithEapi("cat/pkg::repo", &EAPI_LATEST)
+	atom, _ = NewAtomWithEapi("cat/pkg::repo", EAPI_LATEST)
 	assert.Nil(t, atom)
 
 	// all fields
@@ -90,8 +90,8 @@ func TestAtom(t *testing.T) {
 	assert.True(t, atom != c1)
 	c2, _ = NewAtomCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.True(t, c1 == c2)
-	c1, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", &EAPI_LATEST)
-	c2, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", &EAPI_LATEST)
+	c1, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST)
+	c2, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST)
 	assert.True(t, c1 == c2)
 
 	// a1 < a2

@@ -14,31 +14,39 @@ var EAPIS = get_eapis()
 var EAPI_LATEST = EAPIS_OFFICIAL[strconv.Itoa(len(EAPIS_OFFICIAL)-1)]
 
 // Convert an array of Eapi pointers to a mapping.
-func eapis_to_map(eapis []*C.Eapi) map[string]Eapi {
-	m := make(map[string]Eapi)
-	for _, ptr := range eapis {
-		s := C.pkgcraft_eapi_as_str(ptr)
-		id := C.GoString(s)
-		defer C.pkgcraft_str_free(s)
-		m[id] = Eapi{ptr, id}
+func eapis_to_map(eapis []*C.Eapi, start int) map[string]*Eapi {
+	m := make(map[string]*Eapi)
+	for i, ptr := range eapis {
+		if i >= start {
+			s := C.pkgcraft_eapi_as_str(ptr)
+			id := C.GoString(s)
+			defer C.pkgcraft_str_free(s)
+			m[id] = &Eapi{ptr, id}
+		}
 	}
 	return m
 }
 
 // Return the mapping of all official EAPIs.
-func get_official_eapis() map[string]Eapi {
+func get_official_eapis() map[string]*Eapi {
 	var length C.size_t
 	eapis := C.pkgcraft_eapis_official(&length)
-	m := eapis_to_map(unsafe.Slice(eapis, length))
+	m := eapis_to_map(unsafe.Slice(eapis, length), 0)
 	defer C.pkgcraft_eapis_free(eapis, length)
 	return m
 }
 
 // Return the mapping of all known EAPIs.
-func get_eapis() map[string]Eapi {
+func get_eapis() map[string]*Eapi {
 	var length C.size_t
 	eapis := C.pkgcraft_eapis(&length)
-	m := eapis_to_map(unsafe.Slice(eapis, length))
+	m := make(map[string]*Eapi)
+	for k, v := range EAPIS_OFFICIAL {
+		m[k] = v
+	}
+	for k, v := range eapis_to_map(unsafe.Slice(eapis, length), len(m)) {
+		m[k] = v
+	}
 	defer C.pkgcraft_eapis_free(eapis, length)
 	return m
 }
