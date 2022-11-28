@@ -20,10 +20,6 @@ type BasePkg struct {
 	ptr *C.Pkg
 }
 
-type EbuildPkg struct {
-	*BasePkg
-}
-
 type FakePkg struct {
 	*BasePkg
 }
