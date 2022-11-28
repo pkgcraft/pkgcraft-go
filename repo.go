@@ -91,8 +91,6 @@ const (
 
 // Return a new repo from a given pointer.
 func repo_from_ptr(ptr *C.Repo, ref bool) Repo {
-	var repo Repo
-
 	base := &BaseRepo{ptr: ptr}
 	if !ref {
 		runtime.SetFinalizer(base, func(r *BaseRepo) { C.pkgcraft_repo_free(r.ptr) })
@@ -100,12 +98,10 @@ func repo_from_ptr(ptr *C.Repo, ref bool) Repo {
 
 	format := RepoFormat(C.pkgcraft_repo_format(ptr))
 	if format == RepoFormatEbuild {
-		repo = EbuildRepo{base}
+		return &EbuildRepo{base}
 	} else if format == RepoFormatFake {
-		repo = FakeRepo{base}
+		return &FakeRepo{base}
 	} else {
 		panic("unsupported repo format")
 	}
-
-	return repo
 }

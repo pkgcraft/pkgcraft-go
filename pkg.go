@@ -69,19 +69,15 @@ func (p *BasePkg) String() string {
 
 // Return a new package from a given pointer.
 func pkg_from_ptr(ptr *C.Pkg) Pkg {
-	var pkg Pkg
-
 	base := &BasePkg{ptr: ptr}
 	runtime.SetFinalizer(base, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })
 
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
 	if format == PkgFormatEbuild {
-		pkg = EbuildPkg{base}
+		return &EbuildPkg{base}
 	} else if format == PkgFormatFake {
-		pkg = FakePkg{base}
+		return &FakePkg{base}
 	} else {
 		panic("unsupported pkg format")
 	}
-
-	return pkg
 }
