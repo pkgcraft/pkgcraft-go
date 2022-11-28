@@ -38,6 +38,26 @@ func (c *Config) Repos() (*Repos) {
 	return c._repos
 }
 
+// Add an external repo via its file path.
+func (c *Config) AddRepoPath(path string, id string, priority int) (Repo, error) {
+	path_str := C.CString(path)
+	defer C.free(unsafe.Pointer(path_str))
+	id_str := C.CString(id)
+	defer C.free(unsafe.Pointer(id_str))
+
+	ptr := C.pkgcraft_config_add_repo_path(c.ptr, id_str, C.int(priority), path_str)
+	if ptr == nil {
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return nil, errors.New(C.GoString(s))
+	}
+
+	// force config repos refresh
+	c._repos = nil
+
+	return repo_from_ptr(ptr), nil
+}
+
 // Load repos from a portage-compatible repos.conf directory or file.
 func (c *Config) LoadReposConf(path string) (map[string]Repo, error) {
 	var length C.size_t
