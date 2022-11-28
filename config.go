@@ -31,7 +31,7 @@ func NewConfig() (*Config, error) {
 }
 
 // Return the config's repo mapping.
-func (c *Config) Repos() (*Repos) {
+func (c *Config) Repos() *Repos {
 	if c._repos == nil {
 		c._repos = repos_from_config(c)
 	}
@@ -55,7 +55,7 @@ func (c *Config) AddRepoPath(path string, id string, priority int) (Repo, error)
 	// force config repos refresh
 	c._repos = nil
 
-	return repo_from_ptr(ptr), nil
+	return repo_from_ptr(ptr, false), nil
 }
 
 // Load repos from a portage-compatible repos.conf directory or file.
@@ -70,7 +70,7 @@ func (c *Config) LoadReposConf(path string) (map[string]Repo, error) {
 		// force config repos refresh
 		c._repos = nil
 
-		m := repos_to_map(unsafe.Slice(repos, length))
+		m := repos_to_map(unsafe.Slice(repos, length), false)
 		defer C.pkgcraft_repos_free(repos, length)
 		return m, nil
 	} else {
@@ -87,22 +87,22 @@ type Repos struct {
 }
 
 // Return a Repos object for a given config.
-func repos_from_config(config *Config) (*Repos) {
+func repos_from_config(config *Config) *Repos {
 	var length C.size_t
 	repos := C.pkgcraft_config_repos(config.ptr, &length)
-	m := repos_to_map(unsafe.Slice(repos, length))
+	m := repos_to_map(unsafe.Slice(repos, length), true)
 	defer C.pkgcraft_repos_free(repos, length)
 	return &Repos{config: config, _repos: m}
 }
 
 // Convert an array of Repo pointers to a mapping.
-func repos_to_map(repos []*C.Repo) map[string]Repo {
+func repos_to_map(repos []*C.Repo, ref bool) map[string]Repo {
 	m := make(map[string]Repo)
 	for _, r := range repos {
 		s := C.pkgcraft_repo_id(r)
 		id := C.GoString(s)
 		defer C.pkgcraft_str_free(s)
-		m[id] = repo_from_ptr(r)
+		m[id] = repo_from_ptr(r, ref)
 	}
 	return m
 }
