@@ -28,9 +28,6 @@ const (
 	SlotOpStar
 )
 
-// sentinel value for atoms with uncached version fields
-var version_sentinel = &Version{nil}
-
 var atom_cache, _ = lru.New(10000)
 
 type Atom struct {
@@ -66,7 +63,7 @@ func new_atom(s string, eapi string) (*Atom, error) {
 	ptr := C.pkgcraft_atom_new(atom_str, eapi_p)
 
 	if ptr != nil {
-		atom := &Atom{atom: ptr, _version: version_sentinel}
+		atom := &Atom{atom: ptr, _version: nil}
 		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.atom) })
 		return atom, nil
 	} else {
@@ -132,12 +129,12 @@ func (a *Atom) pn() string {
 
 // Return an atom's version.
 func (a *Atom) version() *Version {
-	if a._version == version_sentinel {
+	if a._version == nil {
 		ptr := C.pkgcraft_atom_version(a.atom)
 		if ptr != nil {
 			a._version = &Version{ptr}
 		} else {
-			a._version = nil
+			a._version = &Version{}
 		}
 	}
 	return a._version
@@ -246,7 +243,7 @@ func NewCpv(s string) (*Cpv, error) {
 	ptr := C.pkgcraft_cpv_new(cpv_str)
 
 	if ptr != nil {
-		cpv := &Cpv{Atom{atom: ptr, _version: version_sentinel}}
+		cpv := &Cpv{Atom{atom: ptr, _version: nil}}
 		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.atom) })
 		return cpv, nil
 	} else {

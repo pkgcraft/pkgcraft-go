@@ -16,7 +16,7 @@ func TestAtom(t *testing.T) {
 	atom, _ = New("cat/pkg")
 	assert.Equal(t, atom.category(), "cat")
 	assert.Equal(t, atom.pn(), "pkg")
-	assert.Nil(t, atom.version())
+	assert.Equal(t, atom.version(), &Version{})
 	assert.Equal(t, atom.revision(), "")
 	assert.Equal(t, atom.blocker(), BlockerNone)
 	assert.Equal(t, atom.slot(), "")
