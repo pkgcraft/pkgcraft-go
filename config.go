@@ -22,7 +22,9 @@ func NewConfig() (*Config, error) {
 	if ptr != nil {
 		config := &Config{ptr: ptr}
 		runtime.SetFinalizer(config, func(config *Config) {
-			panic("config object never closed")
+			if config.ptr != nil {
+				panic("config object never closed")
+			}
 		})
 		return config, nil
 	} else {
@@ -35,6 +37,7 @@ func NewConfig() (*Config, error) {
 // Free a config object's encapsulated C pointer.
 func (config *Config) Close() {
 	C.pkgcraft_config_free(config.ptr)
+	config.ptr = nil
 }
 
 // Add an external repo via its file path.
