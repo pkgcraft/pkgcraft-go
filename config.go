@@ -12,7 +12,7 @@ import (
 )
 
 type Config struct {
-	ptr *C.Config
+	ptr   *C.Config
 	Repos map[string]*BaseRepo
 }
 

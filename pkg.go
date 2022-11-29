@@ -17,7 +17,7 @@ type Pkg interface {
 }
 
 type BasePkg struct {
-	ptr *C.Pkg
+	ptr    *C.Pkg
 	format PkgFormat
 }
 

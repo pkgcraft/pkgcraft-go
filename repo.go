@@ -17,7 +17,7 @@ type Repo interface {
 }
 
 type BaseRepo struct {
-	ptr *C.Repo
+	ptr    *C.Repo
 	format RepoFormat
 }
 
