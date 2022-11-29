@@ -21,8 +21,9 @@ func NewConfig() (*Config, error) {
 	ptr := C.pkgcraft_config_new()
 	if ptr != nil {
 		config := &Config{ptr: ptr}
+		_, file, line, _ := runtime.Caller(1)
 		runtime.SetFinalizer(config, func(config *Config) {
-			panic("config object never closed")
+			panic(fmt.Sprintf("%s:%d: unclosed config object", file, line))
 		})
 		return config, nil
 	} else {
