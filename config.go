@@ -53,9 +53,7 @@ func (config *Config) AddRepoPath(path string, id string, priority int) error {
 		return errors.New(C.GoString(s))
 	}
 
-	// refresh config repos
-	config.Repos = repos_from_config(config)
-
+	config.updateRepos()
 	return nil
 }
 
@@ -68,8 +66,7 @@ func (config *Config) LoadReposConf(path string) error {
 	repos := C.pkgcraft_config_load_repos_conf(config.ptr, path_str, &length)
 
 	if repos != nil {
-		// refresh config repos
-		config.Repos = repos_from_config(config)
+		config.updateRepos()
 		C.pkgcraft_repos_free(repos, length)
 		return nil
 	} else {
@@ -113,13 +110,12 @@ func (config *Config) GetFakeRepo(id string) (*FakeRepo, error) {
 	}
 }
 
-// Return a Repos object for a given config.
-func repos_from_config(config *Config) map[string]*BaseRepo {
+// Update the Repos object for a given config.
+func (config *Config) updateRepos() {
 	var length C.size_t
 	repos := C.pkgcraft_config_repos(config.ptr, &length)
-	m := repos_to_map(unsafe.Slice(repos, length), false)
+	config.Repos = repos_to_map(unsafe.Slice(repos, length), false)
 	C.pkgcraft_repos_free(repos, length)
-	return m
 }
 
 // Convert an array of Repo pointers to a mapping.
