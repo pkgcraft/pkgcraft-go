@@ -17,12 +17,7 @@ func (r *EbuildRepo) Pkgs() <-chan *EbuildPkg {
 		for {
 			ptr := C.pkgcraft_repo_iter_next(iter)
 			if ptr != nil {
-				pkg := pkg_from_ptr(ptr)
-				if pkg.format == PkgFormatEbuild {
-					pkgs <- &EbuildPkg{pkg}
-				} else {
-					panic("invalid pkg format")
-				}
+				pkgs <- &EbuildPkg{pkg_from_ptr(ptr)}
 			} else {
 				break
 			}
