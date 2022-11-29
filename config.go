@@ -71,12 +71,12 @@ func (c *Config) LoadReposConf(path string) error {
 	}
 }
 
-// Return a configured ebuild repo from a given id.
-func (c *Config) GetEbuildRepo(id string) (*EbuildRepo, error) {
+// Return a configured repo from a given id if it has a given format.
+func (c *Config) repo_from_format(id string, format RepoFormat) (*BaseRepo, error) {
 	repo, exists := c.Repos[id]
 	if exists {
-		if repo.format == RepoFormatEbuild {
-			return &EbuildRepo{repo}, nil
+		if repo.format == format {
+			return repo, nil
 		} else {
 			return nil, fmt.Errorf("invalid repo type: %s", id)
 		}
@@ -85,17 +85,23 @@ func (c *Config) GetEbuildRepo(id string) (*EbuildRepo, error) {
 	}
 }
 
+// Return a configured ebuild repo from a given id.
+func (c *Config) GetEbuildRepo(id string) (*EbuildRepo, error) {
+	repo, err := c.repo_from_format(id, RepoFormatEbuild)
+	if err == nil {
+		return &EbuildRepo{repo}, nil
+	} else {
+		return nil, err
+	}
+}
+
 // Return a configured fake repo from a given id.
 func (c *Config) GetFakeRepo(id string) (*FakeRepo, error) {
-	repo, exists := c.Repos[id]
-	if exists {
-		if repo.format == RepoFormatFake {
-			return &FakeRepo{repo}, nil
-		} else {
-			return nil, fmt.Errorf("invalid repo type: %s", id)
-		}
+	repo, err := c.repo_from_format(id, RepoFormatEbuild)
+	if err == nil {
+		return &FakeRepo{repo}, nil
 	} else {
-		return nil, fmt.Errorf("nonexistent repo: %s", id)
+		return nil, err
 	}
 }
 
