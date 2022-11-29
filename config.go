@@ -21,13 +21,20 @@ func NewConfig() (*Config, error) {
 	ptr := C.pkgcraft_config_new()
 	if ptr != nil {
 		config := &Config{ptr: ptr}
-		runtime.SetFinalizer(config, func(config *Config) { C.pkgcraft_config_free(config.ptr) })
+		runtime.SetFinalizer(config, func(config *Config) {
+			panic("config object never closed")
+		})
 		return config, nil
 	} else {
 		s := C.pkgcraft_last_error()
 		defer C.pkgcraft_str_free(s)
 		return nil, errors.New(C.GoString(s))
 	}
+}
+
+// Free a config object's encapsulated C pointer.
+func (config *Config) Close() {
+	C.pkgcraft_config_free(config.ptr)
 }
 
 // Add an external repo via its file path.
@@ -108,7 +115,7 @@ func (config *Config) GetFakeRepo(id string) (*FakeRepo, error) {
 func repos_from_config(config *Config) map[string]*BaseRepo {
 	var length C.size_t
 	repos := C.pkgcraft_config_repos(config.ptr, &length)
-	m := repos_to_map(unsafe.Slice(repos, length), true)
+	m := repos_to_map(unsafe.Slice(repos, length), false)
 	C.pkgcraft_repos_free(repos, length)
 	return m
 }
