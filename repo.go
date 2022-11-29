@@ -65,10 +65,6 @@ func (r *BaseRepo) Pkgs() <-chan *BasePkg {
 	return pkgs
 }
 
-type FakeRepo struct {
-	*BaseRepo
-}
-
 type RepoFormat int
 
 const (
