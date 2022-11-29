@@ -13,11 +13,11 @@ type Repo interface {
 	Path() string
 	IsEmpty() bool
 	String() string
-	NewIterator() Iterator[Pkg]
 }
 
 type BaseRepo struct {
 	ptr *C.Repo
+	format RepoFormat
 }
 
 // Return a repo's id.
@@ -44,9 +44,8 @@ func (r *BaseRepo) String() string {
 }
 
 type repo_pkg_iter struct {
-	repo *BaseRepo
 	ptr *C.RepoPkgIter
-	next Pkg
+	next *BasePkg
 }
 
 // Return true if the repo iterator contains another package, false otherwise.
@@ -62,20 +61,16 @@ func (i *repo_pkg_iter) HasNext() bool {
 }
 
 // Return the next package in the iterator.
-func (i *repo_pkg_iter) Next() Pkg {
+func (i *repo_pkg_iter) Next() *BasePkg {
 	return i.next
 }
 
 // Return a new package iterator for a repo.
-func (r *BaseRepo) NewIterator() Iterator[Pkg] {
+func (r *BaseRepo) NewPkgIterator() Iterator[*BasePkg] {
 	ptr := C.pkgcraft_repo_iter(r.ptr)
-	iter := &repo_pkg_iter{r, ptr, nil}
+	iter := &repo_pkg_iter{ptr, nil}
 	runtime.SetFinalizer(iter, func(i *repo_pkg_iter) { C.pkgcraft_repo_iter_free(i.ptr) })
 	return iter
-}
-
-type EbuildRepo struct {
-	*BaseRepo
 }
 
 type FakeRepo struct {
@@ -90,18 +85,11 @@ const (
 )
 
 // Return a new repo from a given pointer.
-func repo_from_ptr(ptr *C.Repo, ref bool) Repo {
-	base := &BaseRepo{ptr: ptr}
+func repo_from_ptr(ptr *C.Repo, ref bool) *BaseRepo {
+	format := RepoFormat(C.pkgcraft_repo_format(ptr))
+	base := &BaseRepo{ptr, format}
 	if !ref {
 		runtime.SetFinalizer(base, func(r *BaseRepo) { C.pkgcraft_repo_free(r.ptr) })
 	}
-
-	format := RepoFormat(C.pkgcraft_repo_format(ptr))
-	if format == RepoFormatEbuild {
-		return &EbuildRepo{base}
-	} else if format == RepoFormatFake {
-		return &FakeRepo{base}
-	} else {
-		panic("unsupported repo format")
-	}
+	return base
 }

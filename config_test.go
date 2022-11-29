@@ -13,5 +13,5 @@ func TestConfig(t *testing.T) {
 
 	// empty
 	config, _ = NewConfig()
-	assert.Equal(t, config.Repos().Len(), 0)
+	assert.Equal(t, len(config.Repos), 0)
 }

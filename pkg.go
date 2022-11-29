@@ -18,6 +18,7 @@ type Pkg interface {
 
 type BasePkg struct {
 	ptr *C.Pkg
+	format PkgFormat
 }
 
 type FakePkg struct {
@@ -64,16 +65,9 @@ func (p *BasePkg) String() string {
 }
 
 // Return a new package from a given pointer.
-func pkg_from_ptr(ptr *C.Pkg) Pkg {
-	base := &BasePkg{ptr: ptr}
-	runtime.SetFinalizer(base, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })
-
+func pkg_from_ptr(ptr *C.Pkg) *BasePkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
-	if format == PkgFormatEbuild {
-		return &EbuildPkg{base}
-	} else if format == PkgFormatFake {
-		return &FakePkg{base}
-	} else {
-		panic("unsupported pkg format")
-	}
+	base := &BasePkg{ptr, format}
+	runtime.SetFinalizer(base, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })
+	return base
 }

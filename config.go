@@ -6,6 +6,7 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
 	"runtime"
 	"unsafe"
 )
@@ -13,7 +14,7 @@ import (
 type Config struct {
 	ptr *C.Config
 	// cached fields
-	_repos *Repos
+	Repos map[string]*BaseRepo
 }
 
 // Return a new config for the system.
@@ -28,14 +29,6 @@ func NewConfig() (*Config, error) {
 		defer C.pkgcraft_str_free(s)
 		return nil, errors.New(C.GoString(s))
 	}
-}
-
-// Return the config's repo mapping.
-func (c *Config) Repos() *Repos {
-	if c._repos == nil {
-		c._repos = repos_from_config(c)
-	}
-	return c._repos
 }
 
 // Add an external repo via its file path.
@@ -53,13 +46,13 @@ func (c *Config) AddRepoPath(path string, id string, priority int) (Repo, error)
 	}
 
 	// force config repos refresh
-	c._repos = nil
+	c.Repos = repos_from_config(c)
 
 	return repo_from_ptr(ptr, false), nil
 }
 
 // Load repos from a portage-compatible repos.conf directory or file.
-func (c *Config) LoadReposConf(path string) (map[string]Repo, error) {
+func (c *Config) LoadReposConf(path string) error {
 	var length C.size_t
 
 	path_str := C.CString(path)
@@ -68,36 +61,56 @@ func (c *Config) LoadReposConf(path string) (map[string]Repo, error) {
 
 	if repos != nil {
 		// force config repos refresh
-		c._repos = nil
-
-		m := repos_to_map(unsafe.Slice(repos, length), false)
-		defer C.pkgcraft_repos_free(repos, length)
-		return m, nil
+		c.Repos = repos_from_config(c)
+		C.pkgcraft_repos_free(repos, length)
+		return nil
 	} else {
 		s := C.pkgcraft_last_error()
 		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		return errors.New(C.GoString(s))
 	}
 }
 
-type Repos struct {
-	config *Config
-	// cached fields
-	_repos map[string]Repo
+// Return a configured ebuild repo from a given id.
+func (c *Config) GetEbuildRepo(id string) (*EbuildRepo, error) {
+	repo, exists := c.Repos[id]
+	if exists {
+		if repo.format == RepoFormatEbuild {
+			return &EbuildRepo{repo}, nil
+		} else {
+			return nil, fmt.Errorf("invalid repo type: %s", id)
+		}
+	} else {
+		return nil, fmt.Errorf("nonexistent repo: %s", id)
+	}
+}
+
+// Return a configured fake repo from a given id.
+func (c *Config) GetFakeRepo(id string) (*FakeRepo, error) {
+	repo, exists := c.Repos[id]
+	if exists {
+		if repo.format == RepoFormatFake {
+			return &FakeRepo{repo}, nil
+		} else {
+			return nil, fmt.Errorf("invalid repo type: %s", id)
+		}
+	} else {
+		return nil, fmt.Errorf("nonexistent repo: %s", id)
+	}
 }
 
 // Return a Repos object for a given config.
-func repos_from_config(config *Config) *Repos {
+func repos_from_config(config *Config) map[string]*BaseRepo {
 	var length C.size_t
 	repos := C.pkgcraft_config_repos(config.ptr, &length)
 	m := repos_to_map(unsafe.Slice(repos, length), true)
-	defer C.pkgcraft_repos_free(repos, length)
-	return &Repos{config: config, _repos: m}
+	C.pkgcraft_repos_free(repos, length)
+	return m
 }
 
 // Convert an array of Repo pointers to a mapping.
-func repos_to_map(repos []*C.Repo, ref bool) map[string]Repo {
-	m := make(map[string]Repo)
+func repos_to_map(repos []*C.Repo, ref bool) map[string]*BaseRepo {
+	m := make(map[string]*BaseRepo)
 	for _, r := range repos {
 		s := C.pkgcraft_repo_id(r)
 		id := C.GoString(s)
@@ -105,9 +118,4 @@ func repos_to_map(repos []*C.Repo, ref bool) map[string]Repo {
 		m[id] = repo_from_ptr(r, ref)
 	}
 	return m
-}
-
-// Return a Repos object length.
-func (r *Repos) Len() int {
-	return len(r._repos)
 }
