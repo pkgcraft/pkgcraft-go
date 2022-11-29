@@ -13,7 +13,6 @@ import (
 
 type Config struct {
 	ptr *C.Config
-	// cached fields
 	Repos map[string]*BaseRepo
 }
 
@@ -32,7 +31,7 @@ func NewConfig() (*Config, error) {
 }
 
 // Add an external repo via its file path.
-func (config *Config) AddRepoPath(path string, id string, priority int) (Repo, error) {
+func (config *Config) AddRepoPath(path string, id string, priority int) error {
 	path_str := C.CString(path)
 	defer C.free(unsafe.Pointer(path_str))
 	id_str := C.CString(id)
@@ -42,13 +41,13 @@ func (config *Config) AddRepoPath(path string, id string, priority int) (Repo, e
 	if ptr == nil {
 		s := C.pkgcraft_last_error()
 		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		return errors.New(C.GoString(s))
 	}
 
-	// force config repos refresh
+	// refresh config repos
 	config.Repos = repos_from_config(config)
 
-	return repo_from_ptr(ptr, false), nil
+	return nil
 }
 
 // Load repos from a portage-compatible repos.conf directory or file.
@@ -60,7 +59,7 @@ func (config *Config) LoadReposConf(path string) error {
 	repos := C.pkgcraft_config_load_repos_conf(config.ptr, path_str, &length)
 
 	if repos != nil {
-		// force config repos refresh
+		// refresh config repos
 		config.Repos = repos_from_config(config)
 		C.pkgcraft_repos_free(repos, length)
 		return nil
