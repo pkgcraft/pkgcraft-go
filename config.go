@@ -14,6 +14,8 @@ import (
 type Config struct {
 	ptr   *C.Config
 	Repos map[string]*BaseRepo
+	ReposEbuild map[string]*EbuildRepo
+	ReposFake map[string]*FakeRepo
 }
 
 // Return a new config for the system.
@@ -76,46 +78,20 @@ func (config *Config) LoadReposConf(path string) error {
 	}
 }
 
-// Return a configured repo from a given id if it has a given format.
-func (config *Config) repo_from_format(id string, format RepoFormat) (*BaseRepo, error) {
-	repo, exists := config.Repos[id]
-	if exists {
-		if repo.format == format {
-			return repo, nil
-		} else {
-			return nil, fmt.Errorf("invalid repo type: %s", id)
-		}
-	} else {
-		return nil, fmt.Errorf("nonexistent repo: %s", id)
-	}
-}
-
-// Return a configured ebuild repo from a given id.
-func (config *Config) GetEbuildRepo(id string) (*EbuildRepo, error) {
-	repo, err := config.repo_from_format(id, RepoFormatEbuild)
-	if err == nil {
-		return &EbuildRepo{repo}, nil
-	} else {
-		return nil, err
-	}
-}
-
-// Return a configured fake repo from a given id.
-func (config *Config) GetFakeRepo(id string) (*FakeRepo, error) {
-	repo, err := config.repo_from_format(id, RepoFormatEbuild)
-	if err == nil {
-		return &FakeRepo{repo}, nil
-	} else {
-		return nil, err
-	}
-}
-
-// Update the Repos object for a given config.
+// Update the repo maps for a config.
 func (config *Config) updateRepos() {
 	var length C.size_t
-	repos := C.pkgcraft_config_repos(config.ptr, &length)
-	config.Repos = repos_to_map(unsafe.Slice(repos, length))
-	C.pkgcraft_repos_free(repos, length)
+	c_repos := C.pkgcraft_config_repos(config.ptr, &length)
+	config.Repos = repos_to_map(unsafe.Slice(c_repos, length))
+	config.ReposEbuild = make(map[string]*EbuildRepo)
+	config.ReposFake = make(map[string]*FakeRepo)
+	for id, r := range config.Repos {
+		switch format := r.format; format {
+			case RepoFormatEbuild: config.ReposEbuild[id] = &EbuildRepo{r}
+			case RepoFormatFake: config.ReposFake[id] = &FakeRepo{r}
+		}
+	}
+	C.pkgcraft_repos_free(c_repos, length)
 }
 
 // Convert an array of Repo pointers to a mapping.
