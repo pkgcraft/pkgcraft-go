@@ -91,3 +91,9 @@ func (e *Eapi) Has(s string) bool {
 	defer C.free(unsafe.Pointer(cstr))
 	return C.pkgcraft_eapi_has(e.ptr, cstr) == true
 }
+
+// Compare an Eapi with another Eapi chronologically returning -1, 0, or 1 if
+// the first is less than, equal to, or greater than the second, respectively.
+func (e1 *Eapi) Cmp(e2 *Eapi) int {
+	return int(C.pkgcraft_eapi_cmp(e1.ptr, e2.ptr))
+}

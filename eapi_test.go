@@ -17,6 +17,14 @@ func TestEapiGlobals(t *testing.T) {
 	assert.True(t, EAPIS[EAPI_LATEST.String()] == EAPI_LATEST)
 }
 
+func TestEapiRange(t *testing.T) {
+	eapis, _ := EapiRange("2-3")
+	assert.Equal(t, eapis, []*Eapi{EAPIS["2"], EAPIS["3"]})
+	eapis, _ = EapiRange("1-")
+	assert.Equal(t, eapis[0], EAPIS["1"])
+	assert.Equal(t, len(eapis), len(EAPIS)-1)
+}
+
 func TestEapiHas(t *testing.T) {
 	assert.False(t, EAPIS["1"].Has("nonexistent_feature"))
 	assert.True(t, EAPIS["1"].Has("slot_deps"))
@@ -28,10 +36,8 @@ func TestEapiString(t *testing.T) {
 	}
 }
 
-func TestEapiRange(t *testing.T) {
-	eapis, _ := EapiRange("2-3")
-	assert.Equal(t, eapis, []*Eapi{EAPIS["2"], EAPIS["3"]})
-	eapis, _ = EapiRange("1-")
-	assert.Equal(t, eapis[0], EAPIS["1"])
-	assert.Equal(t, len(eapis), len(EAPIS)-1)
+func TestEapiCmp(t *testing.T) {
+	assert.Equal(t, EAPIS["1"].Cmp(EAPIS["2"]), -1)
+	assert.Equal(t, EAPIS["2"].Cmp(EAPIS["2"]), 0)
+	assert.Equal(t, EAPIS["2"].Cmp(EAPIS["1"]), 1)
 }
