@@ -16,17 +16,17 @@ func TestVersion(t *testing.T) {
 	// non-revision
 	version, _ = NewVersion("1")
 	assert.Equal(t, version.Revision(), "0")
-	assert.Equal(t, fmt.Sprintf("%s", version), "1")
+	assert.Equal(t, version.String(), "1")
 
 	// revisioned
 	version, _ = NewVersion("1-r1")
 	assert.Equal(t, version.Revision(), "1")
-	assert.Equal(t, fmt.Sprintf("%s", version), "1-r1")
+	assert.Equal(t, version.String(), "1-r1")
 
 	// explicit '0' revision
 	version, _ = NewVersion("1-r0")
 	assert.Equal(t, version.Revision(), "0")
-	assert.Equal(t, fmt.Sprintf("%s", version), "1-r0")
+	assert.Equal(t, version.String(), "1-r0")
 
 	// invalid
 	version, _ = NewVersion(">1-r2")
@@ -35,7 +35,7 @@ func TestVersion(t *testing.T) {
 	// Version with op
 	version, _ = NewVersionWithOp(">1-r2")
 	assert.Equal(t, version.Revision(), "2")
-	assert.Equal(t, fmt.Sprintf("%s", version), ">1-r2")
+	assert.Equal(t, version.String(), ">1-r2")
 
 	// v1 < v2
 	v1, _ := NewVersion("1")
@@ -77,7 +77,8 @@ func TestVersion(t *testing.T) {
 
 func BenchmarkNewVersion(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		NewVersion("1.2.3_alpha4-r5")
+		ver, _ := NewVersion("1.2.3_alpha4-r5")
+		assert.NotNil(b, ver)
 	}
 }
 
@@ -87,9 +88,9 @@ func BenchmarkVersionSort(b *testing.B) {
 		v, _ := NewVersion(fmt.Sprintf("%d", i))
 		versions = append(versions, v)
 	}
-	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "100")
+	assert.Equal(b, versions[0].String(), "100")
 	for i := 0; i < b.N; i++ {
 		sort.Sort(Versions(versions))
 	}
-	assert.Equal(b, fmt.Sprintf("%s", versions[0]), "1")
+	assert.Equal(b, versions[0].String(), "1")
 }

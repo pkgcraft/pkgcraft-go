@@ -89,7 +89,7 @@ func (e *Eapi) String() string {
 func (e *Eapi) Has(s string) bool {
 	cstr := C.CString(s)
 	defer C.free(unsafe.Pointer(cstr))
-	return C.pkgcraft_eapi_has(e.ptr, cstr) == true
+	return bool(C.pkgcraft_eapi_has(e.ptr, cstr))
 }
 
 // Compare an Eapi with another Eapi chronologically returning -1, 0, or 1 if

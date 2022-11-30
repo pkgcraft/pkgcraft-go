@@ -1,7 +1,6 @@
 package pkgcraft_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,7 +31,7 @@ func TestEapiHas(t *testing.T) {
 
 func TestEapiString(t *testing.T) {
 	for id, eapi := range EAPIS {
-		assert.Equal(t, fmt.Sprintf("%s", eapi), id)
+		assert.Equal(t, eapi.String(), id)
 	}
 }
 
