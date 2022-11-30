@@ -5,6 +5,7 @@ package pkgcraft
 import "C"
 
 import (
+	"errors"
 	"strconv"
 	"unsafe"
 )
@@ -49,6 +50,28 @@ func getEapis() map[string]*Eapi {
 	}
 	defer C.pkgcraft_eapis_free(eapis, length)
 	return m
+}
+
+// Convert an EAPI range into an array of Eapi objects.
+func EapiRange(s string) ([]*Eapi, error) {
+	var length C.size_t
+	cstr := C.CString(s)
+	defer C.free(unsafe.Pointer(cstr))
+	c_eapis := C.pkgcraft_eapis_range(cstr, &length)
+	if c_eapis == nil {
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return nil, errors.New(C.GoString(s))
+	}
+
+	var eapis []*Eapi
+	for _, ptr := range unsafe.Slice(c_eapis, length) {
+		s := C.pkgcraft_eapi_as_str(ptr)
+		id := C.GoString(s)
+		defer C.pkgcraft_str_free(s)
+		eapis = append(eapis, EAPIS[id])
+	}
+	return eapis, nil
 }
 
 type Eapi struct {

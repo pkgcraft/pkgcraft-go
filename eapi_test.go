@@ -27,3 +27,11 @@ func TestEapiString(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%s", eapi), id)
 	}
 }
+
+func TestEapiRange(t *testing.T) {
+	eapis, _ := EapiRange("2-3")
+	assert.Equal(t, eapis, []*Eapi{EAPIS["2"], EAPIS["3"]})
+	eapis, _ = EapiRange("1-")
+	assert.Equal(t, eapis[0], EAPIS["1"])
+	assert.Equal(t, len(eapis), len(EAPIS)-1)
+}
