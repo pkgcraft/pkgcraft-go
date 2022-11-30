@@ -36,8 +36,19 @@ func (r *BaseRepo) IsEmpty() bool {
 	return bool(C.pkgcraft_repo_is_empty(r.ptr))
 }
 
+// Return the number of packages in a repo.
+func (r *BaseRepo) Len() int {
+	return int(C.pkgcraft_repo_len(r.ptr))
+}
+
 func (r *BaseRepo) String() string {
 	return r.Id()
+}
+
+// Compare a repo with another repo returning -1, 0, or 1 if the first is less
+// than, equal to, or greater than the second, respectively.
+func (r1 *BaseRepo) Cmp(r2 *BaseRepo) int {
+	return int(C.pkgcraft_repo_cmp(r1.ptr, r2.ptr))
 }
 
 // Return a channel iterating over the packages of a repo.
