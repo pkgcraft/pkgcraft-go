@@ -11,7 +11,7 @@ import (
 type Pkg interface {
 	Atom() *Cpv
 	Eapi() *Eapi
-	Repo() Repo
+	Repo() *BaseRepo
 	Version() *Version
 	String() string
 }
@@ -47,7 +47,7 @@ func (p *BasePkg) Eapi() *Eapi {
 }
 
 // Return a package's repo.
-func (p *BasePkg) Repo() Repo {
+func (p *BasePkg) Repo() *BaseRepo {
 	ptr := C.pkgcraft_pkg_repo(p.ptr)
 	return repo_from_ptr(ptr)
 }

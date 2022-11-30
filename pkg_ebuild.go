@@ -12,6 +12,12 @@ type EbuildPkg struct {
 	*BasePkg
 }
 
+// Return a package's repo.
+func (p *EbuildPkg) Repo() *EbuildRepo {
+	base := &BaseRepo{C.pkgcraft_pkg_repo(p.ptr), RepoFormatEbuild}
+	return &EbuildRepo{base}
+}
+
 // Return a package's path.
 func (p *EbuildPkg) Path() string {
 	s := C.pkgcraft_pkg_ebuild_path(p.ptr)
