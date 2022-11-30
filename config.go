@@ -12,10 +12,10 @@ import (
 )
 
 type Config struct {
-	ptr   *C.Config
-	Repos map[string]*BaseRepo
+	ptr         *C.Config
+	Repos       map[string]*BaseRepo
 	ReposEbuild map[string]*EbuildRepo
-	ReposFake map[string]*FakeRepo
+	ReposFake   map[string]*FakeRepo
 }
 
 // Return a new config for the system.
@@ -23,10 +23,10 @@ func NewConfig() (*Config, error) {
 	ptr := C.pkgcraft_config_new()
 	if ptr != nil {
 		config := &Config{
-			ptr: ptr,
-			Repos: make(map[string]*BaseRepo),
+			ptr:         ptr,
+			Repos:       make(map[string]*BaseRepo),
 			ReposEbuild: make(map[string]*EbuildRepo),
-			ReposFake: make(map[string]*FakeRepo),
+			ReposFake:   make(map[string]*FakeRepo),
 		}
 		_, file, line, _ := runtime.Caller(1)
 		runtime.SetFinalizer(config, func(config *Config) {
@@ -100,8 +100,10 @@ func (config *Config) updateRepos() {
 	repos_fake := make(map[string]*FakeRepo)
 	for id, r := range repos {
 		switch format := r.format; format {
-			case RepoFormatEbuild: repos_ebuild[id] = &EbuildRepo{r}
-			case RepoFormatFake: repos_fake[id] = &FakeRepo{r}
+		case RepoFormatEbuild:
+			repos_ebuild[id] = &EbuildRepo{r}
+		case RepoFormatFake:
+			repos_fake[id] = &FakeRepo{r}
 		}
 	}
 
