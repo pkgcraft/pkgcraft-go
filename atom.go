@@ -79,8 +79,7 @@ func NewAtomWithEapi(s string, eapi *Eapi) (*Atom, error) {
 
 func new_cached_atom(s string, eapi *Eapi) (*Atom, error) {
 	key := Pair[string, *Eapi]{s, eapi}
-	v, ok := atom_cache.Get(key)
-	if ok {
+	if v, ok := atom_cache.Get(key); ok {
 		return v.(*Atom), nil
 	} else {
 		atom, err := new_atom(s, eapi)
