@@ -87,26 +87,25 @@ func (config *Config) LoadReposConf(path string) error {
 func (config *Config) updateRepos() {
 	var length C.size_t
 	c_repos := C.pkgcraft_config_repos(config.ptr, &length)
-	config.Repos = repos_to_map(unsafe.Slice(c_repos, length))
-	config.ReposEbuild = make(map[string]*EbuildRepo)
-	config.ReposFake = make(map[string]*FakeRepo)
-	for id, r := range config.Repos {
-		switch format := r.format; format {
-			case RepoFormatEbuild: config.ReposEbuild[id] = &EbuildRepo{r}
-			case RepoFormatFake: config.ReposFake[id] = &FakeRepo{r}
-		}
-	}
-	C.pkgcraft_repos_free(c_repos, length)
-}
-
-// Convert an array of Repo pointers to a mapping.
-func repos_to_map(repos []*C.Repo) map[string]*BaseRepo {
-	m := make(map[string]*BaseRepo)
-	for _, r := range repos {
+	repos := make(map[string]*BaseRepo)
+	for _, r := range unsafe.Slice(c_repos, length) {
 		s := C.pkgcraft_repo_id(r)
 		id := C.GoString(s)
 		defer C.pkgcraft_str_free(s)
-		m[id] = repo_from_ptr(r)
+		repos[id] = repo_from_ptr(r)
 	}
-	return m
+	C.pkgcraft_repos_free(c_repos, length)
+
+	repos_ebuild := make(map[string]*EbuildRepo)
+	repos_fake := make(map[string]*FakeRepo)
+	for id, r := range repos {
+		switch format := r.format; format {
+			case RepoFormatEbuild: repos_ebuild[id] = &EbuildRepo{r}
+			case RepoFormatFake: repos_fake[id] = &FakeRepo{r}
+		}
+	}
+
+	config.Repos = repos
+	config.ReposEbuild = repos_ebuild
+	config.ReposFake = repos_fake
 }
