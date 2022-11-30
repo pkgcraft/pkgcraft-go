@@ -22,7 +22,12 @@ type Config struct {
 func NewConfig() (*Config, error) {
 	ptr := C.pkgcraft_config_new()
 	if ptr != nil {
-		config := &Config{ptr: ptr}
+		config := &Config{
+			ptr: ptr,
+			Repos: make(map[string]*BaseRepo),
+			ReposEbuild: make(map[string]*EbuildRepo),
+			ReposFake: make(map[string]*FakeRepo),
+		}
 		_, file, line, _ := runtime.Caller(1)
 		runtime.SetFinalizer(config, func(config *Config) {
 			panic(fmt.Sprintf("%s:%d: unclosed config object", file, line))
