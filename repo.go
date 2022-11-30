@@ -60,7 +60,7 @@ func (r *BaseRepo) Pkgs() <-chan *BasePkg {
 		for {
 			ptr := C.pkgcraft_repo_iter_next(iter)
 			if ptr != nil {
-				pkgs <- pkg_from_ptr(ptr)
+				pkgs <- pkgFromPtr(ptr)
 			} else {
 				break
 			}
@@ -80,7 +80,7 @@ const (
 )
 
 // Return a new repo from a given pointer.
-func repo_from_ptr(ptr *C.Repo) *BaseRepo {
+func repoFromPtr(ptr *C.Repo) *BaseRepo {
 	format := RepoFormat(C.pkgcraft_repo_format(ptr))
 	return &BaseRepo{ptr, format}
 }

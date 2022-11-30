@@ -13,7 +13,7 @@ const MIN_VERSION = "0.0.2"
 const MAX_VERSION = "0.0.2"
 
 func TestLibVersion(t *testing.T) {
-	ver, _ := version.NewVersion(pkgcraft_lib_version())
+	ver, _ := version.NewVersion(pkgcraftLibVersion())
 	min_ver, _ := version.NewVersion(MIN_VERSION)
 	max_ver, _ := version.NewVersion(MAX_VERSION)
 	min_err := fmt.Sprintf("pkgcraft C library %s failed requirements >=%s\n", ver, min_ver)

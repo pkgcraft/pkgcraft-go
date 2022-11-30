@@ -44,7 +44,7 @@ type Pair[T, U any] struct {
 	Second U
 }
 
-func new_atom(s string, eapi *Eapi) (*Atom, error) {
+func newAtom(s string, eapi *Eapi) (*Atom, error) {
 	var eapi_ptr *C.Eapi
 	if eapi == nil {
 		eapi_ptr = nil
@@ -69,20 +69,20 @@ func new_atom(s string, eapi *Eapi) (*Atom, error) {
 
 // Parse a string into an atom using the latest EAPI.
 func NewAtom(s string) (*Atom, error) {
-	return new_atom(s, nil)
+	return newAtom(s, nil)
 }
 
 // Parse a string into an atom using a specific EAPI.
 func NewAtomWithEapi(s string, eapi *Eapi) (*Atom, error) {
-	return new_atom(s, eapi)
+	return newAtom(s, eapi)
 }
 
-func new_cached_atom(s string, eapi *Eapi) (*Atom, error) {
+func newCachedAtom(s string, eapi *Eapi) (*Atom, error) {
 	key := Pair[string, *Eapi]{s, eapi}
 	if v, ok := atom_cache.Get(key); ok {
 		return v.(*Atom), nil
 	} else {
-		atom, err := new_atom(s, eapi)
+		atom, err := newAtom(s, eapi)
 		if err == nil {
 			atom_cache.Add(key, atom)
 		}
@@ -92,12 +92,12 @@ func new_cached_atom(s string, eapi *Eapi) (*Atom, error) {
 
 // Return a cached Atom if one exists, otherwise return a new instance.
 func NewAtomCached(s string) (*Atom, error) {
-	return new_cached_atom(s, nil)
+	return newCachedAtom(s, nil)
 }
 
 // Return a cached Atom if one exists, otherwise parse using a specific EAPI.
 func NewAtomCachedWithEapi(s string, eapi *Eapi) (*Atom, error) {
-	return new_cached_atom(s, eapi)
+	return newCachedAtom(s, eapi)
 }
 
 // Return an atom's category.

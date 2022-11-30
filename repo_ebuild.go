@@ -17,7 +17,7 @@ func (r *EbuildRepo) Pkgs() <-chan *EbuildPkg {
 		for {
 			ptr := C.pkgcraft_repo_iter_next(iter)
 			if ptr != nil {
-				pkgs <- &EbuildPkg{pkg_from_ptr(ptr)}
+				pkgs <- &EbuildPkg{pkgFromPtr(ptr)}
 			} else {
 				break
 			}

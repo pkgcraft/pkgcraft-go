@@ -49,7 +49,7 @@ func (p *BasePkg) Eapi() *Eapi {
 // Return a package's repo.
 func (p *BasePkg) Repo() *BaseRepo {
 	ptr := C.pkgcraft_pkg_repo(p.ptr)
-	return repo_from_ptr(ptr)
+	return repoFromPtr(ptr)
 }
 
 // Return a package's version.
@@ -65,7 +65,7 @@ func (p *BasePkg) String() string {
 }
 
 // Return a new package from a given pointer.
-func pkg_from_ptr(ptr *C.Pkg) *BasePkg {
+func pkgFromPtr(ptr *C.Pkg) *BasePkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
 	base := &BasePkg{ptr, format}
 	runtime.SetFinalizer(base, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })

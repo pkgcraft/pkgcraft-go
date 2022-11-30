@@ -5,7 +5,7 @@ package pkgcraft
 import "C"
 
 // Return the pkgcraft library version.
-func pkgcraft_lib_version() string {
+func pkgcraftLibVersion() string {
 	s := C.pkgcraft_lib_version()
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)

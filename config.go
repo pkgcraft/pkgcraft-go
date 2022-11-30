@@ -92,7 +92,7 @@ func (config *Config) updateRepos() {
 		s := C.pkgcraft_repo_id(r)
 		id := C.GoString(s)
 		defer C.pkgcraft_str_free(s)
-		repos[id] = repo_from_ptr(r)
+		repos[id] = repoFromPtr(r)
 	}
 	C.pkgcraft_repos_free(c_repos, length)
 

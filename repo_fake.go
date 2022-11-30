@@ -17,7 +17,7 @@ func (r *FakeRepo) Pkgs() <-chan *FakePkg {
 		for {
 			ptr := C.pkgcraft_repo_iter_next(iter)
 			if ptr != nil {
-				pkgs <- &FakePkg{pkg_from_ptr(ptr)}
+				pkgs <- &FakePkg{pkgFromPtr(ptr)}
 			} else {
 				break
 			}
