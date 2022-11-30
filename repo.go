@@ -4,10 +4,6 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
-import (
-	"runtime"
-)
-
 type Repo interface {
 	Id() string
 	Path() string
@@ -73,11 +69,7 @@ const (
 )
 
 // Return a new repo from a given pointer.
-func repo_from_ptr(ptr *C.Repo, ref bool) *BaseRepo {
+func repo_from_ptr(ptr *C.Repo) *BaseRepo {
 	format := RepoFormat(C.pkgcraft_repo_format(ptr))
-	base := &BaseRepo{ptr, format}
-	if !ref {
-		runtime.SetFinalizer(base, func(r *BaseRepo) { C.pkgcraft_repo_free(r.ptr) })
-	}
-	return base
+	return &BaseRepo{ptr, format}
 }

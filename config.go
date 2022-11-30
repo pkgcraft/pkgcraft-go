@@ -114,18 +114,18 @@ func (config *Config) GetFakeRepo(id string) (*FakeRepo, error) {
 func (config *Config) updateRepos() {
 	var length C.size_t
 	repos := C.pkgcraft_config_repos(config.ptr, &length)
-	config.Repos = repos_to_map(unsafe.Slice(repos, length), false)
+	config.Repos = repos_to_map(unsafe.Slice(repos, length))
 	C.pkgcraft_repos_free(repos, length)
 }
 
 // Convert an array of Repo pointers to a mapping.
-func repos_to_map(repos []*C.Repo, ref bool) map[string]*BaseRepo {
+func repos_to_map(repos []*C.Repo) map[string]*BaseRepo {
 	m := make(map[string]*BaseRepo)
 	for _, r := range repos {
 		s := C.pkgcraft_repo_id(r)
 		id := C.GoString(s)
 		defer C.pkgcraft_str_free(s)
-		m[id] = repo_from_ptr(r, ref)
+		m[id] = repo_from_ptr(r)
 	}
 	return m
 }

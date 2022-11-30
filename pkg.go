@@ -49,7 +49,7 @@ func (p *BasePkg) Eapi() *Eapi {
 // Return a package's repo.
 func (p *BasePkg) Repo() Repo {
 	ptr := C.pkgcraft_pkg_repo(p.ptr)
-	return repo_from_ptr(ptr, true)
+	return repo_from_ptr(ptr)
 }
 
 // Return a package's version.
