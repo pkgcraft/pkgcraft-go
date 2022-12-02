@@ -12,6 +12,108 @@ import (
 	"github.com/hashicorp/golang-lru"
 )
 
+type Cpv struct {
+	ptr *C.Atom
+	// cached fields
+	_category string
+	_package  string
+	_version  *Version
+	_hash     uint64
+}
+
+// Parse a CPV string into an atom.
+func NewCpv(s string) (*Cpv, error) {
+	c_str := C.CString(s)
+	defer C.free(unsafe.Pointer(c_str))
+	ptr := C.pkgcraft_cpv_new(c_str)
+
+	if ptr != nil {
+		cpv := &Cpv{ptr: ptr}
+		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.ptr) })
+		return cpv, nil
+	} else {
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return nil, errors.New(C.GoString(s))
+	}
+}
+
+// Return an atom's category.
+func (cpv *Cpv) Category() string {
+	if cpv._category == "" {
+		s := C.pkgcraft_atom_category(cpv.ptr)
+		defer C.pkgcraft_str_free(s)
+		cpv._category = C.GoString(s)
+	}
+	return cpv._category
+}
+
+// Return an atom's package name.
+func (cpv *Cpv) Package() string {
+	if cpv._package == "" {
+		s := C.pkgcraft_atom_package(cpv.ptr)
+		defer C.pkgcraft_str_free(s)
+		cpv._package = C.GoString(s)
+	}
+	return cpv._package
+}
+
+// Return an atom's version.
+func (cpv *Cpv) Version() *Version {
+	if cpv._version == nil {
+		ptr := C.pkgcraft_atom_version(cpv.ptr)
+		if ptr != nil {
+			cpv._version = &Version{ptr}
+		} else {
+			cpv._version = &Version{}
+		}
+	}
+	return cpv._version
+}
+
+// Return an atom's revision.
+func (cpv *Cpv) Revision() string {
+	s := C.pkgcraft_atom_revision(cpv.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+// Return the concatenated string of an atom's category and package.
+func (cpv *Cpv) Key() string {
+	s := C.pkgcraft_atom_key(cpv.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+func (cpv *Cpv) String() string {
+	s := C.pkgcraft_atom_str(cpv.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+func (cpv *Cpv) Hash() uint64 {
+	if cpv._hash == 0 {
+		cpv._hash = uint64(C.pkgcraft_atom_hash(cpv.ptr))
+	}
+	return cpv._hash
+}
+
+// Compare an atom with another atom returning -1, 0, or 1 if the first atom is
+// less than, equal to, or greater than the second atom, respectively.
+func (c1 *Cpv) Cmp(c2 *Cpv) int {
+	return int(C.pkgcraft_atom_cmp(c1.ptr, c2.ptr))
+}
+
+type Cpvs []*Cpv
+
+func (s Cpvs) Len() int           { return len(s) }
+func (s Cpvs) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
+func (s Cpvs) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+
+type Atom struct {
+	Cpv
+}
+
 type Blocker int
 
 const (
@@ -30,15 +132,6 @@ const (
 
 var atom_cache, _ = lru.New(10000)
 
-type Atom struct {
-	ptr *C.Atom
-	// cached fields
-	_category string
-	_package  string
-	_version  *Version
-	_hash     uint64
-}
-
 type Pair[T, U any] struct {
 	First  T
 	Second U
@@ -52,12 +145,12 @@ func newAtom(s string, eapi *Eapi) (*Atom, error) {
 		eapi_ptr = eapi.ptr
 	}
 
-	atom_str := C.CString(s)
-	defer C.free(unsafe.Pointer(atom_str))
-	ptr := C.pkgcraft_atom_new(atom_str, eapi_ptr)
+	c_str := C.CString(s)
+	defer C.free(unsafe.Pointer(c_str))
+	ptr := C.pkgcraft_atom_new(c_str, eapi_ptr)
 
 	if ptr != nil {
-		atom := &Atom{ptr: ptr}
+		atom := &Atom{Cpv{ptr: ptr}}
 		runtime.SetFinalizer(atom, func(a *Atom) { C.pkgcraft_atom_free(a.ptr) })
 		return atom, nil
 	} else {
@@ -98,46 +191,6 @@ func NewAtomCached(s string) (*Atom, error) {
 // Return a cached Atom if one exists, otherwise parse using a specific EAPI.
 func NewAtomCachedWithEapi(s string, eapi *Eapi) (*Atom, error) {
 	return newCachedAtom(s, eapi)
-}
-
-// Return an atom's category.
-func (a *Atom) Category() string {
-	if a._category == "" {
-		s := C.pkgcraft_atom_category(a.ptr)
-		defer C.pkgcraft_str_free(s)
-		a._category = C.GoString(s)
-	}
-	return a._category
-}
-
-// Return an atom's package name.
-func (a *Atom) Package() string {
-	if a._package == "" {
-		s := C.pkgcraft_atom_package(a.ptr)
-		defer C.pkgcraft_str_free(s)
-		a._package = C.GoString(s)
-	}
-	return a._package
-}
-
-// Return an atom's version.
-func (a *Atom) Version() *Version {
-	if a._version == nil {
-		ptr := C.pkgcraft_atom_version(a.ptr)
-		if ptr != nil {
-			a._version = &Version{ptr}
-		} else {
-			a._version = &Version{}
-		}
-	}
-	return a._version
-}
-
-// Return an atom's revision.
-func (a *Atom) Revision() string {
-	s := C.pkgcraft_atom_revision(a.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
 }
 
 // Return an atom's blocker.
@@ -186,15 +239,8 @@ func (a *Atom) Repo() string {
 	return C.GoString(s)
 }
 
-// Return the concatenated string of an atom's category and package.
-func (a *Atom) Key() string {
-	s := C.pkgcraft_atom_key(a.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
-}
-
 // Return the concatenated string of an atom's category, package, and version.
-func (a *Atom) Cpv() string {
+func (a *Atom) CPV() string {
 	s := C.pkgcraft_atom_cpv(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
@@ -211,37 +257,3 @@ type Atoms []*Atom
 func (s Atoms) Len() int           { return len(s) }
 func (s Atoms) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
 func (s Atoms) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-
-func (a *Atom) String() string {
-	s := C.pkgcraft_atom_str(a.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
-}
-
-func (a *Atom) Hash() uint64 {
-	if a._hash == 0 {
-		a._hash = uint64(C.pkgcraft_atom_hash(a.ptr))
-	}
-	return a._hash
-}
-
-type Cpv struct {
-	Atom
-}
-
-// Parse a CPV string into an atom.
-func NewCpv(s string) (*Cpv, error) {
-	cpv_str := C.CString(s)
-	defer C.free(unsafe.Pointer(cpv_str))
-	ptr := C.pkgcraft_cpv_new(cpv_str)
-
-	if ptr != nil {
-		cpv := &Cpv{Atom{ptr: ptr}}
-		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.ptr) })
-		return cpv, nil
-	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
-	}
-}

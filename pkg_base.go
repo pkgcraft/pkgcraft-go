@@ -12,7 +12,7 @@ type BasePkg struct {
 // Return a package's atom.
 func (p *BasePkg) Atom() *Cpv {
 	ptr := C.pkgcraft_pkg_atom(p.ptr)
-	return &Cpv{Atom{ptr: ptr}}
+	return &Cpv{ptr: ptr}
 }
 
 // Return a package's EAPI.
