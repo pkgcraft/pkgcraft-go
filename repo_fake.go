@@ -23,8 +23,8 @@ func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
 	}
 
 	c_id := C.CString(id)
-	defer C.free(unsafe.Pointer(c_id))
 	ptr := C.pkgcraft_repo_fake_new(c_id, C.int(priority), (**C.char)(c_cpvs), C.size_t(len(cpvs)))
+	C.free(unsafe.Pointer(c_id))
 	C.free(c_cpvs)
 
 	if ptr != nil {
