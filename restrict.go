@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"fmt"
 	"runtime"
 	"unsafe"
@@ -40,10 +39,6 @@ func stringToRestrict(s string) (*C.Restrict, error) {
 			return ptr, nil
 		} else if ptr := C.pkgcraft_restrict_parse_pkg(c_str); ptr != nil {
 			return ptr, nil
-		} else {
-			s := C.pkgcraft_last_error()
-			defer C.pkgcraft_str_free(s)
-			return nil, errors.New(C.GoString(s))
 		}
 	}
 	return nil, fmt.Errorf("invalid restriction string: %s", s)
@@ -51,11 +46,11 @@ func stringToRestrict(s string) (*C.Restrict, error) {
 
 // Try to convert an object to a restriction.
 func objectToRestrict(obj interface{}) (*C.Restrict, error) {
-	switch obj.(type) {
+	switch obj := obj.(type) {
 	case *Atom:
-		return C.pkgcraft_atom_restrict(obj.(*Atom).ptr), nil
+		return C.pkgcraft_atom_restrict(obj.ptr), nil
 	case string:
-		return stringToRestrict(obj.(string))
+		return stringToRestrict(obj)
 	default:
 		return nil, fmt.Errorf("unsupported restrict type: %t", obj)
 	}
