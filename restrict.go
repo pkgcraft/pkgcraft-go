@@ -15,7 +15,7 @@ type Restrict struct {
 	ptr *C.Restrict
 }
 
-// Return a new config for the system.
+// Return a new restriction from a given object.
 func NewRestrict(obj interface{}) (*Restrict, error) {
 	ptr, err := objectToRestrict(obj)
 	if ptr != nil {
@@ -27,6 +27,7 @@ func NewRestrict(obj interface{}) (*Restrict, error) {
 	}
 }
 
+// Try to convert a string to a restriction.
 func stringToRestrict(s string) (*C.Restrict, error) {
 	if cpv, _ := NewCpv(s); cpv != nil {
 		return C.pkgcraft_atom_restrict(cpv.ptr), nil
@@ -48,6 +49,7 @@ func stringToRestrict(s string) (*C.Restrict, error) {
 	return nil, fmt.Errorf("invalid restriction string: %s", s)
 }
 
+// Try to convert an object to a restriction.
 func objectToRestrict(obj interface{}) (*C.Restrict, error) {
 	switch obj.(type) {
 	case *Atom:
