@@ -17,7 +17,7 @@ func TestAtom(t *testing.T) {
 	// unversioned
 	atom, _ = NewAtom("cat/pkg")
 	assert.Equal(t, atom.Category(), "cat")
-	assert.Equal(t, atom.PN(), "pkg")
+	assert.Equal(t, atom.Package(), "pkg")
 	assert.Equal(t, atom.Version(), &Version{})
 	assert.Equal(t, atom.Revision(), "")
 	assert.Equal(t, atom.Blocker(), BlockerNone)
@@ -33,7 +33,7 @@ func TestAtom(t *testing.T) {
 	// versioned
 	atom, _ = NewAtom("=cat/pkg-1-r2")
 	assert.Equal(t, atom.Category(), "cat")
-	assert.Equal(t, atom.PN(), "pkg")
+	assert.Equal(t, atom.Package(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
 	assert.Equal(t, atom.Version(), ver)
 	assert.Equal(t, atom.Revision(), "2")
@@ -70,7 +70,7 @@ func TestAtom(t *testing.T) {
 	// all fields
 	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.Equal(t, atom.Category(), "cat")
-	assert.Equal(t, atom.PN(), "pkg")
+	assert.Equal(t, atom.Package(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
 	assert.Equal(t, atom.Version(), ver)
 	assert.Equal(t, atom.Revision(), "2")
@@ -197,7 +197,7 @@ func TestCpv(t *testing.T) {
 	// valid
 	cpv, _ = NewCpv("cat/pkg-1-r2")
 	assert.Equal(t, cpv.Category(), "cat")
-	assert.Equal(t, cpv.PN(), "pkg")
+	assert.Equal(t, cpv.Package(), "pkg")
 	ver, _ = NewVersion("1-r2")
 	assert.Equal(t, cpv.Version(), ver)
 	assert.Equal(t, cpv.Revision(), "2")

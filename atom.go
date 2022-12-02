@@ -111,7 +111,7 @@ func (a *Atom) Category() string {
 }
 
 // Return an atom's package name.
-func (a *Atom) PN() string {
+func (a *Atom) Package() string {
 	if a._package == "" {
 		s := C.pkgcraft_atom_package(a.ptr)
 		defer C.pkgcraft_str_free(s)
