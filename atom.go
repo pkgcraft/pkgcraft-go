@@ -167,7 +167,7 @@ func (a *Atom) SlotOp() SlotOperator {
 }
 
 // Return an atom's USE deps.
-func (a *Atom) UseDeps() []string {
+func (a *Atom) Use() []string {
 	var length C.size_t
 	array := C.pkgcraft_atom_use_deps(a.ptr, &length)
 	use_slice := unsafe.Slice(array, length)
