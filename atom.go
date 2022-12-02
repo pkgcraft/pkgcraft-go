@@ -194,7 +194,7 @@ func (a *Atom) Key() string {
 }
 
 // Return the concatenated string of an atom's category, package, and version.
-func (a *Atom) CPV() string {
+func (a *Atom) Cpv() string {
 	s := C.pkgcraft_atom_cpv(a.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
