@@ -23,3 +23,8 @@ func (r *EbuildRepo) createPkg(ptr *C.Pkg) *EbuildPkg {
 func (r *EbuildRepo) Pkgs() <-chan *EbuildPkg {
 	return repoPkgs((pkgRepo[*EbuildPkg])(r))
 }
+
+// Return a channel iterating over the restricted packages of a repo.
+func (r *EbuildRepo) RestrictPkgs(restrict *Restrict) <-chan *EbuildPkg {
+	return repoRestrictPkgs((pkgRepo[*EbuildPkg])(r), restrict)
+}

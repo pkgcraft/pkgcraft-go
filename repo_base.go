@@ -63,6 +63,11 @@ func (r *BaseRepo) Pkgs() <-chan *BasePkg {
 	return repoPkgs((pkgRepo[*BasePkg])(r))
 }
 
+// Return a channel iterating over the restricted packages of a repo.
+func (r *BaseRepo) RestrictPkgs(restrict *Restrict) <-chan *BasePkg {
+	return repoRestrictPkgs((pkgRepo[*BasePkg])(r), restrict)
+}
+
 // Return a new repo from a given pointer.
 func repoFromPtr(ptr *C.Repo) *BaseRepo {
 	format := RepoFormat(C.pkgcraft_repo_format(ptr))

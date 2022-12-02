@@ -49,3 +49,8 @@ func (r *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
 func (r *FakeRepo) Pkgs() <-chan *FakePkg {
 	return repoPkgs((pkgRepo[*FakePkg])(r))
 }
+
+// Return a channel iterating over the restricted packages of a repo.
+func (r *FakeRepo) RestrictPkgs(restrict *Restrict) <-chan *FakePkg {
+	return repoRestrictPkgs((pkgRepo[*FakePkg])(r), restrict)
+}
