@@ -4,27 +4,22 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
+import (
+	"runtime"
+)
+
 type EbuildRepo struct {
 	*BaseRepo
 }
 
+func (r *EbuildRepo) createPkg(ptr *C.Pkg) *EbuildPkg {
+	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
+	pkg := &EbuildPkg{&BasePkg{ptr, format}}
+	runtime.SetFinalizer(pkg, func(p *EbuildPkg) { C.pkgcraft_pkg_free(p.ptr) })
+	return pkg
+}
+
 // Return a channel iterating over the packages of a repo.
 func (r *EbuildRepo) Pkgs() <-chan *EbuildPkg {
-	pkgs := make(chan *EbuildPkg)
-
-	go func() {
-		iter := C.pkgcraft_repo_iter(r.ptr)
-		for {
-			ptr := C.pkgcraft_repo_iter_next(iter)
-			if ptr != nil {
-				pkgs <- &EbuildPkg{pkgFromPtr(ptr)}
-			} else {
-				break
-			}
-		}
-		close(pkgs)
-		C.pkgcraft_repo_iter_free(iter)
-	}()
-
-	return pkgs
+	return repoPkgs((pkgRepo[*EbuildPkg])(r))
 }

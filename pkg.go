@@ -4,14 +4,9 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
-import (
-	"runtime"
-)
-
 type Pkg interface {
 	Atom() *Cpv
 	Eapi() *Eapi
-	Repo() *BaseRepo
 	Version() *Version
 	String() string
 }
@@ -62,12 +57,4 @@ func (p *BasePkg) String() string {
 	s := C.pkgcraft_pkg_str(p.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
-}
-
-// Return a new package from a given pointer.
-func pkgFromPtr(ptr *C.Pkg) *BasePkg {
-	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
-	base := &BasePkg{ptr, format}
-	runtime.SetFinalizer(base, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })
-	return base
 }

@@ -4,17 +4,22 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
-type Repo interface {
-	Id() string
-	Path() string
-	IsEmpty() bool
-	String() string
-	Pkgs() <-chan *BasePkg
+import (
+	"runtime"
+)
+
+type pkgRepo[P Pkg] interface {
+	p() *C.Repo
+	createPkg(*C.Pkg) P
 }
 
 type BaseRepo struct {
 	ptr    *C.Repo
 	format RepoFormat
+}
+
+func (r *BaseRepo) p() *C.Repo {
+	return r.ptr
 }
 
 // Return a repo's id.
@@ -51,16 +56,28 @@ func (r1 *BaseRepo) Cmp(r2 *BaseRepo) int {
 	return int(C.pkgcraft_repo_cmp(r1.ptr, r2.ptr))
 }
 
+func (r *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {
+	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
+	pkg := &BasePkg{ptr, format}
+	runtime.SetFinalizer(pkg, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })
+	return pkg
+}
+
 // Return a channel iterating over the packages of a repo.
 func (r *BaseRepo) Pkgs() <-chan *BasePkg {
-	pkgs := make(chan *BasePkg)
+	return repoPkgs((pkgRepo[*BasePkg])(r))
+}
+
+// Return a generic channel iterating over the packages of a repo.
+func repoPkgs[P Pkg](r pkgRepo[P]) <-chan P {
+	pkgs := make(chan P)
 
 	go func() {
-		iter := C.pkgcraft_repo_iter(r.ptr)
+		iter := C.pkgcraft_repo_iter(r.p())
 		for {
 			ptr := C.pkgcraft_repo_iter_next(iter)
 			if ptr != nil {
-				pkgs <- pkgFromPtr(ptr)
+				pkgs <- r.createPkg(ptr)
 			} else {
 				break
 			}
