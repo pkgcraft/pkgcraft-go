@@ -2,10 +2,12 @@ package pkgcraft_test
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/pelletier/go-toml"
 
 	. "github.com/pkgcraft/pkgcraft-go"
 )
@@ -24,7 +26,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.Slot(), "")
 	assert.Equal(t, atom.Subslot(), "")
 	assert.Equal(t, atom.SlotOp(), SlotOpNone)
-	assert.Equal(t, atom.Use(), []string{})
+	assert.Equal(t, len(atom.Use()), 0)
 	assert.Equal(t, atom.Repo(), "")
 	assert.Equal(t, atom.Key(), "cat/pkg")
 	assert.Equal(t, atom.CPV(), "cat/pkg")
@@ -130,6 +132,79 @@ func TestAtom(t *testing.T) {
 	m[a2.Hash()] = true
 	m[a3.Hash()] = true
 	assert.Equal(t, len(m), 3)
+}
+
+type ValidAtom struct {
+	Atom string
+	Eapis string
+	Category string
+	Package string
+	Blocker string
+	Version string
+	Revision string
+	Slot string
+	Subslot string
+	Slot_Op string
+	Use []string
+}
+
+type AtomData struct {
+	Valid []ValidAtom
+	Invalid [][]string
+	Sorting [][][]string
+}
+
+func TestAtomToml(t *testing.T) {
+	var atoms AtomData
+	f, err := os.ReadFile("testdata/toml/atoms.toml")
+	if err != nil {
+		panic(err)
+	}
+	err = toml.Unmarshal(f, &atoms)
+	if err != nil {
+		panic(err)
+	}
+
+	// valid atoms
+	var ver *Version
+	var blocker Blocker
+	var slot_op SlotOperator
+	for _, el := range atoms.Valid {
+		eapis, err := EapiRange(el.Eapis)
+		if err != nil {
+			panic(err)
+		}
+		for _, eapi := range eapis {
+			atom, err := NewAtomWithEapi(el.Atom, eapi)
+			if err != nil {
+				panic(err)
+			}
+			assert.Equal(t, atom.Category(), el.Category)
+			assert.Equal(t, atom.Package(), el.Package)
+			if el.Blocker == "" {
+				blocker = BlockerNone
+			} else {
+				blocker, _ = BlockerFromString(el.Blocker)
+			}
+			assert.Equal(t, atom.Blocker(), blocker, "non-equal blocker: %s", el.Atom)
+			if el.Version != "" {
+				ver, _ = NewVersionWithOp(el.Version)
+			} else {
+				ver = &Version{}
+			}
+			assert.Equal(t, atom.Version(), ver)
+			assert.Equal(t, atom.Revision(), el.Revision)
+			assert.Equal(t, atom.Slot(), el.Slot)
+			assert.Equal(t, atom.Subslot(), el.Subslot)
+			if el.Slot_Op == "" {
+				slot_op = SlotOpNone
+			} else {
+				slot_op, _ = SlotOperatorFromString(el.Slot_Op)
+			}
+			assert.Equal(t, atom.SlotOp(), slot_op, "non-equal slot ops: %s", el.Atom)
+			assert.Equal(t, atom.Use(), el.Use, "non-equal use: %s", el.Use)
+		}
+	}
 }
 
 // test sending Atoms over a channel
