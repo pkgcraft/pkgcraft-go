@@ -14,18 +14,23 @@ type FakeRepo struct {
 	*BaseRepo
 }
 
-// Create a new fake repo.
-func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
-	c_cpvs := C.malloc(C.size_t(len(cpvs)) * C.size_t(unsafe.Sizeof(uintptr(0))))
-	a := (*[1<<30 - 1]*C.char)(c_cpvs)
-	for i, s := range cpvs {
+// Convert a slice of Go strings to an array of C strings.
+func sliceToCharArray(vals []string) (**C.char, C.size_t) {
+	c_strs := C.malloc(C.size_t(len(vals)) * C.size_t(unsafe.Sizeof(uintptr(0))))
+	a := (*[1<<30 - 1]*C.char)(c_strs)
+	for i, s := range vals {
 		a[i] = C.CString(s)
 	}
+	return (**C.char)(c_strs), C.size_t(len(vals))
+}
 
+// Create a new fake repo.
+func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
+	c_cpvs, c_len := sliceToCharArray(cpvs)
 	c_id := C.CString(id)
-	ptr := C.pkgcraft_repo_fake_new(c_id, C.int(priority), (**C.char)(c_cpvs), C.size_t(len(cpvs)))
+	ptr := C.pkgcraft_repo_fake_new(c_id, C.int(priority), c_cpvs, c_len)
 	C.free(unsafe.Pointer(c_id))
-	C.free(c_cpvs)
+	C.free(unsafe.Pointer(c_cpvs))
 
 	if ptr != nil {
 		repo := &FakeRepo{repoFromPtr(ptr)}
@@ -36,6 +41,20 @@ func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
 		defer C.pkgcraft_str_free(s)
 		return nil, errors.New(C.GoString(s))
 	}
+}
+
+// Add packages to an existing repo.
+func (r *FakeRepo) Extend(cpvs []string) error {
+	c_cpvs, c_len := sliceToCharArray(cpvs)
+	ptr := C.pkgcraft_repo_fake_extend(r.ptr, (**C.char)(c_cpvs), c_len)
+	C.free(unsafe.Pointer(c_cpvs))
+
+	if ptr != nil {
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return errors.New(C.GoString(s))
+	}
+	return nil
 }
 
 func (r *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
