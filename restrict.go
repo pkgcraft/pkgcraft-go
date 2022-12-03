@@ -14,12 +14,17 @@ type Restrict struct {
 	ptr *C.Restrict
 }
 
+func restrictFromPtr(ptr *C.Restrict) *Restrict {
+	restrict := &Restrict{ptr}
+	runtime.SetFinalizer(restrict, func(r *Restrict) { C.pkgcraft_restrict_free(r.ptr) })
+	return restrict
+}
+
 // Return a new restriction from a given object.
 func NewRestrict(obj interface{}) (*Restrict, error) {
 	ptr, err := objectToRestrict(obj)
 	if ptr != nil {
-		restrict := &Restrict{ptr}
-		runtime.SetFinalizer(restrict, func(r *Restrict) { C.pkgcraft_restrict_free(r.ptr) })
+		restrict := restrictFromPtr(ptr)
 		return restrict, nil
 	} else {
 		return nil, err
@@ -56,4 +61,28 @@ func objectToRestrict(obj interface{}) (*C.Restrict, error) {
 	default:
 		return nil, fmt.Errorf("unsupported restrict type: %t", obj)
 	}
+}
+
+// Create a new restriction combining two restrictions via logical AND.
+func (r1 *Restrict) And(r2 *Restrict) *Restrict {
+	ptr := C.pkgcraft_restrict_and(r1.ptr, r2.ptr)
+	return restrictFromPtr(ptr)
+}
+
+// Create a new restriction combining two restrictions via logical OR.
+func (r1 *Restrict) Or(r2 *Restrict) *Restrict {
+	ptr := C.pkgcraft_restrict_or(r1.ptr, r2.ptr)
+	return restrictFromPtr(ptr)
+}
+
+// Create a new restriction combining two restrictions via logical XOR.
+func (r1 *Restrict) Xor(r2 *Restrict) *Restrict {
+	ptr := C.pkgcraft_restrict_xor(r1.ptr, r2.ptr)
+	return restrictFromPtr(ptr)
+}
+
+// Create a new restriction inverting a restriction via logical NOT.
+func (r *Restrict) Not() *Restrict {
+	ptr := C.pkgcraft_restrict_not(r.ptr)
+	return restrictFromPtr(ptr)
 }
