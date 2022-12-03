@@ -107,5 +107,3 @@ type Cpvs []*Cpv
 func (s Cpvs) Len() int           { return len(s) }
 func (s Cpvs) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
 func (s Cpvs) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-
-
