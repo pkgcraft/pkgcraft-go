@@ -49,6 +49,8 @@ func objectToRestrict(obj interface{}) (*C.Restrict, error) {
 	switch obj := obj.(type) {
 	case *Cpv:
 		return C.pkgcraft_atom_restrict(obj.ptr), nil
+	case *BasePkg:
+		return C.pkgcraft_pkg_restrict(obj.ptr), nil
 	case string:
 		return stringToRestrict(obj)
 	default:
