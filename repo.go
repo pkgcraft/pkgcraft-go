@@ -4,52 +4,9 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
-type pkgRepo[P Pkg] interface {
-	p() *C.Repo
-	createPkg(*C.Pkg) P
-}
-
-// Return a generic channel iterating over the packages of a repo.
-func repoPkgs[P Pkg](repo pkgRepo[P]) <-chan P {
-	pkgs := make(chan P)
-
-	go func() {
-		iter := C.pkgcraft_repo_iter(repo.p())
-		for {
-			ptr := C.pkgcraft_repo_iter_next(iter)
-			if ptr != nil {
-				pkgs <- repo.createPkg(ptr)
-			} else {
-				break
-			}
-		}
-		close(pkgs)
-		C.pkgcraft_repo_iter_free(iter)
-	}()
-
-	return pkgs
-}
-
-// Return a generic channel iterating over the restricted packages of a repo.
-func repoRestrictPkgs[P Pkg](repo pkgRepo[P], restrict *Restrict) <-chan P {
-	pkgs := make(chan P)
-
-	go func(restrict *Restrict) {
-		iter := C.pkgcraft_repo_restrict_iter(repo.p(), restrict.ptr)
-		for {
-			ptr := C.pkgcraft_repo_restrict_iter_next(iter)
-			if ptr != nil {
-				pkgs <- repo.createPkg(ptr)
-			} else {
-				break
-			}
-		}
-		close(pkgs)
-		C.pkgcraft_repo_restrict_iter_free(iter)
-	}(restrict)
-
-	return pkgs
-}
+import (
+	"runtime"
+)
 
 type RepoFormat int
 
@@ -57,3 +14,94 @@ const (
 	RepoFormatEbuild RepoFormat = iota
 	RepoFormatFake
 )
+
+type pkgRepo[P Pkg] interface {
+	p() *C.Repo
+	createPkg(*C.Pkg) P
+}
+
+type pkgIter[P Pkg] struct {
+	ptr  *C.RepoPkgIter
+	repo pkgRepo[P]
+	next P
+}
+
+// Create an iterator over the packages of a repo.
+func newPkgIter[P Pkg](repo pkgRepo[P]) *pkgIter[P] {
+	ptr := C.pkgcraft_repo_iter(repo.p())
+	iter := &pkgIter[P]{ptr: ptr, repo: repo}
+	runtime.SetFinalizer(iter, func(i *pkgIter[P]) { C.pkgcraft_repo_iter_free(i.ptr) })
+	return iter
+}
+
+// Determine if a package iterator has another entry.
+func (iter *pkgIter[P]) HasNext() bool {
+	ptr := C.pkgcraft_repo_iter_next(iter.ptr)
+	if ptr != nil {
+		iter.next = iter.repo.createPkg(ptr)
+		return true
+	} else {
+		return false
+	}
+}
+
+// Return the next available package in the iterator.
+func (iter *pkgIter[P]) Next() P {
+	return iter.next
+}
+
+// Return a generic channel iterating over the packages of a repo.
+func repoPkgs[P Pkg](repo pkgRepo[P]) <-chan P {
+	pkgs := make(chan P)
+	go func() {
+		for iter := newPkgIter[P](repo); iter.HasNext(); {
+			pkgs <- iter.Next()
+		}
+		close(pkgs)
+	}()
+	return pkgs
+}
+
+type restrictPkgIter[P Pkg] struct {
+	ptr  *C.RepoRestrictPkgIter
+	repo pkgRepo[P]
+	next P
+}
+
+// Create a restricted iterator over the packages of a repo.
+func newRestrictPkgIter[P Pkg](repo pkgRepo[P], restrict *Restrict) *restrictPkgIter[P] {
+	ptr := C.pkgcraft_repo_restrict_iter(repo.p(), restrict.ptr)
+	iter := &restrictPkgIter[P]{ptr: ptr, repo: repo}
+	runtime.SetFinalizer(iter, func(i *restrictPkgIter[P]) { C.pkgcraft_repo_restrict_iter_free(i.ptr) })
+	return iter
+}
+
+// Determine if a restricted package iterator has another entry.
+func (iter *restrictPkgIter[P]) HasNext() bool {
+	ptr := C.pkgcraft_repo_restrict_iter_next(iter.ptr)
+	if ptr != nil {
+		iter.next = iter.repo.createPkg(ptr)
+		return true
+	} else {
+		return false
+	}
+}
+
+// Return the next available package in the iterator.
+func (iter *restrictPkgIter[P]) Next() P {
+	return iter.next
+}
+
+// Return a generic channel iterating over the restricted packages of a repo.
+func repoRestrictPkgs[P Pkg](repo pkgRepo[P], restrict *Restrict) <-chan P {
+	pkgs := make(chan P)
+
+	go func(restrict *Restrict) {
+		for iter := newRestrictPkgIter[P](repo, restrict); iter.HasNext(); {
+			pkgs <- iter.Next()
+		}
+		close(pkgs)
+	}(restrict)
+
+	return pkgs
+}

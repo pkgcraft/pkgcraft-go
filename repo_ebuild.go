@@ -19,12 +19,22 @@ func (r *EbuildRepo) createPkg(ptr *C.Pkg) *EbuildPkg {
 	return pkg
 }
 
+// Return an iterator over the packages of a repo.
+func (r *EbuildRepo) PkgIter() *pkgIter[*EbuildPkg] {
+	return newPkgIter[*EbuildPkg](r)
+}
+
 // Return a channel iterating over the packages of a repo.
 func (r *EbuildRepo) Pkgs() <-chan *EbuildPkg {
-	return repoPkgs((pkgRepo[*EbuildPkg])(r))
+	return repoPkgs[*EbuildPkg](r)
+}
+
+// Return an iterator over the restricted packages of a repo.
+func (r *EbuildRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*EbuildPkg] {
+	return newRestrictPkgIter[*EbuildPkg](r, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.
 func (r *EbuildRepo) RestrictPkgs(restrict *Restrict) <-chan *EbuildPkg {
-	return repoRestrictPkgs((pkgRepo[*EbuildPkg])(r), restrict)
+	return repoRestrictPkgs[*EbuildPkg](r, restrict)
 }

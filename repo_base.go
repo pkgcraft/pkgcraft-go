@@ -59,14 +59,24 @@ func (r *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {
 	return pkg
 }
 
+// Return an iterator over the packages of a repo.
+func (r *BaseRepo) PkgIter() *pkgIter[*BasePkg] {
+	return newPkgIter[*BasePkg](r)
+}
+
 // Return a channel iterating over the packages of a repo.
 func (r *BaseRepo) Pkgs() <-chan *BasePkg {
-	return repoPkgs((pkgRepo[*BasePkg])(r))
+	return repoPkgs[*BasePkg](r)
+}
+
+// Return an iterator over the restricted packages of a repo.
+func (r *BaseRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*BasePkg] {
+	return newRestrictPkgIter[*BasePkg](r, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.
 func (r *BaseRepo) RestrictPkgs(restrict *Restrict) <-chan *BasePkg {
-	return repoRestrictPkgs((pkgRepo[*BasePkg])(r), restrict)
+	return repoRestrictPkgs[*BasePkg](r, restrict)
 }
 
 // Return true if a repo contains a given object, false otherwise.
