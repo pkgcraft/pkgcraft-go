@@ -47,7 +47,7 @@ func stringToRestrict(s string) (*C.Restrict, error) {
 // Try to convert an object to a restriction.
 func objectToRestrict(obj interface{}) (*C.Restrict, error) {
 	switch obj := obj.(type) {
-	case *Atom:
+	case *Cpv:
 		return C.pkgcraft_atom_restrict(obj.ptr), nil
 	case string:
 		return stringToRestrict(obj)
