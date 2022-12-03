@@ -6,6 +6,7 @@ import "C"
 
 import (
 	"runtime"
+	"unsafe"
 )
 
 type BaseRepo struct {
@@ -66,6 +67,25 @@ func (r *BaseRepo) Pkgs() <-chan *BasePkg {
 // Return a channel iterating over the restricted packages of a repo.
 func (r *BaseRepo) RestrictPkgs(restrict *Restrict) <-chan *BasePkg {
 	return repoRestrictPkgs((pkgRepo[*BasePkg])(r), restrict)
+}
+
+// Return true if a repo contains a given object, false otherwise.
+func (r *BaseRepo) Contains(obj interface{}) bool {
+	switch obj := obj.(type) {
+	case string:
+		c_str := C.CString(obj)
+		defer C.free(unsafe.Pointer(c_str))
+		return bool(C.pkgcraft_repo_contains_path(r.ptr, c_str))
+	case *Restrict:
+		pkgs := r.RestrictPkgs(obj)
+		_, ok := <-pkgs
+		return ok
+	default:
+		if restrict, _ := NewRestrict(obj); restrict != nil {
+			return r.Contains(restrict)
+		}
+		return false
+	}
 }
 
 // Return a new repo from a given pointer.
