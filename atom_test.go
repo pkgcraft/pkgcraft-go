@@ -214,6 +214,25 @@ func TestAtomToml(t *testing.T) {
 			assert.Equal(t, atom.Use(), el.Use, "unequal use: %s", el.Use)
 		}
 	}
+
+	// invalid atoms
+	for _, data := range atoms.Invalid {
+		s := data[0]
+		failing_eapis, _ := EapiRange(data[1])
+		failing_map := make(map[string]*Eapi)
+		for _, eapi := range failing_eapis {
+			failing_map[eapi.String()] = eapi
+		}
+		for _, eapi := range EAPIS {
+			if _, ok := failing_map[eapi.String()]; ok {
+				_, err := NewAtomWithEapi(s, eapi)
+				assert.NotNil(t, err, "%s passed for EAPI=%s", s, eapi)
+			} else {
+				_, err := NewAtomWithEapi(s, eapi)
+				assert.Nil(t, err, "%s failed for EAPI=%s", s, eapi)
+			}
+		}
+	}
 }
 
 // test sending Atoms over a channel
