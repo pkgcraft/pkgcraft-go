@@ -6,8 +6,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/pelletier/go-toml"
+	"github.com/stretchr/testify/assert"
 
 	. "github.com/pkgcraft/pkgcraft-go"
 )
@@ -144,21 +144,21 @@ func TestAtom(t *testing.T) {
 }
 
 type ValidAtom struct {
-	Atom string
-	Eapis string
+	Atom     string
+	Eapis    string
 	Category string
-	Package string
-	Blocker string
-	Version string
+	Package  string
+	Blocker  string
+	Version  string
 	Revision string
-	Slot string
-	Subslot string
-	Slot_Op string
-	Use []string
+	Slot     string
+	Subslot  string
+	Slot_Op  string
+	Use      []string
 }
 
 type AtomData struct {
-	Valid []ValidAtom
+	Valid   []ValidAtom
 	Invalid [][]string
 	Sorting [][][]string
 }
