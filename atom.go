@@ -151,9 +151,3 @@ func (a *Atom) CPV() string {
 func (a1 *Atom) Cmp(a2 *Atom) int {
 	return int(C.pkgcraft_atom_cmp(a1.ptr, a2.ptr))
 }
-
-type Atoms []*Atom
-
-func (s Atoms) Len() int           { return len(s) }
-func (s Atoms) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
-func (s Atoms) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }

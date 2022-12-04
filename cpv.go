@@ -101,9 +101,3 @@ func (cpv *Cpv) Hash() uint64 {
 func (c1 *Cpv) Cmp(c2 *Cpv) int {
 	return int(C.pkgcraft_atom_cmp(c1.ptr, c2.ptr))
 }
-
-type Cpvs []*Cpv
-
-func (s Cpvs) Len() int           { return len(s) }
-func (s Cpvs) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
-func (s Cpvs) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }

@@ -185,7 +185,7 @@ func BenchmarkAtomSort(b *testing.B) {
 	}
 	assert.Equal(b, atoms[0].String(), "=cat/pkg-100")
 	for i := 0; i < b.N; i++ {
-		sort.Sort(Atoms(atoms))
+		sort.SliceStable(atoms, func(i, j int) bool { return atoms[i].Cmp(atoms[j]) == -1 })
 	}
 	assert.Equal(b, atoms[0].String(), "=cat/pkg-1")
 }
