@@ -6,7 +6,6 @@ import "C"
 
 import (
 	"errors"
-	"fmt"
 	"unsafe"
 
 	"github.com/hashicorp/golang-lru"
@@ -24,17 +23,6 @@ const (
 	BlockerWeak
 )
 
-func BlockerFromString(s string) (Blocker, error) {
-	c_str := C.CString(s)
-	i := C.pkgcraft_atom_blocker_from_str(c_str)
-	C.free(unsafe.Pointer(c_str))
-	if i >= 0 {
-		return Blocker(i), nil
-	} else {
-		return BlockerNone, fmt.Errorf("invalid blocker: %s", s)
-	}
-}
-
 type SlotOperator int
 
 const (
@@ -42,17 +30,6 @@ const (
 	SlotOpEqual
 	SlotOpStar
 )
-
-func SlotOperatorFromString(s string) (SlotOperator, error) {
-	c_str := C.CString(s)
-	i := C.pkgcraft_atom_slot_op_from_str(c_str)
-	C.free(unsafe.Pointer(c_str))
-	if i >= 0 {
-		return SlotOperator(i), nil
-	} else {
-		return SlotOpNone, fmt.Errorf("invalid slot operator: %s", s)
-	}
-}
 
 var atom_cache, _ = lru.New(10000)
 
