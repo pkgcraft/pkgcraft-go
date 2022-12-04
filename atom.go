@@ -47,8 +47,8 @@ func newAtom(s string, eapi *Eapi) (*Atom, error) {
 	}
 
 	c_str := C.CString(s)
-	defer C.free(unsafe.Pointer(c_str))
 	ptr := C.pkgcraft_atom_new(c_str, eapi_ptr)
+	C.free(unsafe.Pointer(c_str))
 
 	if ptr != nil {
 		atom := &Atom{Cpv{ptr: ptr}}
@@ -128,7 +128,7 @@ func (a *Atom) Use() []string {
 	for _, s := range use_slice {
 		use = append(use, C.GoString(s))
 	}
-	defer C.pkgcraft_str_array_free(array, length)
+	C.pkgcraft_str_array_free(array, length)
 	return use
 }
 
