@@ -86,6 +86,7 @@ func TestVersion(t *testing.T) {
 type versionData struct {
 	Compares []string
 	Sorting  [][][]string
+	Hashing  [][]interface{}
 }
 
 func TestVersionToml(t *testing.T) {
