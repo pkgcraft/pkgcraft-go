@@ -2,9 +2,11 @@ package pkgcraft_test
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"testing"
 
+	"github.com/pelletier/go-toml"
 	"github.com/stretchr/testify/assert"
 
 	. "github.com/pkgcraft/pkgcraft-go"
@@ -79,6 +81,44 @@ func TestVersion(t *testing.T) {
 	m[v2.Hash()] = true
 	m[v3.Hash()] = true
 	assert.Equal(t, len(m), 3)
+}
+
+type versionData struct {
+	Compares []string
+	Sorting  [][][]string
+}
+
+func TestVersionToml(t *testing.T) {
+	var ver_data versionData
+	f, err := os.ReadFile("testdata/toml/versions.toml")
+	if err != nil {
+		panic(err)
+	}
+	err = toml.Unmarshal(f, &ver_data)
+	if err != nil {
+		panic(err)
+	}
+
+	// sorting
+	for _, data := range ver_data.Sorting {
+		var sorted []*Version
+		for _, s := range data[0] {
+			ver, _ := NewVersion(s)
+			sorted = append(sorted, ver)
+		}
+		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Cmp(sorted[j]) == -1 })
+
+		var expected []*Version
+		for _, s := range data[1] {
+			ver, _ := NewVersion(s)
+			expected = append(expected, ver)
+		}
+
+		assert.Equal(t, len(sorted), len(expected))
+		for i := range sorted {
+			assert.True(t, sorted[i].Cmp(expected[i]) == 0, "%s != %s", sorted, expected)
+		}
+	}
 }
 
 func BenchmarkNewVersion(b *testing.B) {
