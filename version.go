@@ -56,12 +56,6 @@ func (v1 *Version) Cmp(v2 *Version) int {
 	return int(C.pkgcraft_version_cmp(v1.ptr, v2.ptr))
 }
 
-type Versions []*Version
-
-func (s Versions) Len() int           { return len(s) }
-func (s Versions) Less(i, j int) bool { return s[i].Cmp(s[j]) == -1 }
-func (s Versions) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-
 func (v *Version) String() string {
 	s := C.pkgcraft_version_str(v.ptr)
 	defer C.pkgcraft_str_free(s)

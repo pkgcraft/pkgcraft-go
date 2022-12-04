@@ -136,7 +136,7 @@ func BenchmarkVersionSort(b *testing.B) {
 	}
 	assert.Equal(b, versions[0].String(), "100")
 	for i := 0; i < b.N; i++ {
-		sort.Sort(Versions(versions))
+		sort.SliceStable(versions, func(i, j int) bool { return versions[i].Cmp(versions[j]) == -1 })
 	}
 	assert.Equal(b, versions[0].String(), "1")
 }
