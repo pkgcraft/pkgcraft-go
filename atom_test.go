@@ -158,19 +158,19 @@ type validAtom struct {
 	Use      []string
 }
 
-type AtomData struct {
+type atomData struct {
 	Valid   []validAtom
 	Invalid [][]string
 	Sorting [][][]string
 }
 
 func TestAtomToml(t *testing.T) {
-	var atoms AtomData
+	var atom_data atomData
 	f, err := os.ReadFile("testdata/toml/atoms.toml")
 	if err != nil {
 		panic(err)
 	}
-	err = toml.Unmarshal(f, &atoms)
+	err = toml.Unmarshal(f, &atom_data)
 	if err != nil {
 		panic(err)
 	}
@@ -179,7 +179,7 @@ func TestAtomToml(t *testing.T) {
 	var ver *Version
 	var blocker Blocker
 	var slot_op SlotOperator
-	for _, el := range atoms.Valid {
+	for _, el := range atom_data.Valid {
 		eapis, err := EapiRange(el.Eapis)
 		if err != nil {
 			panic(err)
@@ -217,7 +217,7 @@ func TestAtomToml(t *testing.T) {
 	}
 
 	// invalid atoms
-	for _, data := range atoms.Invalid {
+	for _, data := range atom_data.Invalid {
 		s := data[0]
 		failing_eapis, _ := EapiRange(data[1])
 		failing_map := make(map[string]*Eapi)
@@ -236,7 +236,7 @@ func TestAtomToml(t *testing.T) {
 	}
 
 	// sorting
-	for _, data := range atoms.Sorting {
+	for _, data := range atom_data.Sorting {
 		var sorted []*Atom
 		for _, s := range data[0] {
 			atom, _ := NewAtom(s)
