@@ -143,7 +143,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, len(m), 3)
 }
 
-type ValidAtom struct {
+type validAtom struct {
 	Atom     string
 	Eapis    string
 	Category string
@@ -158,7 +158,7 @@ type ValidAtom struct {
 }
 
 type AtomData struct {
-	Valid   []ValidAtom
+	Valid   []validAtom
 	Invalid [][]string
 	Sorting [][][]string
 }
@@ -231,6 +231,27 @@ func TestAtomToml(t *testing.T) {
 				_, err := NewAtomWithEapi(s, eapi)
 				assert.Nil(t, err, "%s failed for EAPI=%s", s, eapi)
 			}
+		}
+	}
+
+	// sorting
+	for _, data := range atoms.Sorting {
+		var sorted []*Atom
+		for _, s := range data[0] {
+			atom, _ := NewAtom(s)
+			sorted = append(sorted, atom)
+		}
+		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Cmp(sorted[j]) == -1 })
+
+		var expected []*Atom
+		for _, s := range data[1] {
+			atom, _ := NewAtom(s)
+			expected = append(expected, atom)
+		}
+
+		assert.Equal(t, len(sorted), len(expected))
+		for i := range sorted {
+			assert.True(t, sorted[i].Cmp(expected[i]) == 0, "%s != %s", sorted, expected)
 		}
 	}
 }
