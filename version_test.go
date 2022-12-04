@@ -12,28 +12,34 @@ import (
 
 func TestVersion(t *testing.T) {
 	var version *Version
+	var err error
 
 	// non-revision
-	version, _ = NewVersion("1")
+	version, err = NewVersion("1")
+	assert.Nil(t, err)
 	assert.Equal(t, version.Revision(), "0")
 	assert.Equal(t, version.String(), "1")
 
 	// revisioned
-	version, _ = NewVersion("1-r1")
+	version, err = NewVersion("1-r1")
+	assert.Nil(t, err)
 	assert.Equal(t, version.Revision(), "1")
 	assert.Equal(t, version.String(), "1-r1")
 
 	// explicit '0' revision
-	version, _ = NewVersion("1-r0")
+	version, err = NewVersion("1-r0")
+	assert.Nil(t, err)
 	assert.Equal(t, version.Revision(), "0")
 	assert.Equal(t, version.String(), "1-r0")
 
 	// invalid
-	version, _ = NewVersion(">1-r2")
+	version, err = NewVersion(">1-r2")
 	assert.Nil(t, version)
+	assert.NotNil(t, err)
 
 	// Version with op
-	version, _ = NewVersionWithOp(">1-r2")
+	version, err = NewVersionWithOp(">1-r2")
+	assert.Nil(t, err)
 	assert.Equal(t, version.Revision(), "2")
 	assert.Equal(t, version.String(), ">1-r2")
 
