@@ -13,7 +13,7 @@ import (
 )
 
 type Atom struct {
-	Cpv
+	*Cpv
 }
 
 type Blocker int
@@ -74,7 +74,7 @@ func newAtom(s string, eapi *Eapi) (*Atom, error) {
 	C.free(unsafe.Pointer(c_str))
 
 	if ptr != nil {
-		atom := &Atom{Cpv{ptr: ptr}}
+		atom := &Atom{&Cpv{ptr: ptr}}
 		return atom, nil
 	} else {
 		s := C.pkgcraft_last_error()
