@@ -14,10 +14,12 @@ import (
 
 func TestAtom(t *testing.T) {
 	var atom, c1, c2 *Atom
+	var err error
 	var ver *Version
 
 	// unversioned
-	atom, _ = NewAtom("cat/pkg")
+	atom, err = NewAtom("cat/pkg")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Category(), "cat")
 	assert.Equal(t, atom.Package(), "pkg")
 	assert.Equal(t, atom.Version(), &Version{})
@@ -33,7 +35,8 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.String(), "cat/pkg")
 
 	// versioned
-	atom, _ = NewAtom("=cat/pkg-1-r2")
+	atom, err = NewAtom("=cat/pkg-1-r2")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Category(), "cat")
 	assert.Equal(t, atom.Package(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
@@ -44,33 +47,39 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.String(), "=cat/pkg-1-r2")
 
 	// blocker
-	atom, _ = NewAtom("!cat/pkg")
+	atom, err = NewAtom("!cat/pkg")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Blocker(), BlockerWeak)
 	assert.Equal(t, atom.String(), "!cat/pkg")
 
 	// subslotted
-	atom, _ = NewAtom("cat/pkg:1/2")
+	atom, err = NewAtom("cat/pkg:1/2")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Slot(), "1")
 	assert.Equal(t, atom.Subslot(), "2")
 	assert.Equal(t, atom.String(), "cat/pkg:1/2")
 
 	// slot operator
-	atom, _ = NewAtom("cat/pkg:0=")
+	atom, err = NewAtom("cat/pkg:0=")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Slot(), "0")
 	assert.Equal(t, atom.SlotOp(), SlotOpEqual)
 	assert.Equal(t, atom.String(), "cat/pkg:0=")
 
 	// repo
-	atom, _ = NewAtom("cat/pkg::repo")
+	atom, err = NewAtom("cat/pkg::repo")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Repo(), "repo")
 	assert.Equal(t, atom.String(), "cat/pkg::repo")
 
 	// repo dep invalid on official EAPIs
-	atom, _ = NewAtomWithEapi("cat/pkg::repo", EAPI_LATEST)
+	atom, err = NewAtomWithEapi("cat/pkg::repo", EAPI_LATEST)
 	assert.Nil(t, atom)
+	assert.NotNil(t, err)
 
 	// all fields
-	atom, _ = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	atom, err = NewAtom("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	assert.Nil(t, err)
 	assert.Equal(t, atom.Category(), "cat")
 	assert.Equal(t, atom.Package(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
