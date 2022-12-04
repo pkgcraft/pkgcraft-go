@@ -186,7 +186,7 @@ func TestAtomToml(t *testing.T) {
 			} else {
 				blocker, _ = BlockerFromString(el.Blocker)
 			}
-			assert.Equal(t, atom.Blocker(), blocker, "non-equal blocker: %s", el.Atom)
+			assert.Equal(t, atom.Blocker(), blocker, "unequal blocker: %s", el.Atom)
 			if el.Version != "" {
 				ver, _ = NewVersionWithOp(el.Version)
 			} else {
@@ -201,8 +201,8 @@ func TestAtomToml(t *testing.T) {
 			} else {
 				slot_op, _ = SlotOperatorFromString(el.Slot_Op)
 			}
-			assert.Equal(t, atom.SlotOp(), slot_op, "non-equal slot ops: %s", el.Atom)
-			assert.Equal(t, atom.Use(), el.Use, "non-equal use: %s", el.Use)
+			assert.Equal(t, atom.SlotOp(), slot_op, "unequal slot ops: %s", el.Atom)
+			assert.Equal(t, atom.Use(), el.Use, "unequal use: %s", el.Use)
 		}
 	}
 }
