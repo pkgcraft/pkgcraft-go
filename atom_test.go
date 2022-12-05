@@ -31,7 +31,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.SlotOp(), SlotOpNone)
 	assert.Equal(t, len(atom.Use()), 0)
 	assert.Equal(t, atom.Repo(), "")
-	assert.Equal(t, atom.Key(), "cat/pkg")
+	assert.Equal(t, atom.Cpn(), "cat/pkg")
 	assert.Equal(t, atom.CPV(), "cat/pkg")
 	assert.Equal(t, atom.String(), "cat/pkg")
 
@@ -43,7 +43,7 @@ func TestAtom(t *testing.T) {
 	ver, _ = NewVersionWithOp("=1-r2")
 	assert.Equal(t, atom.Version(), ver)
 	assert.Equal(t, atom.Revision(), "2")
-	assert.Equal(t, atom.Key(), "cat/pkg")
+	assert.Equal(t, atom.Cpn(), "cat/pkg")
 	assert.Equal(t, atom.CPV(), "cat/pkg-1-r2")
 	assert.Equal(t, atom.String(), "=cat/pkg-1-r2")
 
@@ -92,7 +92,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.SlotOp(), SlotOpEqual)
 	assert.Equal(t, atom.Use(), []string{"a", "b", "c"})
 	assert.Equal(t, atom.Repo(), "repo")
-	assert.Equal(t, atom.Key(), "cat/pkg")
+	assert.Equal(t, atom.Cpn(), "cat/pkg")
 	assert.Equal(t, atom.CPV(), "cat/pkg-1-r2")
 	assert.Equal(t, atom.String(), "!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 
