@@ -166,7 +166,7 @@ type atomData struct {
 
 func TestAtomToml(t *testing.T) {
 	var atom_data atomData
-	f, err := os.ReadFile("testdata/toml/atoms.toml")
+	f, err := os.ReadFile("testdata/toml/atom.toml")
 	if err != nil {
 		panic(err)
 	}

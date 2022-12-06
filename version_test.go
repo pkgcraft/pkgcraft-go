@@ -91,7 +91,7 @@ type versionData struct {
 
 func TestVersionToml(t *testing.T) {
 	var ver_data versionData
-	f, err := os.ReadFile("testdata/toml/versions.toml")
+	f, err := os.ReadFile("testdata/toml/version.toml")
 	if err != nil {
 		panic(err)
 	}
