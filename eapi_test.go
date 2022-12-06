@@ -17,8 +17,15 @@ func TestEapiGlobals(t *testing.T) {
 }
 
 func TestEapiRange(t *testing.T) {
-	eapis, err := EapiRange("2..=3")
-	assert.Equal(t, eapis, []*Eapi{EAPIS["2"], EAPIS["3"]})
+	// valid
+	eapis, err := EapiRange("..")
+	assert.Equal(t, len(eapis), len(EAPIS))
+	assert.Nil(t, err)
+	eapis, err = EapiRange("..=L")
+	assert.Equal(t, len(eapis), len(EAPIS_OFFICIAL))
+	assert.Nil(t, err)
+	eapis, err = EapiRange("2..3")
+	assert.Equal(t, eapis, []*Eapi{EAPIS["2"]})
 	assert.Nil(t, err)
 	eapis, err = EapiRange("1..")
 	assert.Nil(t, err)
