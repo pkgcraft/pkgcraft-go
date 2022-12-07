@@ -50,11 +50,12 @@ func (r *FakeRepo) Extend(cpvs []string) error {
 	C.free(unsafe.Pointer(c_cpvs))
 
 	if ptr != nil {
+		return nil
+	} else {
 		s := C.pkgcraft_last_error()
 		defer C.pkgcraft_str_free(s)
 		return errors.New(C.GoString(s))
 	}
-	return nil
 }
 
 func (r *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
