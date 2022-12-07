@@ -21,9 +21,6 @@ func TestEapiRange(t *testing.T) {
 	eapis, err := EapiRange("..")
 	assert.Equal(t, len(eapis), len(EAPIS))
 	assert.Nil(t, err)
-	eapis, err = EapiRange("..=L")
-	assert.Equal(t, len(eapis), len(EAPIS_OFFICIAL))
-	assert.Nil(t, err)
 	eapis, err = EapiRange("2..3")
 	assert.Equal(t, eapis, []*Eapi{EAPIS["2"]})
 	assert.Nil(t, err)
@@ -36,10 +33,10 @@ func TestEapiRange(t *testing.T) {
 	assert.Equal(t, len(eapis), 0)
 
 	// invalid
-	_, err = EapiRange("")
-	assert.NotNil(t, err)
-	_, err = EapiRange("1")
-	assert.NotNil(t, err)
+	for _, s := range []string{"", "1", "..9999"} {
+		_, err = EapiRange(s)
+		assert.NotNil(t, err)
+	}
 }
 
 func TestEapiHas(t *testing.T) {
