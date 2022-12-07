@@ -9,7 +9,7 @@ type FakePkg struct {
 }
 
 // Return a package's repo.
-func (p *FakePkg) Repo() *FakeRepo {
-	base := &BaseRepo{C.pkgcraft_pkg_repo(p.ptr), RepoFormatFake}
+func (self *FakePkg) Repo() *FakeRepo {
+	base := &BaseRepo{C.pkgcraft_pkg_repo(self.ptr), RepoFormatFake}
 	return &FakeRepo{base}
 }

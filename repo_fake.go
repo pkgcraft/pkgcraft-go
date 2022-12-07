@@ -34,7 +34,7 @@ func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
 
 	if ptr != nil {
 		repo := &FakeRepo{repoFromPtr(ptr)}
-		runtime.SetFinalizer(repo, func(r *FakeRepo) { C.pkgcraft_repo_free(r.ptr) })
+		runtime.SetFinalizer(repo, func(self *FakeRepo) { C.pkgcraft_repo_free(self.ptr) })
 		return repo, nil
 	} else {
 		s := C.pkgcraft_last_error()
@@ -44,9 +44,9 @@ func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
 }
 
 // Add packages to an existing repo.
-func (r *FakeRepo) Extend(cpvs []string) error {
+func (self *FakeRepo) Extend(cpvs []string) error {
 	c_cpvs, c_len := sliceToCharArray(cpvs)
-	ptr := C.pkgcraft_repo_fake_extend(r.ptr, (**C.char)(c_cpvs), c_len)
+	ptr := C.pkgcraft_repo_fake_extend(self.ptr, (**C.char)(c_cpvs), c_len)
 	C.free(unsafe.Pointer(c_cpvs))
 
 	if ptr != nil {
@@ -58,29 +58,29 @@ func (r *FakeRepo) Extend(cpvs []string) error {
 	}
 }
 
-func (r *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
+func (self *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
 	pkg := &FakePkg{&BasePkg{ptr, format}}
-	runtime.SetFinalizer(pkg, func(p *FakePkg) { C.pkgcraft_pkg_free(p.ptr) })
+	runtime.SetFinalizer(pkg, func(self *FakePkg) { C.pkgcraft_pkg_free(self.ptr) })
 	return pkg
 }
 
 // Return an iterator over the packages of a repo.
-func (r *FakeRepo) PkgIter() *pkgIter[*FakePkg] {
-	return newPkgIter[*FakePkg](r)
+func (self *FakeRepo) PkgIter() *pkgIter[*FakePkg] {
+	return newPkgIter[*FakePkg](self)
 }
 
 // Return a channel iterating over the packages of a repo.
-func (r *FakeRepo) Pkgs() <-chan *FakePkg {
-	return repoPkgs((pkgRepo[*FakePkg])(r))
+func (self *FakeRepo) Pkgs() <-chan *FakePkg {
+	return repoPkgs((pkgRepo[*FakePkg])(self))
 }
 
 // Return an iterator over the restricted packages of a repo.
-func (r *FakeRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*FakePkg] {
-	return newRestrictPkgIter[*FakePkg](r, restrict)
+func (self *FakeRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*FakePkg] {
+	return newRestrictPkgIter[*FakePkg](self, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.
-func (r *FakeRepo) RestrictPkgs(restrict *Restrict) <-chan *FakePkg {
-	return repoRestrictPkgs((pkgRepo[*FakePkg])(r), restrict)
+func (self *FakeRepo) RestrictPkgs(restrict *Restrict) <-chan *FakePkg {
+	return repoRestrictPkgs((pkgRepo[*FakePkg])(self), restrict)
 }

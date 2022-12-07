@@ -27,7 +27,7 @@ func NewCpv(s string) (*Cpv, error) {
 
 	if ptr != nil {
 		cpv := &Cpv{ptr: ptr}
-		runtime.SetFinalizer(cpv, func(cpv *Cpv) { C.pkgcraft_atom_free(cpv.ptr) })
+		runtime.SetFinalizer(cpv, func(self *Cpv) { C.pkgcraft_atom_free(self.ptr) })
 		return cpv, nil
 	} else {
 		s := C.pkgcraft_last_error()
@@ -37,67 +37,67 @@ func NewCpv(s string) (*Cpv, error) {
 }
 
 // Return an atom's category.
-func (cpv *Cpv) Category() string {
-	if cpv._category == "" {
-		s := C.pkgcraft_atom_category(cpv.ptr)
+func (self *Cpv) Category() string {
+	if self._category == "" {
+		s := C.pkgcraft_atom_category(self.ptr)
 		defer C.pkgcraft_str_free(s)
-		cpv._category = C.GoString(s)
+		self._category = C.GoString(s)
 	}
-	return cpv._category
+	return self._category
 }
 
 // Return an atom's package name.
-func (cpv *Cpv) Package() string {
-	if cpv._package == "" {
-		s := C.pkgcraft_atom_package(cpv.ptr)
+func (self *Cpv) Package() string {
+	if self._package == "" {
+		s := C.pkgcraft_atom_package(self.ptr)
 		defer C.pkgcraft_str_free(s)
-		cpv._package = C.GoString(s)
+		self._package = C.GoString(s)
 	}
-	return cpv._package
+	return self._package
 }
 
 // Return an atom's version.
-func (cpv *Cpv) Version() *Version {
-	if cpv._version == nil {
-		ptr := C.pkgcraft_atom_version(cpv.ptr)
+func (self *Cpv) Version() *Version {
+	if self._version == nil {
+		ptr := C.pkgcraft_atom_version(self.ptr)
 		if ptr != nil {
-			cpv._version = &Version{ptr}
+			self._version = &Version{ptr}
 		} else {
-			cpv._version = &Version{}
+			self._version = &Version{}
 		}
 	}
-	return cpv._version
+	return self._version
 }
 
 // Return an atom's revision.
-func (cpv *Cpv) Revision() string {
-	s := C.pkgcraft_atom_revision(cpv.ptr)
+func (self *Cpv) Revision() string {
+	s := C.pkgcraft_atom_revision(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return the concatenated string of an atom's category and package.
-func (cpv *Cpv) Cpn() string {
-	s := C.pkgcraft_atom_cpn(cpv.ptr)
+func (self *Cpv) Cpn() string {
+	s := C.pkgcraft_atom_cpn(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
-func (cpv *Cpv) String() string {
-	s := C.pkgcraft_atom_str(cpv.ptr)
+func (self *Cpv) String() string {
+	s := C.pkgcraft_atom_str(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
-func (cpv *Cpv) Hash() uint64 {
-	if cpv._hash == 0 {
-		cpv._hash = uint64(C.pkgcraft_atom_hash(cpv.ptr))
+func (self *Cpv) Hash() uint64 {
+	if self._hash == 0 {
+		self._hash = uint64(C.pkgcraft_atom_hash(self.ptr))
 	}
-	return cpv._hash
+	return self._hash
 }
 
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
-func (c1 *Cpv) Cmp(c2 *Cpv) int {
-	return int(C.pkgcraft_atom_cmp(c1.ptr, c2.ptr))
+func (self *Cpv) Cmp(other *Cpv) int {
+	return int(C.pkgcraft_atom_cmp(self.ptr, other.ptr))
 }

@@ -14,85 +14,85 @@ type BaseRepo struct {
 	format RepoFormat
 }
 
-func (r *BaseRepo) p() *C.Repo {
-	return r.ptr
+func (self *BaseRepo) p() *C.Repo {
+	return self.ptr
 }
 
 // Return a repo's id.
-func (r *BaseRepo) Id() string {
-	s := C.pkgcraft_repo_id(r.ptr)
+func (self *BaseRepo) Id() string {
+	s := C.pkgcraft_repo_id(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return a repo's path.
-func (r *BaseRepo) Path() string {
-	s := C.pkgcraft_repo_path(r.ptr)
+func (self *BaseRepo) Path() string {
+	s := C.pkgcraft_repo_path(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return if a repo is empty.
-func (r *BaseRepo) IsEmpty() bool {
-	return bool(C.pkgcraft_repo_is_empty(r.ptr))
+func (self *BaseRepo) IsEmpty() bool {
+	return bool(C.pkgcraft_repo_is_empty(self.ptr))
 }
 
 // Return the number of packages in a repo.
-func (r *BaseRepo) Len() int {
-	return int(C.pkgcraft_repo_len(r.ptr))
+func (self *BaseRepo) Len() int {
+	return int(C.pkgcraft_repo_len(self.ptr))
 }
 
-func (r *BaseRepo) String() string {
-	return r.Id()
+func (self *BaseRepo) String() string {
+	return self.Id()
 }
 
 // Compare a repo with another repo returning -1, 0, or 1 if the first is less
 // than, equal to, or greater than the second, respectively.
-func (r1 *BaseRepo) Cmp(r2 *BaseRepo) int {
-	return int(C.pkgcraft_repo_cmp(r1.ptr, r2.ptr))
+func (self *BaseRepo) Cmp(other *BaseRepo) int {
+	return int(C.pkgcraft_repo_cmp(self.ptr, other.ptr))
 }
 
-func (r *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {
+func (self *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
 	pkg := &BasePkg{ptr, format}
-	runtime.SetFinalizer(pkg, func(p *BasePkg) { C.pkgcraft_pkg_free(p.ptr) })
+	runtime.SetFinalizer(pkg, func(self *BasePkg) { C.pkgcraft_pkg_free(self.ptr) })
 	return pkg
 }
 
 // Return an iterator over the packages of a repo.
-func (r *BaseRepo) PkgIter() *pkgIter[*BasePkg] {
-	return newPkgIter[*BasePkg](r)
+func (self *BaseRepo) PkgIter() *pkgIter[*BasePkg] {
+	return newPkgIter[*BasePkg](self)
 }
 
 // Return a channel iterating over the packages of a repo.
-func (r *BaseRepo) Pkgs() <-chan *BasePkg {
-	return repoPkgs[*BasePkg](r)
+func (self *BaseRepo) Pkgs() <-chan *BasePkg {
+	return repoPkgs[*BasePkg](self)
 }
 
 // Return an iterator over the restricted packages of a repo.
-func (r *BaseRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*BasePkg] {
-	return newRestrictPkgIter[*BasePkg](r, restrict)
+func (self *BaseRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*BasePkg] {
+	return newRestrictPkgIter[*BasePkg](self, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.
-func (r *BaseRepo) RestrictPkgs(restrict *Restrict) <-chan *BasePkg {
-	return repoRestrictPkgs[*BasePkg](r, restrict)
+func (self *BaseRepo) RestrictPkgs(restrict *Restrict) <-chan *BasePkg {
+	return repoRestrictPkgs[*BasePkg](self, restrict)
 }
 
 // Return true if a repo contains a given object, false otherwise.
-func (r *BaseRepo) Contains(obj interface{}) bool {
+func (self *BaseRepo) Contains(obj interface{}) bool {
 	switch obj := obj.(type) {
 	case string:
 		c_str := C.CString(obj)
 		defer C.free(unsafe.Pointer(c_str))
-		return bool(C.pkgcraft_repo_contains_path(r.ptr, c_str))
+		return bool(C.pkgcraft_repo_contains_path(self.ptr, c_str))
 	case *Restrict:
-		pkgs := r.RestrictPkgs(obj)
+		pkgs := self.RestrictPkgs(obj)
 		_, ok := <-pkgs
 		return ok
 	default:
 		if restrict, _ := NewRestrict(obj); restrict != nil {
-			return r.Contains(restrict)
+			return self.Contains(restrict)
 		}
 		return false
 	}

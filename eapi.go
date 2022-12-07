@@ -81,19 +81,19 @@ type Eapi struct {
 }
 
 // Return the string for an EAPI.
-func (e *Eapi) String() string {
-	return e.id
+func (self *Eapi) String() string {
+	return self.id
 }
 
 // Check if an EAPI has a given feature.
-func (e *Eapi) Has(s string) bool {
+func (self *Eapi) Has(s string) bool {
 	cstr := C.CString(s)
 	defer C.free(unsafe.Pointer(cstr))
-	return bool(C.pkgcraft_eapi_has(e.ptr, cstr))
+	return bool(C.pkgcraft_eapi_has(self.ptr, cstr))
 }
 
 // Compare an Eapi with another Eapi chronologically returning -1, 0, or 1 if
 // the first is less than, equal to, or greater than the second, respectively.
-func (e1 *Eapi) Cmp(e2 *Eapi) int {
-	return int(C.pkgcraft_eapi_cmp(e1.ptr, e2.ptr))
+func (self *Eapi) Cmp(other *Eapi) int {
+	return int(C.pkgcraft_eapi_cmp(self.ptr, other.ptr))
 }

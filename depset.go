@@ -23,7 +23,7 @@ type DepRestrict struct {
 
 func depRestrictFromPtr(ptr *C.DepRestrict, kind DepSetKind) *DepRestrict {
 	obj := &DepRestrict{ptr, kind}
-	runtime.SetFinalizer(obj, func(o *DepRestrict) { C.pkgcraft_deprestrict_free(o.ptr) })
+	runtime.SetFinalizer(obj, func(self *DepRestrict) { C.pkgcraft_deprestrict_free(self.ptr) })
 	return obj
 }
 
@@ -40,7 +40,7 @@ type DepSet struct {
 
 func depSetFromPtr(ptr *C.DepSet, kind DepSetKind) *DepSet {
 	obj := &DepSet{ptr, kind}
-	runtime.SetFinalizer(obj, func(o *DepSet) { C.pkgcraft_depset_free(o.ptr) })
+	runtime.SetFinalizer(obj, func(self *DepSet) { C.pkgcraft_depset_free(self.ptr) })
 	return obj
 }
 

@@ -94,35 +94,35 @@ func NewAtomCachedWithEapi(s string, eapi *Eapi) (*Atom, error) {
 }
 
 // Return an atom's blocker.
-func (a *Atom) Blocker() Blocker {
-	i := C.pkgcraft_atom_blocker(a.ptr)
+func (self *Atom) Blocker() Blocker {
+	i := C.pkgcraft_atom_blocker(self.ptr)
 	return Blocker(i)
 }
 
 // Return an atom's slot.
-func (a *Atom) Slot() string {
-	s := C.pkgcraft_atom_slot(a.ptr)
+func (self *Atom) Slot() string {
+	s := C.pkgcraft_atom_slot(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's subslot.
-func (a *Atom) Subslot() string {
-	s := C.pkgcraft_atom_subslot(a.ptr)
+func (self *Atom) Subslot() string {
+	s := C.pkgcraft_atom_subslot(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return an atom's slot operator.
-func (a *Atom) SlotOp() SlotOperator {
-	i := C.pkgcraft_atom_slot_op(a.ptr)
+func (self *Atom) SlotOp() SlotOperator {
+	i := C.pkgcraft_atom_slot_op(self.ptr)
 	return SlotOperator(i)
 }
 
 // Return an atom's USE deps.
-func (a *Atom) Use() []string {
+func (self *Atom) Use() []string {
 	var length C.size_t
-	array := C.pkgcraft_atom_use_deps(a.ptr, &length)
+	array := C.pkgcraft_atom_use_deps(self.ptr, &length)
 	use_slice := unsafe.Slice(array, length)
 	var use []string
 	for _, s := range use_slice {
@@ -133,21 +133,21 @@ func (a *Atom) Use() []string {
 }
 
 // Return an atom's repo.
-func (a *Atom) Repo() string {
-	s := C.pkgcraft_atom_repo(a.ptr)
+func (self *Atom) Repo() string {
+	s := C.pkgcraft_atom_repo(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Return the concatenated string of an atom's category, package, and version.
-func (a *Atom) CPV() string {
-	s := C.pkgcraft_atom_cpv(a.ptr)
+func (self *Atom) CPV() string {
+	s := C.pkgcraft_atom_cpv(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
-func (a1 *Atom) Cmp(a2 *Atom) int {
-	return int(C.pkgcraft_atom_cmp(a1.ptr, a2.ptr))
+func (self *Atom) Cmp(other *Atom) int {
+	return int(C.pkgcraft_atom_cmp(self.ptr, other.ptr))
 }

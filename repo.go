@@ -30,15 +30,15 @@ type pkgIter[P Pkg] struct {
 func newPkgIter[P Pkg](repo pkgRepo[P]) *pkgIter[P] {
 	ptr := C.pkgcraft_repo_iter(repo.p())
 	iter := &pkgIter[P]{ptr: ptr, repo: repo}
-	runtime.SetFinalizer(iter, func(i *pkgIter[P]) { C.pkgcraft_repo_iter_free(i.ptr) })
+	runtime.SetFinalizer(iter, func(self *pkgIter[P]) { C.pkgcraft_repo_iter_free(self.ptr) })
 	return iter
 }
 
 // Determine if a package iterator has another entry.
-func (iter *pkgIter[P]) HasNext() bool {
-	ptr := C.pkgcraft_repo_iter_next(iter.ptr)
+func (self *pkgIter[P]) HasNext() bool {
+	ptr := C.pkgcraft_repo_iter_next(self.ptr)
 	if ptr != nil {
-		iter.next = iter.repo.createPkg(ptr)
+		self.next = self.repo.createPkg(ptr)
 		return true
 	} else {
 		return false
@@ -46,8 +46,8 @@ func (iter *pkgIter[P]) HasNext() bool {
 }
 
 // Return the next available package in the iterator.
-func (iter *pkgIter[P]) Next() P {
-	return iter.next
+func (self *pkgIter[P]) Next() P {
+	return self.next
 }
 
 // Return a generic channel iterating over the packages of a repo.
@@ -72,15 +72,15 @@ type restrictPkgIter[P Pkg] struct {
 func newRestrictPkgIter[P Pkg](repo pkgRepo[P], restrict *Restrict) *restrictPkgIter[P] {
 	ptr := C.pkgcraft_repo_restrict_iter(repo.p(), restrict.ptr)
 	iter := &restrictPkgIter[P]{ptr: ptr, repo: repo}
-	runtime.SetFinalizer(iter, func(i *restrictPkgIter[P]) { C.pkgcraft_repo_restrict_iter_free(i.ptr) })
+	runtime.SetFinalizer(iter, func(self *restrictPkgIter[P]) { C.pkgcraft_repo_restrict_iter_free(self.ptr) })
 	return iter
 }
 
 // Determine if a restricted package iterator has another entry.
-func (iter *restrictPkgIter[P]) HasNext() bool {
-	ptr := C.pkgcraft_repo_restrict_iter_next(iter.ptr)
+func (self *restrictPkgIter[P]) HasNext() bool {
+	ptr := C.pkgcraft_repo_restrict_iter_next(self.ptr)
 	if ptr != nil {
-		iter.next = iter.repo.createPkg(ptr)
+		self.next = self.repo.createPkg(ptr)
 		return true
 	} else {
 		return false
@@ -88,8 +88,8 @@ func (iter *restrictPkgIter[P]) HasNext() bool {
 }
 
 // Return the next available package in the iterator.
-func (iter *restrictPkgIter[P]) Next() P {
-	return iter.next
+func (self *restrictPkgIter[P]) Next() P {
+	return self.next
 }
 
 // Return a generic channel iterating over the restricted packages of a repo.
