@@ -58,3 +58,53 @@ func (p *EbuildPkg) Subslot() string {
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
+
+// Return a package's DEPEND.
+func (p *EbuildPkg) Depend() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_depend(p.ptr), DepSetAtom)
+}
+
+// Return a package's BDEPEND.
+func (p *EbuildPkg) Bdepend() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_bdepend(p.ptr), DepSetAtom)
+}
+
+// Return a package's IDEPEND.
+func (p *EbuildPkg) Idepend() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_idepend(p.ptr), DepSetAtom)
+}
+
+// Return a package's PDEPEND.
+func (p *EbuildPkg) Pdepend() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_pdepend(p.ptr), DepSetAtom)
+}
+
+// Return a package's RDEPEND.
+func (p *EbuildPkg) Rdepend() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_rdepend(p.ptr), DepSetAtom)
+}
+
+// Return a package's LICENSE.
+func (p *EbuildPkg) License() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_license(p.ptr), DepSetString)
+}
+
+// Return a package's PROPERTIES.
+func (p *EbuildPkg) Properties() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_properties(p.ptr), DepSetString)
+}
+
+// Return a package's REQUIRED_USE.
+func (p *EbuildPkg) RequiredUse() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_required_use(p.ptr), DepSetString)
+}
+
+// Return a package's Restrict.
+func (p *EbuildPkg) Restrict() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_restrict(p.ptr), DepSetString)
+}
+
+// Return a package's SRC_URI.
+func (p *EbuildPkg) SrcUri() *DepSet {
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_src_uri(p.ptr), DepSetUri)
+}
