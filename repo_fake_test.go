@@ -39,6 +39,7 @@ func TestFakeRepoExtend(t *testing.T) {
 
 	// error when added to a config
 	config, _ := NewConfig()
+	defer config.Close()
 	err = config.AddRepo(repo)
 	assert.Nil(t, err)
 	err = repo.Extend([]string{"cat/pkg-3"})
