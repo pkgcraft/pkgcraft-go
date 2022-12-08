@@ -160,7 +160,7 @@ type validAtom struct {
 
 type atomData struct {
 	Valid   []validAtom
-	Invalid [][]string
+	Invalid []string
 	Sorting [][][]string
 }
 
@@ -217,21 +217,10 @@ func TestAtomToml(t *testing.T) {
 	}
 
 	// invalid atoms
-	for _, data := range atom_data.Invalid {
-		s := data[0]
-		failing_eapis, _ := EapiRange(data[1])
-		failing_map := make(map[string]*Eapi)
-		for _, eapi := range failing_eapis {
-			failing_map[eapi.String()] = eapi
-		}
+	for _, s := range atom_data.Invalid {
 		for _, eapi := range EAPIS {
-			if _, ok := failing_map[eapi.String()]; ok {
-				_, err := NewAtomWithEapi(s, eapi)
-				assert.NotNil(t, err, "%s passed for EAPI=%s", s, eapi)
-			} else {
-				_, err := NewAtomWithEapi(s, eapi)
-				assert.Nil(t, err, "%s failed for EAPI=%s", s, eapi)
-			}
+			_, err := NewAtomWithEapi(s, eapi)
+			assert.NotNil(t, err, "%s passed for EAPI=%s", s, eapi)
 		}
 	}
 
