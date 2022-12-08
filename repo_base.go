@@ -48,8 +48,8 @@ func (self *BaseRepo) String() string {
 
 // Compare a repo with another repo returning -1, 0, or 1 if the first is less
 // than, equal to, or greater than the second, respectively.
-func (self *BaseRepo) Cmp(other *BaseRepo) int {
-	return int(C.pkgcraft_repo_cmp(self.ptr, other.ptr))
+func (self *BaseRepo) Cmp(other repoPtr) int {
+	return int(C.pkgcraft_repo_cmp(self.ptr, other.p()))
 }
 
 func (self *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {

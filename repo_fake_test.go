@@ -22,7 +22,8 @@ func TestNewFakeRepo(t *testing.T) {
 	assert.Equal(t, repo.Len(), 2)
 }
 
-func TestExtend(t *testing.T) {
+func TestFakeRepoExtend(t *testing.T) {
+	// empty
 	repo, _ := NewFakeRepo("fake", 0, []string{})
 	assert.Equal(t, repo.Len(), 0)
 
@@ -35,4 +36,138 @@ func TestExtend(t *testing.T) {
 	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
 	assert.Equal(t, repo.Len(), 2)
 	assert.Nil(t, err)
+}
+
+func TestFakeRepoPkgIter(t *testing.T) {
+	var cpvs []string
+
+	// empty
+	repo, _ := NewFakeRepo("fake", 0, []string{})
+	iter := repo.PkgIter()
+	assert.False(t, iter.HasNext())
+	assert.Nil(t, iter.Next())
+
+	// add single pkg
+	err := repo.Extend([]string{"cat/pkg-1"})
+	assert.Nil(t, err)
+	for iter := repo.PkgIter(); iter.HasNext(); {
+		pkg := iter.Next()
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
+
+	// reset slice
+	cpvs = cpvs[:0]
+
+	// add multiple pkgs with overlap
+	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
+	assert.Nil(t, err)
+	for iter := repo.PkgIter(); iter.HasNext(); {
+		pkg := iter.Next()
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1", "cat/pkg-2"})
+}
+
+func TestFakeRepoPkgs(t *testing.T) {
+	var cpvs []string
+
+	// empty
+	repo, _ := NewFakeRepo("fake", 0, []string{})
+	assert.Empty(t, repo.Pkgs())
+
+	// add single pkg
+	err := repo.Extend([]string{"cat/pkg-1"})
+	assert.Nil(t, err)
+	for pkg := range repo.Pkgs() {
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
+
+	// reset slice
+	cpvs = cpvs[:0]
+
+	// add multiple pkgs with overlap
+	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
+	assert.Nil(t, err)
+	for pkg := range repo.Pkgs() {
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1", "cat/pkg-2"})
+}
+
+func TestFakeRepoRestrictPkgIter(t *testing.T) {
+	var cpvs []string
+	restrict, _ := NewRestrict("<cat/pkg-2")
+
+	// empty
+	repo, _ := NewFakeRepo("fake", 0, []string{})
+	iter := repo.RestrictPkgIter(restrict)
+	assert.False(t, iter.HasNext())
+	assert.Nil(t, iter.Next())
+
+	// add single pkg
+	err := repo.Extend([]string{"cat/pkg-1"})
+	assert.Nil(t, err)
+	for iter := repo.RestrictPkgIter(restrict); iter.HasNext(); {
+		pkg := iter.Next()
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
+
+	// reset slice
+	cpvs = cpvs[:0]
+
+	// add multiple pkgs with overlap
+	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
+	assert.Nil(t, err)
+	for iter := repo.RestrictPkgIter(restrict); iter.HasNext(); {
+		pkg := iter.Next()
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
+}
+
+func TestFakeRepoRestrictPkgs(t *testing.T) {
+	var cpvs []string
+	restrict, _ := NewRestrict("<cat/pkg-2")
+
+	// empty
+	repo, _ := NewFakeRepo("fake", 0, []string{})
+	assert.Empty(t, repo.RestrictPkgs(restrict))
+
+	// add single pkg
+	err := repo.Extend([]string{"cat/pkg-1"})
+	assert.Nil(t, err)
+	for pkg := range repo.RestrictPkgs(restrict) {
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
+
+	// reset slice
+	cpvs = cpvs[:0]
+
+	// add multiple pkgs with overlap
+	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
+	assert.Nil(t, err)
+	for pkg := range repo.RestrictPkgs(restrict) {
+		// verify repos are equal
+		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
+		cpvs = append(cpvs, pkg.Atom().String())
+	}
+	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 }

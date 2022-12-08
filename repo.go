@@ -15,8 +15,12 @@ const (
 	RepoFormatFake
 )
 
-type pkgRepo[P Pkg] interface {
+type repoPtr interface {
 	p() *C.Repo
+}
+
+type pkgRepo[P Pkg] interface {
+	repoPtr
 	createPkg(*C.Pkg) P
 }
 
