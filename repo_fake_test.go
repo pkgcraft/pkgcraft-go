@@ -20,6 +20,10 @@ func TestNewFakeRepo(t *testing.T) {
 	// multiple pkgs with invalid cpv
 	repo, _ = NewFakeRepo("fake", 0, []string{"a/b-1", "c/d-2", "=cat/pkg-1"})
 	assert.Equal(t, repo.Len(), 2)
+
+	// invalid repo id
+	_, err := NewFakeRepo("fake\xc5", 0, []string{})
+	assert.NotNil(t, err)
 }
 
 func TestFakeRepoExtend(t *testing.T) {
