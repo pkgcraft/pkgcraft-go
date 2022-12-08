@@ -24,6 +24,10 @@ func TestNewFakeRepo(t *testing.T) {
 	// invalid repo id
 	_, err := NewFakeRepo("fake\xc5", 0, []string{})
 	assert.NotNil(t, err)
+
+	// CPV string with invalid utf8
+	_, err = NewFakeRepo("fake", 0, []string{"cat/pkg\xc5-1"})
+	assert.NotNil(t, err)
 }
 
 func TestFakeRepoExtend(t *testing.T) {
