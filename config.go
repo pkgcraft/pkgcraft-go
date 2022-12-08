@@ -59,6 +59,19 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 	return nil
 }
 
+// Add an external repo.
+func (self *Config) AddRepo(repo repoPtr) error {
+	ptr := C.pkgcraft_config_add_repo(self.ptr, repo.p())
+	if ptr == nil {
+		s := C.pkgcraft_last_error()
+		defer C.pkgcraft_str_free(s)
+		return errors.New(C.GoString(s))
+	}
+
+	self.updateRepos()
+	return nil
+}
+
 // Load repos from a portage-compatible repos.conf directory or file.
 func (self *Config) LoadReposConf(path string) error {
 	var length C.size_t
