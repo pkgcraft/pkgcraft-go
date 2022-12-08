@@ -9,6 +9,10 @@ type BasePkg struct {
 	format PkgFormat
 }
 
+func (self *BasePkg) p() *C.Pkg {
+	return self.ptr
+}
+
 // Return a package's atom.
 func (self *BasePkg) Atom() *Cpv {
 	ptr := C.pkgcraft_pkg_atom(self.ptr)
@@ -39,4 +43,10 @@ func (self *BasePkg) String() string {
 	s := C.pkgcraft_pkg_str(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
+}
+
+// Compare a package with another package returning -1, 0, or 1 if the first is
+// less than, equal to, or greater than the second, respectively.
+func (self *BasePkg) Cmp(other pkgPtr) int {
+	return int(C.pkgcraft_pkg_cmp(self.ptr, other.p()))
 }
