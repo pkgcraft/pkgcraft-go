@@ -65,24 +65,20 @@ func objectToRestrict(obj interface{}) (*C.Restrict, error) {
 
 // Create a new restriction combining two restrictions via logical AND.
 func (self *Restrict) And(other *Restrict) *Restrict {
-	ptr := C.pkgcraft_restrict_and(self.ptr, other.ptr)
-	return restrictFromPtr(ptr)
+	return restrictFromPtr(C.pkgcraft_restrict_and(self.ptr, other.ptr))
 }
 
 // Create a new restriction combining two restrictions via logical OR.
 func (self *Restrict) Or(other *Restrict) *Restrict {
-	ptr := C.pkgcraft_restrict_or(self.ptr, other.ptr)
-	return restrictFromPtr(ptr)
+	return restrictFromPtr(C.pkgcraft_restrict_or(self.ptr, other.ptr))
 }
 
 // Create a new restriction combining two restrictions via logical XOR.
 func (self *Restrict) Xor(other *Restrict) *Restrict {
-	ptr := C.pkgcraft_restrict_xor(self.ptr, other.ptr)
-	return restrictFromPtr(ptr)
+	return restrictFromPtr(C.pkgcraft_restrict_xor(self.ptr, other.ptr))
 }
 
 // Create a new restriction inverting a restriction via logical NOT.
 func (self *Restrict) Not() *Restrict {
-	ptr := C.pkgcraft_restrict_not(self.ptr)
-	return restrictFromPtr(ptr)
+	return restrictFromPtr(C.pkgcraft_restrict_not(self.ptr))
 }
