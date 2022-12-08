@@ -36,6 +36,13 @@ func TestFakeRepoExtend(t *testing.T) {
 	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
 	assert.Equal(t, repo.Len(), 2)
 	assert.Nil(t, err)
+
+	// error when added to a config
+	config, _ := NewConfig()
+	err = config.AddRepo(repo)
+	assert.Nil(t, err)
+	err = repo.Extend([]string{"cat/pkg-3"})
+	assert.NotNil(t, err)
 }
 
 func TestFakeRepoPkgIter(t *testing.T) {
