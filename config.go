@@ -112,6 +112,8 @@ func (self *Config) updateRepos() {
 			repos_ebuild[id] = &EbuildRepo{r}
 		case RepoFormatFake:
 			repos_fake[id] = &FakeRepo{r}
+		default:
+			panic(fmt.Sprintf("unknown repo format: %d", format))
 		}
 	}
 
