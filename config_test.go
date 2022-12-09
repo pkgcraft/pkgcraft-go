@@ -8,7 +8,7 @@ import (
 	. "github.com/pkgcraft/pkgcraft-go"
 )
 
-func TestConfig(t *testing.T) {
+func TestNewConfig(t *testing.T) {
 	// empty
 	config, _ := NewConfig()
 	defer config.Close()
@@ -21,4 +21,14 @@ func TestConfig(t *testing.T) {
 	assert.False(t, exists)
 	_, exists = config.ReposFake["repo"]
 	assert.False(t, exists)
+}
+
+func TestConfigAddRepo(t *testing.T) {
+	config, _ := NewConfig()
+	defer config.Close()
+	assert.Equal(t, len(config.Repos), 0)
+	repo, _ := NewFakeRepo("fake", 0, []string{})
+	err := config.AddRepo(repo)
+	assert.Nil(t, err)
+	assert.Equal(t, len(config.Repos), 1)
 }
