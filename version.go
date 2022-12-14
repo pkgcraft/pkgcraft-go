@@ -20,9 +20,9 @@ func newVersion(ptr *C.AtomVersion) (*Version, error) {
 		runtime.SetFinalizer(ver, func(self *Version) { C.pkgcraft_version_free(self.ptr) })
 		return ver, nil
 	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
 	}
 }
 

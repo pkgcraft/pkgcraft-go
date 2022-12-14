@@ -29,9 +29,9 @@ func NewConfig() (*Config, error) {
 		})
 		return config, nil
 	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
 	}
 }
 
@@ -50,9 +50,9 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 
 	ptr := C.pkgcraft_config_add_repo_path(self.ptr, id_str, C.int(priority), path_str)
 	if ptr == nil {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return errors.New(C.GoString(err.message))
 	}
 
 	self.updateRepos()
@@ -63,9 +63,9 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 func (self *Config) AddRepo(repo repoPtr) error {
 	ptr := C.pkgcraft_config_add_repo(self.ptr, repo.p())
 	if ptr == nil {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return errors.New(C.GoString(err.message))
 	}
 
 	self.updateRepos()
@@ -85,9 +85,9 @@ func (self *Config) LoadReposConf(path string) error {
 		C.pkgcraft_repos_free(repos, length)
 		return nil
 	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return errors.New(C.GoString(err.message))
 	}
 }
 

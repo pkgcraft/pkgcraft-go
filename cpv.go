@@ -30,9 +30,9 @@ func NewCpv(s string) (*Cpv, error) {
 		runtime.SetFinalizer(cpv, func(self *Cpv) { C.pkgcraft_atom_free(self.ptr) })
 		return cpv, nil
 	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
 	}
 }
 

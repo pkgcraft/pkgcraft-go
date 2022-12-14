@@ -59,9 +59,9 @@ func EapiRange(s string) ([]*Eapi, error) {
 	defer C.free(unsafe.Pointer(cstr))
 	c_eapis := C.pkgcraft_eapis_range(cstr, &length)
 	if c_eapis == nil {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
 	}
 
 	var eapis []*Eapi

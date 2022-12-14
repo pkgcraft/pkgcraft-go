@@ -54,9 +54,9 @@ func newAtom(s string, eapi *Eapi) (*Atom, error) {
 		atom := &Atom{&Cpv{ptr: ptr}}
 		return atom, nil
 	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return nil, errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
 	}
 }
 

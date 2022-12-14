@@ -32,9 +32,9 @@ func (self *EbuildPkg) Ebuild() (string, error) {
 		defer C.pkgcraft_str_free(s)
 		return C.GoString(s), nil
 	} else {
-		s := C.pkgcraft_last_error()
-		defer C.pkgcraft_str_free(s)
-		return "", errors.New(C.GoString(s))
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return "", errors.New(C.GoString(err.message))
 	}
 }
 
