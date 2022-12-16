@@ -10,7 +10,7 @@ import (
 
 func TestNewConfig(t *testing.T) {
 	// empty
-	config, _ := NewConfig()
+	config := NewConfig()
 	defer config.Close()
 	assert.Equal(t, len(config.Repos), 0)
 
@@ -24,7 +24,7 @@ func TestNewConfig(t *testing.T) {
 }
 
 func TestConfigAddRepo(t *testing.T) {
-	config, _ := NewConfig()
+	config := NewConfig()
 	defer config.Close()
 	assert.Equal(t, len(config.Repos), 0)
 	repo, _ := NewFakeRepo("fake", 0, []string{})

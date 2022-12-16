@@ -46,7 +46,7 @@ func TestFakeRepoExtend(t *testing.T) {
 	assert.Nil(t, err)
 
 	// error when added to a config
-	config, _ := NewConfig()
+	config := NewConfig()
 	defer config.Close()
 	err = config.AddRepo(repo)
 	assert.Nil(t, err)

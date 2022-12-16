@@ -19,20 +19,17 @@ type Config struct {
 }
 
 // Return a new config for the system.
-func NewConfig() (*Config, error) {
+func NewConfig() *Config {
 	ptr := C.pkgcraft_config_new()
-	if ptr != nil {
-		config := &Config{ptr: ptr}
-		_, file, line, _ := runtime.Caller(1)
-		runtime.SetFinalizer(config, func(self *Config) {
-			panic(fmt.Sprintf("%s:%d: unclosed config object", file, line))
-		})
-		return config, nil
-	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
-	}
+	config := &Config{ptr: ptr}
+
+	// force caller to explicitly close Config object, otherwise a panic occurs
+	_, file, line, _ := runtime.Caller(1)
+	runtime.SetFinalizer(config, func(self *Config) {
+		panic(fmt.Sprintf("%s:%d: unclosed config object", file, line))
+	})
+
+	return config
 }
 
 // Free a config object's encapsulated C pointer.
