@@ -53,6 +53,7 @@ jobs:
         go test -v -race -coverprofile=coverage.out -bench=. ./...
 
     - name: Upload coverage to Codecov
+      if: ${{ github.event_name != 'workflow_call' }}
       uses: codecov/codecov-action@v3
       with:
         files: coverage.out
