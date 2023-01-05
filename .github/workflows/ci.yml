@@ -6,15 +6,38 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      go-version:
+        required: false
+        type: string
   workflow_call:
+    inputs:
+      go-version:
+        required: false
+        type: string
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      go-version: ${{ steps.vars.outputs.go-version }}
+    steps:
+    - name: Set golang versions to test against
+      id: vars
+      run: |
+        if [[ "${{ github.event_name }}" == workflow_* && -n "${{ inputs.go-version }}" ]]; then
+          echo "go-version=$(jq 'split(",")' -Rc <(echo '${{ inputs.go-version }}'))" >> $GITHUB_OUTPUT
+        else
+          echo "go-version=['1.18.0', 'stable']" >> $GITHUB_OUTPUT
+        fi
+
   test:
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        go-version: ['1.18.0', 'stable']
+        go-version: ${{ fromJson(needs.setup.outputs.go-version) }}
 
     steps:
     - name: Set pkgcraft dir env var
@@ -53,7 +76,7 @@ jobs:
         go test -v -race -coverprofile=coverage.out -bench=. ./...
 
     - name: Upload coverage to Codecov
-      if: ${{ github.event_name != 'workflow_call' }}
+      if: startsWith(github.event_name, 'workflow_') != true
       uses: codecov/codecov-action@v3
       with:
         files: coverage.out
