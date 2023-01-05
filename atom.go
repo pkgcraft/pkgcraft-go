@@ -8,7 +8,7 @@ import (
 	"errors"
 	"unsafe"
 
-	"github.com/hashicorp/golang-lru"
+	"github.com/hashicorp/golang-lru/v2"
 )
 
 type Atom struct {
@@ -31,12 +31,12 @@ const (
 	SlotOpStar
 )
 
-var atom_cache, _ = lru.New(10000)
-
 type Pair[T, U any] struct {
 	First  T
 	Second U
 }
+
+var atom_cache, _ = lru.New[Pair[string, *Eapi], *Atom](10000)
 
 func newAtom(s string, eapi *Eapi) (*Atom, error) {
 	var eapi_ptr *C.Eapi
@@ -72,8 +72,8 @@ func NewAtomWithEapi(s string, eapi *Eapi) (*Atom, error) {
 
 func newCachedAtom(s string, eapi *Eapi) (*Atom, error) {
 	key := Pair[string, *Eapi]{s, eapi}
-	if v, ok := atom_cache.Get(key); ok {
-		return v.(*Atom), nil
+	if atom, ok := atom_cache.Get(key); ok {
+		return atom, nil
 	} else {
 		atom, err := newAtom(s, eapi)
 		if err == nil {

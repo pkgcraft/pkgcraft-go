@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/hashicorp/go-version v1.6.0
-	github.com/hashicorp/golang-lru v0.5.4
+	github.com/hashicorp/golang-lru/v2 v2.0.1
 	github.com/pelletier/go-toml v1.9.5
 	github.com/stretchr/testify v1.7.1
 )
