@@ -7,4 +7,4 @@ Go bindings for pkgcraft.
 
 ## Development
 
-Requirements: [pkgcraft-c](https://github.com/pkgcraft/pkgcraft-c)
+Requirements: [pkgcraft-c](https://github.com/pkgcraft/pkgcraft/tree/main/crates/pkgcraft-c)
