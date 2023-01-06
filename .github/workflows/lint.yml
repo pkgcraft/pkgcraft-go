@@ -3,8 +3,12 @@ name: lint
 on:
   push:
     branches-ignore: [deploy]
+    paths:
+      - "**/*.go"
+      - ".github/workflows/lint.yml"
   pull_request:
     branches: [main]
+    paths: "**/*.go"
 
 jobs:
   lint:
