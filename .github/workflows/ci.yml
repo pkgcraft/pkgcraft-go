@@ -30,7 +30,7 @@ jobs:
       go-version: ${{ steps.vars.outputs.go-version }}
     steps:
     - name: Checkout code to determine the minimum supported go version
-      if: ${{ inputs.go-version }} == ""
+      if: ${{ inputs.go-version == '' }}
       uses: actions/checkout@v3
       with:
         repository: pkgcraft/pkgcraft-go
@@ -90,7 +90,7 @@ jobs:
         go test -v -race -coverprofile=coverage.out -bench=. ./...
 
     - name: Upload coverage to Codecov
-      if: startsWith(github.event_name, 'workflow_') != true
+      if: ${{ inputs.go-version == '' }}
       uses: codecov/codecov-action@v3
       with:
         files: coverage.out
