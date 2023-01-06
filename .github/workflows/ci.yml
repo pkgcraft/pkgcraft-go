@@ -37,7 +37,7 @@ jobs:
     - name: Set golang versions to test against
       id: vars
       run: |
-        if [[ "${{ github.event_name }}" == workflow_* && -n "${{ inputs.go-version }}" ]]; then
+        if [[ -n "${{ inputs.go-version }}" ]]; then
           echo "go-version=$(jq 'split(",")' -Rc <(echo '${{ inputs.go-version }}'))" >> $GITHUB_OUTPUT
         else
           min_go_ver=$(grep '^go ' go.mod | cut -f2 -d ' ')
