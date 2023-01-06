@@ -22,13 +22,19 @@ jobs:
     outputs:
       go-version: ${{ steps.vars.outputs.go-version }}
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        repository: pkgcraft/pkgcraft-go
+
     - name: Set golang versions to test against
       id: vars
       run: |
         if [[ "${{ github.event_name }}" == workflow_* && -n "${{ inputs.go-version }}" ]]; then
           echo "go-version=$(jq 'split(",")' -Rc <(echo '${{ inputs.go-version }}'))" >> $GITHUB_OUTPUT
         else
-          echo "go-version=['1.18.0', 'stable']" >> $GITHUB_OUTPUT
+          min_go_ver=$(grep '^go ' go.mod | cut -f2 -d ' ')
+          echo "go-version=['${min_go_ver}', 'stable']" >> $GITHUB_OUTPUT
         fi
 
   test:
