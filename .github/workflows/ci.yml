@@ -41,8 +41,12 @@ jobs:
         if [[ -n "${{ inputs.go-version }}" ]]; then
           echo "go-version=$(jq 'split(",")' -Rc <(echo '${{ inputs.go-version }}'))" >> $GITHUB_OUTPUT
         else
-          min_go_ver=$(grep '^go ' go.mod | cut -f2 -d ' ')
-          echo "go-version=['${min_go_ver}', 'stable']" >> $GITHUB_OUTPUT
+          min_ver=$(sed -rn '/^go / s/^go ([0-9](.[0-9]+)*)/\1/p' go.mod)
+          if [[ -n ${min_ver} ]]; then
+            echo "go-version=['${min_ver}', 'stable']" >> $GITHUB_OUTPUT
+          else
+            exit 1
+          fi
         fi
 
   test:
