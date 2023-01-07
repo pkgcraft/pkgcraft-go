@@ -91,7 +91,7 @@ jobs:
     - name: Build and test
       run: |
         go build
-        go test -v -race -coverprofile=coverage.out -bench=. ./...
+        go test -v -race -coverprofile=coverage.out ./...
 
     - name: Upload coverage to Codecov
       if: ${{ inputs.go-version == '' }}
