@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	. "github.com/pkgcraft/pkgcraft-go"
+	. "github.com/pkgcraft/pkgcraft-go/internal"
 )
 
 func TestVersion(t *testing.T) {
@@ -83,9 +84,14 @@ func TestVersion(t *testing.T) {
 	assert.Equal(t, len(m), 3)
 }
 
+type sortedVersion struct {
+	Sorted []string
+	Equal  bool
+}
+
 type versionData struct {
 	Compares []string
-	Sorting  [][][]string
+	Sorting  []sortedVersion
 	Hashing  [][]interface{}
 }
 
@@ -102,17 +108,20 @@ func TestVersionToml(t *testing.T) {
 
 	// sorting
 	for _, data := range ver_data.Sorting {
-		var sorted []*Version
-		for _, s := range data[0] {
-			ver, _ := NewVersion(s)
-			sorted = append(sorted, ver)
-		}
-		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Cmp(sorted[j]) == -1 })
-
 		var expected []*Version
-		for _, s := range data[1] {
+		for _, s := range data.Sorted {
 			ver, _ := NewVersion(s)
 			expected = append(expected, ver)
+		}
+
+		sorted := make([]*Version, len(expected))
+		copy(sorted, expected)
+		ReverseSlice(sorted)
+		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Cmp(sorted[j]) == -1 })
+
+		// equal versions aren't sorted so reversing should restore the original order
+		if data.Equal {
+			ReverseSlice(sorted)
 		}
 
 		assert.Equal(t, len(sorted), len(expected))

@@ -158,10 +158,15 @@ type validAtom struct {
 	Use      []string
 }
 
+type sortedAtom struct {
+	Sorted []string
+	Equal  bool
+}
+
 type atomData struct {
 	Valid   []validAtom
 	Invalid []string
-	Sorting [][][]string
+	Sorting []sortedAtom
 }
 
 func TestAtomToml(t *testing.T) {
@@ -226,17 +231,20 @@ func TestAtomToml(t *testing.T) {
 
 	// sorting
 	for _, data := range atom_data.Sorting {
-		var sorted []*Atom
-		for _, s := range data[0] {
-			atom, _ := NewAtom(s)
-			sorted = append(sorted, atom)
-		}
-		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Cmp(sorted[j]) == -1 })
-
 		var expected []*Atom
-		for _, s := range data[1] {
+		for _, s := range data.Sorted {
 			atom, _ := NewAtom(s)
 			expected = append(expected, atom)
+		}
+
+		sorted := make([]*Atom, len(expected))
+		copy(sorted, expected)
+		ReverseSlice(sorted)
+		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].Cmp(sorted[j]) == -1 })
+
+		// equal atoms aren't sorted so reversing should restore the original order
+		if data.Equal {
+			ReverseSlice(sorted)
 		}
 
 		assert.Equal(t, len(sorted), len(expected))
