@@ -89,10 +89,15 @@ type sortedVersion struct {
 	Equal  bool
 }
 
+type hashingVersion struct {
+	Versions []string
+	Equal  bool
+}
+
 type versionData struct {
 	Compares []string
 	Sorting  []sortedVersion
-	Hashing  [][]interface{}
+	Hashing  []hashingVersion
 }
 
 func TestVersionToml(t *testing.T) {
