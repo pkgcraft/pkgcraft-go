@@ -91,7 +91,7 @@ type sortedVersion struct {
 
 type hashingVersion struct {
 	Versions []string
-	Equal  bool
+	Equal    bool
 }
 
 type versionData struct {

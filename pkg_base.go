@@ -16,7 +16,8 @@ func (self *BasePkg) p() *C.Pkg {
 // Return a package's atom.
 func (self *BasePkg) Atom() *Cpv {
 	ptr := C.pkgcraft_pkg_atom(self.ptr)
-	return &Cpv{ptr: ptr}
+	cpv, _ := cpvFromPtr(ptr)
+	return cpv
 }
 
 // Return a package's EAPI.
@@ -36,7 +37,8 @@ func (self *BasePkg) Repo() *BaseRepo {
 // Return a package's version.
 func (self *BasePkg) Version() *Version {
 	ptr := C.pkgcraft_pkg_version(self.ptr)
-	return &Version{ptr}
+	version, _ := versionFromPtr(ptr)
+	return version
 }
 
 func (self *BasePkg) String() string {

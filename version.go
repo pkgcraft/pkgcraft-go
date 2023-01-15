@@ -14,7 +14,7 @@ type Version struct {
 	ptr *C.AtomVersion
 }
 
-func newVersion(ptr *C.AtomVersion) (*Version, error) {
+func versionFromPtr(ptr *C.AtomVersion) (*Version, error) {
 	if ptr != nil {
 		ver := &Version{ptr}
 		runtime.SetFinalizer(ver, func(self *Version) { C.pkgcraft_version_free(self.ptr) })
@@ -31,7 +31,7 @@ func NewVersion(s string) (*Version, error) {
 	ver_str := C.CString(s)
 	defer C.free(unsafe.Pointer(ver_str))
 	ptr := C.pkgcraft_version_new(ver_str)
-	return newVersion(ptr)
+	return versionFromPtr(ptr)
 }
 
 // Parse a string into a version with an operator.
@@ -39,7 +39,7 @@ func NewVersionWithOp(s string) (*Version, error) {
 	ver_str := C.CString(s)
 	defer C.free(unsafe.Pointer(ver_str))
 	ptr := C.pkgcraft_version_with_op(ver_str)
-	return newVersion(ptr)
+	return versionFromPtr(ptr)
 }
 
 // Return a version's revision.

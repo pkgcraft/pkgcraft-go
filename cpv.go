@@ -19,12 +19,7 @@ type Cpv struct {
 	_hash     uint64
 }
 
-// Parse a CPV string into an atom.
-func NewCpv(s string) (*Cpv, error) {
-	c_str := C.CString(s)
-	defer C.free(unsafe.Pointer(c_str))
-	ptr := C.pkgcraft_cpv_new(c_str)
-
+func cpvFromPtr(ptr *C.Atom) (*Cpv, error) {
 	if ptr != nil {
 		cpv := &Cpv{ptr: ptr}
 		runtime.SetFinalizer(cpv, func(self *Cpv) { C.pkgcraft_atom_free(self.ptr) })
@@ -34,6 +29,14 @@ func NewCpv(s string) (*Cpv, error) {
 		defer C.pkgcraft_error_free(err)
 		return nil, errors.New(C.GoString(err.message))
 	}
+}
+
+// Parse a CPV string into an atom.
+func NewCpv(s string) (*Cpv, error) {
+	c_str := C.CString(s)
+	defer C.free(unsafe.Pointer(c_str))
+	ptr := C.pkgcraft_cpv_new(c_str)
+	return cpvFromPtr(ptr)
 }
 
 // Return an atom's category.
@@ -61,7 +64,7 @@ func (self *Cpv) Version() *Version {
 	if self._version == nil {
 		ptr := C.pkgcraft_atom_version(self.ptr)
 		if ptr != nil {
-			self._version = &Version{ptr}
+			self._version, _ = versionFromPtr(ptr)
 		} else {
 			self._version = &Version{}
 		}

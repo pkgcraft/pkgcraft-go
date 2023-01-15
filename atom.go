@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"unsafe"
 
 	"github.com/hashicorp/golang-lru/v2"
@@ -50,13 +49,11 @@ func newAtom(s string, eapi *Eapi) (*Atom, error) {
 	ptr := C.pkgcraft_atom_new(c_str, eapi_ptr)
 	C.free(unsafe.Pointer(c_str))
 
-	if ptr != nil {
-		atom := &Atom{&Cpv{ptr: ptr}}
-		return atom, nil
+	cpv, err := cpvFromPtr(ptr)
+	if cpv != nil {
+		return &Atom{cpv}, nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, err
 	}
 }
 
