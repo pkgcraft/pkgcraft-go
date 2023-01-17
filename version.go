@@ -57,7 +57,7 @@ func (self *Version) Cmp(other *Version) int {
 }
 
 func (self *Version) String() string {
-	s := C.pkgcraft_version_str(self.ptr)
+	s := C.pkgcraft_version_str_with_op(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
