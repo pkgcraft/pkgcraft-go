@@ -180,15 +180,21 @@ type validAtom struct {
 	Use      []string
 }
 
+type intersectsAtom struct {
+	Vals   []string
+	Status bool
+}
+
 type sortedAtom struct {
 	Sorted []string
 	Equal  bool
 }
 
 type atomData struct {
-	Valid   []validAtom
-	Invalid []string
-	Sorting []sortedAtom
+	Valid      []validAtom
+	Invalid    []string
+	Intersects []intersectsAtom
+	Sorting    []sortedAtom
 }
 
 func TestAtomToml(t *testing.T) {

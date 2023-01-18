@@ -106,6 +106,11 @@ func TestVersionIntersects(t *testing.T) {
 	assert.True(t, v1.Intersects(v2))
 }
 
+type intersectsVersion struct {
+	Vals   []string
+	Status bool
+}
+
 type sortedVersion struct {
 	Sorted []string
 	Equal  bool
@@ -117,9 +122,10 @@ type hashingVersion struct {
 }
 
 type versionData struct {
-	Compares []string
-	Sorting  []sortedVersion
-	Hashing  []hashingVersion
+	Compares   []string
+	Intersects []intersectsVersion
+	Sorting    []sortedVersion
+	Hashing    []hashingVersion
 }
 
 func TestVersionToml(t *testing.T) {
