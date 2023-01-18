@@ -65,3 +65,8 @@ func (self *Version) String() string {
 func (self *Version) Hash() uint64 {
 	return uint64(C.pkgcraft_version_hash(self.ptr))
 }
+
+// Determine if two versions intersect.
+func (self *Version) Intersects(other *Version) bool {
+	return bool(C.pkgcraft_version_intersects(self.ptr, other.ptr))
+}

@@ -88,6 +88,24 @@ func TestVersionHash(t *testing.T) {
 	assert.Equal(t, len(m), 3)
 }
 
+// TODO: use shared intersects test data
+func TestVersionIntersects(t *testing.T) {
+	// equal, non-op versions
+	v1, _ := NewVersion("1.0.2")
+	v2, _ := NewVersion("1.0.2-r0")
+	assert.True(t, v1.Intersects(v2))
+
+	// unequal, non-op versions
+	v1, _ = NewVersion("0")
+	v2, _ = NewVersion("1")
+	assert.False(t, v1.Intersects(v2))
+
+	// non-op and op versions
+	v1, _ = NewVersion("0")
+	v2, _ = NewVersionWithOp("=0*")
+	assert.True(t, v1.Intersects(v2))
+}
+
 type sortedVersion struct {
 	Sorted []string
 	Equal  bool
