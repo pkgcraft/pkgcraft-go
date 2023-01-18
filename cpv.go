@@ -19,6 +19,10 @@ type Cpv struct {
 	_hash     uint64
 }
 
+type atomPtr interface {
+	p() *C.Atom
+}
+
 func cpvFromPtr(ptr *C.Atom) (*Cpv, error) {
 	if ptr != nil {
 		cpv := &Cpv{ptr: ptr}
@@ -37,6 +41,10 @@ func NewCpv(s string) (*Cpv, error) {
 	defer C.free(unsafe.Pointer(c_str))
 	ptr := C.pkgcraft_cpv_new(c_str)
 	return cpvFromPtr(ptr)
+}
+
+func (self *Cpv) p() *C.Atom {
+	return self.ptr
 }
 
 // Return an atom's category.
@@ -101,6 +109,11 @@ func (self *Cpv) Hash() uint64 {
 
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
-func (self *Cpv) Cmp(other *Cpv) int {
-	return int(C.pkgcraft_atom_cmp(self.ptr, other.ptr))
+func (self *Cpv) Cmp(other atomPtr) int {
+	return int(C.pkgcraft_atom_cmp(self.ptr, other.p()))
+}
+
+// Determine if two atoms intersect.
+func (self *Cpv) Intersects(other atomPtr) bool {
+	return bool(C.pkgcraft_atom_intersects(self.ptr, other.p()))
 }

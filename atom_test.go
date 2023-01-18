@@ -148,6 +148,24 @@ func TestHash(t *testing.T) {
 	assert.Equal(t, len(m), 3)
 }
 
+// TODO: use shared intersects test data
+func TestAtomIntersects(t *testing.T) {
+	// equal versions
+	a1, _ := NewAtom("=a/b-1.0.2")
+	a2, _ := NewAtom("=a/b-1.0.2-r0")
+	assert.True(t, a1.Intersects(a2))
+
+	// unequal versions
+	a1, _ = NewAtom("=a/b-0")
+	a2, _ = NewAtom("=a/b-1")
+	assert.False(t, a1.Intersects(a2))
+
+	// CPV and atom
+	cpv, _ := NewCpv("a/b-0")
+	atom, _ := NewAtom("=a/b-0*")
+	assert.True(t, cpv.Intersects(atom))
+}
+
 type validAtom struct {
 	Atom     string
 	Eapis    string
