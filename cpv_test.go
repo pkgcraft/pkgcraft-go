@@ -8,7 +8,7 @@ import (
 	. "github.com/pkgcraft/pkgcraft-go"
 )
 
-func TestCpv(t *testing.T) {
+func TestNewCpv(t *testing.T) {
 	var cpv *Cpv
 	var err error
 	var ver *Version
@@ -34,7 +34,9 @@ func TestCpv(t *testing.T) {
 	// invalid
 	_, err = NewCpv("=cat/pkg-1-r2")
 	assert.NotNil(t, err)
+}
 
+func TestCpvCmp(t *testing.T) {
 	// c1 < c2
 	c1, _ := NewCpv("cat/pkg-1")
 	c2, _ := NewCpv("cat/pkg-2")

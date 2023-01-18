@@ -45,7 +45,9 @@ func TestVersion(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, version.Revision(), "2")
 	assert.Equal(t, version.String(), ">1-r2")
+}
 
+func TestVersionCmp(t *testing.T) {
 	// v1 < v2
 	v1, _ := NewVersion("1")
 	v2, _ := NewVersion("2")
@@ -60,10 +62,12 @@ func TestVersion(t *testing.T) {
 	v1, _ = NewVersion("2")
 	v2, _ = NewVersion("1")
 	assert.Equal(t, v1.Cmp(v2), 1)
+}
 
+func TestVersionHash(t *testing.T) {
 	// hashing equal values
-	v1, _ = NewVersion("1.0.2")
-	v2, _ = NewVersion("1.0.2-r0")
+	v1, _ := NewVersion("1.0.2")
+	v2, _ := NewVersion("1.0.2-r0")
 	v3, _ := NewVersion("1.000.2")
 	v4, _ := NewVersion("1.00.2-r0")
 	m := make(map[uint64]bool)

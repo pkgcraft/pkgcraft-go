@@ -105,7 +105,9 @@ func TestAtom(t *testing.T) {
 	c1, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST)
 	c2, _ = NewAtomCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST)
 	assert.True(t, c1 == c2)
+}
 
+func TestAtomCmp(t *testing.T) {
 	// a1 < a2
 	a1, _ := NewAtom("=cat/pkg-1")
 	a2, _ := NewAtom("=cat/pkg-2")
@@ -120,10 +122,12 @@ func TestAtom(t *testing.T) {
 	a1, _ = NewAtom("=cat/pkg-2")
 	a2, _ = NewAtom("=cat/pkg-1")
 	assert.Equal(t, a1.Cmp(a2), 1)
+}
 
+func TestHash(t *testing.T) {
 	// hashing equal values
-	a1, _ = NewAtom("=cat/pkg-1.0.2")
-	a2, _ = NewAtom("=cat/pkg-1.0.2-r0")
+	a1, _ := NewAtom("=cat/pkg-1.0.2")
+	a2, _ := NewAtom("=cat/pkg-1.0.2-r0")
 	a3, _ := NewAtom("=cat/pkg-1.000.2")
 	a4, _ := NewAtom("=cat/pkg-1.00.2-r0")
 	m := make(map[uint64]bool)
