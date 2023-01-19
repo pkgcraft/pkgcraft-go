@@ -16,7 +16,7 @@ import (
 func TestAtom(t *testing.T) {
 	var atom, c1, c2 *Atom
 	var err error
-	var ver *Version
+	var ver *VersionWithOp
 
 	// unversioned
 	atom, err = NewAtom("cat/pkg")
@@ -41,7 +41,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.Category(), "cat")
 	assert.Equal(t, atom.Package(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
-	assert.Equal(t, atom.Version(), ver)
+	assert.True(t, atom.Version().Cmp(ver) == 0)
 	assert.Equal(t, atom.Revision(), "2")
 	assert.Equal(t, atom.Cpn(), "cat/pkg")
 	assert.Equal(t, atom.CPV(), "cat/pkg-1-r2")
@@ -84,7 +84,7 @@ func TestAtom(t *testing.T) {
 	assert.Equal(t, atom.Category(), "cat")
 	assert.Equal(t, atom.Package(), "pkg")
 	ver, _ = NewVersionWithOp("=1-r2")
-	assert.Equal(t, atom.Version(), ver)
+	assert.True(t, atom.Version().Cmp(ver) == 0)
 	assert.Equal(t, atom.Revision(), "2")
 	assert.Equal(t, atom.Blocker(), BlockerStrong)
 	assert.Equal(t, atom.Slot(), "3")
@@ -209,7 +209,7 @@ func TestAtomToml(t *testing.T) {
 	}
 
 	// valid atoms
-	var ver *Version
+	var ver *VersionWithOp
 	var blocker Blocker
 	var slot_op SlotOperator
 	for _, el := range atom_data.Valid {
@@ -232,10 +232,10 @@ func TestAtomToml(t *testing.T) {
 			assert.Equal(t, atom.Blocker(), blocker, "unequal blocker: %s", el.Atom)
 			if el.Version != "" {
 				ver, _ = NewVersionWithOp(el.Version)
+				assert.True(t, atom.Version().Cmp(ver) == 0)
 			} else {
-				ver = &Version{}
+				assert.Equal(t, atom.Version(), &Version{})
 			}
-			assert.Equal(t, atom.Version(), ver)
 			assert.Equal(t, atom.Revision(), el.Revision)
 			assert.Equal(t, atom.Slot(), el.Slot)
 			assert.Equal(t, atom.Subslot(), el.Subslot)
