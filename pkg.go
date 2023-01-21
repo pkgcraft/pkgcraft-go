@@ -5,7 +5,7 @@ package pkgcraft
 import "C"
 
 type Pkg interface {
-	Atom() *Cpv
+	Cpv() *Cpv
 	Eapi() *Eapi
 	Version() *Version
 	String() string

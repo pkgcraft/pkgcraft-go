@@ -14,8 +14,8 @@ func (self *BasePkg) p() *C.Pkg {
 }
 
 // Return a package's atom.
-func (self *BasePkg) Atom() *Cpv {
-	ptr := C.pkgcraft_pkg_atom(self.ptr)
+func (self *BasePkg) Cpv() *Cpv {
+	ptr := C.pkgcraft_pkg_cpv(self.ptr)
 	cpv, _ := cpvFromPtr(ptr)
 	return cpv
 }

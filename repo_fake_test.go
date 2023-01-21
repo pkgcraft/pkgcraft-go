@@ -70,7 +70,7 @@ func TestFakeRepoPkgIter(t *testing.T) {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 
@@ -84,7 +84,7 @@ func TestFakeRepoPkgIter(t *testing.T) {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1", "cat/pkg-2"})
 }
@@ -102,7 +102,7 @@ func TestFakeRepoPkgs(t *testing.T) {
 	for pkg := range repo.Pkgs() {
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 
@@ -115,7 +115,7 @@ func TestFakeRepoPkgs(t *testing.T) {
 	for pkg := range repo.Pkgs() {
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1", "cat/pkg-2"})
 }
@@ -137,7 +137,7 @@ func TestFakeRepoRestrictPkgIter(t *testing.T) {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 
@@ -151,7 +151,7 @@ func TestFakeRepoRestrictPkgIter(t *testing.T) {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 }
@@ -170,7 +170,7 @@ func TestFakeRepoRestrictPkgs(t *testing.T) {
 	for pkg := range repo.RestrictPkgs(restrict) {
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 
@@ -183,7 +183,7 @@ func TestFakeRepoRestrictPkgs(t *testing.T) {
 	for pkg := range repo.RestrictPkgs(restrict) {
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
-		cpvs = append(cpvs, pkg.Atom().String())
+		cpvs = append(cpvs, pkg.Cpv().String())
 	}
 	assert.Equal(t, cpvs, []string{"cat/pkg-1"})
 }
