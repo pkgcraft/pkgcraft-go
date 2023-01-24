@@ -17,7 +17,7 @@ type Atom struct {
 type Blocker int
 
 const (
-	BlockerNone Blocker = iota - 1
+	BlockerNone Blocker = iota
 	BlockerStrong
 	BlockerWeak
 )
@@ -25,7 +25,7 @@ const (
 type SlotOperator int
 
 const (
-	SlotOpNone SlotOperator = iota - 1
+	SlotOpNone SlotOperator = iota
 	SlotOpEqual
 	SlotOpStar
 )
