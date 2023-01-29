@@ -106,7 +106,7 @@ func (self *Config) updateRepos() {
 	for id, r := range repos {
 		switch format := r.format; format {
 		case RepoFormatEbuild:
-			repos_ebuild[id] = &EbuildRepo{r}
+			repos_ebuild[id] = &EbuildRepo{r, nil}
 		case RepoFormatFake:
 			repos_fake[id] = &FakeRepo{r}
 		default:

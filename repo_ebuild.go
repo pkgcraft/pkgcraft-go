@@ -10,6 +10,19 @@ import (
 
 type EbuildRepo struct {
 	*BaseRepo
+	// cached fields
+	eapi *Eapi
+}
+
+// Return an ebuild repo's EAPI.
+func (self *EbuildRepo) Eapi() *Eapi {
+	if self.eapi == nil {
+		ptr := C.pkgcraft_repo_ebuild_eapi(self.ptr)
+		s := C.pkgcraft_eapi_as_str(ptr)
+		defer C.pkgcraft_str_free(s)
+		self.eapi = EAPIS[C.GoString(s)]
+	}
+	return self.eapi
 }
 
 func (self *EbuildRepo) createPkg(ptr *C.Pkg) *EbuildPkg {
