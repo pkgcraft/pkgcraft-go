@@ -7,6 +7,8 @@ import "C"
 type BasePkg struct {
 	ptr    *C.Pkg
 	format PkgFormat
+	// cached fields
+	eapi *Eapi
 }
 
 func (self *BasePkg) p() *C.Pkg {
@@ -22,10 +24,13 @@ func (self *BasePkg) Cpv() *Cpv {
 
 // Return a package's EAPI.
 func (self *BasePkg) Eapi() *Eapi {
-	ptr := C.pkgcraft_pkg_eapi(self.ptr)
-	s := C.pkgcraft_eapi_as_str(ptr)
-	defer C.pkgcraft_str_free(s)
-	return EAPIS[C.GoString(s)]
+	if self.eapi == nil {
+		ptr := C.pkgcraft_pkg_eapi(self.ptr)
+		s := C.pkgcraft_eapi_as_str(ptr)
+		defer C.pkgcraft_str_free(s)
+		self.eapi = EAPIS[C.GoString(s)]
+	}
+	return self.eapi
 }
 
 // Return a package's repo.

@@ -27,7 +27,7 @@ func (self *EbuildRepo) Eapi() *Eapi {
 
 func (self *EbuildRepo) createPkg(ptr *C.Pkg) *EbuildPkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
-	pkg := &EbuildPkg{&BasePkg{ptr, format}}
+	pkg := &EbuildPkg{&BasePkg{ptr: ptr, format: format}}
 	runtime.SetFinalizer(pkg, func(self *EbuildPkg) { C.pkgcraft_pkg_free(self.ptr) })
 	return pkg
 }

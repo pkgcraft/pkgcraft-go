@@ -54,7 +54,7 @@ func (self *BaseRepo) Cmp(other repoPtr) int {
 
 func (self *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
-	pkg := &BasePkg{ptr, format}
+	pkg := &BasePkg{ptr: ptr, format: format}
 	runtime.SetFinalizer(pkg, func(self *BasePkg) { C.pkgcraft_pkg_free(self.ptr) })
 	return pkg
 }

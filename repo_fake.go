@@ -60,7 +60,7 @@ func (self *FakeRepo) Extend(cpvs []string) error {
 
 func (self *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
 	format := PkgFormat(C.pkgcraft_pkg_format(ptr))
-	pkg := &FakePkg{&BasePkg{ptr, format}}
+	pkg := &FakePkg{&BasePkg{ptr: ptr, format: format}}
 	runtime.SetFinalizer(pkg, func(self *FakePkg) { C.pkgcraft_pkg_free(self.ptr) })
 	return pkg
 }
