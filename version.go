@@ -11,14 +11,14 @@ import (
 )
 
 type Version struct {
-	ptr *C.AtomVersion
+	ptr *C.Version
 }
 
 type versionPtr interface {
-	p() *C.AtomVersion
+	p() *C.Version
 }
 
-func versionFromPtr(ptr *C.AtomVersion) (*Version, error) {
+func versionFromPtr(ptr *C.Version) (*Version, error) {
 	if ptr != nil {
 		ver := &Version{ptr}
 		runtime.SetFinalizer(ver, func(self *Version) { C.pkgcraft_version_free(self.ptr) })
@@ -38,7 +38,7 @@ func NewVersion(s string) (*Version, error) {
 	return versionFromPtr(ptr)
 }
 
-func (self *Version) p() *C.AtomVersion {
+func (self *Version) p() *C.Version {
 	return self.ptr
 }
 
