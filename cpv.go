@@ -82,9 +82,11 @@ func (self *Cpv) Version() *Version {
 
 // Return an atom's revision.
 func (self *Cpv) Revision() string {
-	s := C.pkgcraft_atom_revision(self.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+	version := self.Version()
+	if *version != (Version{}) {
+		return version.Revision()
+	}
+	return ""
 }
 
 // Return the concatenated string of an atom's category and package.
