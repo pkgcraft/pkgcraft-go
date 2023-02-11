@@ -21,7 +21,13 @@ func TestNewCpv(t *testing.T) {
 	ver, _ = NewVersion("1-r2")
 	assert.Equal(t, cpv.Version(), ver)
 	assert.Equal(t, cpv.Revision(), "2")
+	assert.Equal(t, cpv.P(), "pkg-1")
+	assert.Equal(t, cpv.Pf(), "pkg-1-r2")
+	assert.Equal(t, cpv.Pr(), "r2")
+	assert.Equal(t, cpv.Pv(), "1")
+	assert.Equal(t, cpv.Pvr(), "1-r2")
 	assert.Equal(t, cpv.Cpn(), "cat/pkg")
+	assert.Equal(t, cpv.CPV(), "cat/pkg-1-r2")
 	assert.Equal(t, cpv.String(), "cat/pkg-1-r2")
 
 	cpv, err = NewCpv("cat/pkg-0-r0")

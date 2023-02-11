@@ -136,13 +136,6 @@ func (self *Atom) Repo() string {
 	return C.GoString(s)
 }
 
-// Return the concatenated string of an atom's category, package, and version.
-func (self *Atom) CPV() string {
-	s := C.pkgcraft_atom_cpv(self.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
-}
-
 // Compare an atom with another atom returning -1, 0, or 1 if the first atom is
 // less than, equal to, or greater than the second atom, respectively.
 func (self *Atom) Cmp(other *Atom) int {

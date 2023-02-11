@@ -89,9 +89,60 @@ func (self *Cpv) Revision() string {
 	return ""
 }
 
-// Return the concatenated string of an atom's category and package.
+// Return an atom's package and version.
+func (self *Cpv) P() string {
+	c_str := C.pkgcraft_atom_p(self.ptr)
+	defer C.pkgcraft_str_free(c_str)
+	return C.GoString(c_str)
+}
+
+// Return an atom's package, version, and revision.
+func (self *Cpv) Pf() string {
+	c_str := C.pkgcraft_atom_pf(self.ptr)
+	defer C.pkgcraft_str_free(c_str)
+	return C.GoString(c_str)
+}
+
+// Return an atom's revision.
+func (self *Cpv) Pr() string {
+	c_str := C.pkgcraft_atom_pr(self.ptr)
+	if c_str != nil {
+		defer C.pkgcraft_str_free(c_str)
+		return C.GoString(c_str)
+	}
+	return ""
+}
+
+// Return an atom's version.
+func (self *Cpv) Pv() string {
+	c_str := C.pkgcraft_atom_pv(self.ptr)
+	if c_str != nil {
+		defer C.pkgcraft_str_free(c_str)
+		return C.GoString(c_str)
+	}
+	return ""
+}
+
+// Return an atom's version and revision.
+func (self *Cpv) Pvr() string {
+	c_str := C.pkgcraft_atom_pvr(self.ptr)
+	if c_str != nil {
+		defer C.pkgcraft_str_free(c_str)
+		return C.GoString(c_str)
+	}
+	return ""
+}
+
+// Return an atom's category and package.
 func (self *Cpv) Cpn() string {
 	s := C.pkgcraft_atom_cpn(self.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+// Return an atom's category, package, and version.
+func (self *Cpv) CPV() string {
+	s := C.pkgcraft_atom_cpv(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
