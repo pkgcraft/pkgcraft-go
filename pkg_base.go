@@ -16,6 +16,36 @@ func (self *BasePkg) p() *C.Pkg {
 	return self.ptr
 }
 
+// Return a package's package and version.
+func (self *BasePkg) P() string {
+	return self.Cpv().P()
+}
+
+// Return a package's package, version, and revision.
+func (self *BasePkg) Pf() string {
+	return self.Cpv().Pf()
+}
+
+// Return an package's revision.
+func (self *BasePkg) Pr() string {
+	return self.Cpv().Pr()
+}
+
+// Return an package's version.
+func (self *BasePkg) Pv() string {
+	return self.Cpv().Pv()
+}
+
+// Return a package's version and revision.
+func (self *BasePkg) Pvr() string {
+	return self.Cpv().Pvr()
+}
+
+// Return a package's category and package.
+func (self *BasePkg) Cpn() string {
+	return self.Cpv().Cpn()
+}
+
 // Return a package's atom.
 func (self *BasePkg) Cpv() *Cpv {
 	if self.cpv == nil {
