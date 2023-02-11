@@ -9,6 +9,7 @@ type BasePkg struct {
 	format PkgFormat
 	// cached fields
 	eapi *Eapi
+	cpv  *Cpv
 }
 
 func (self *BasePkg) p() *C.Pkg {
@@ -17,9 +18,11 @@ func (self *BasePkg) p() *C.Pkg {
 
 // Return a package's atom.
 func (self *BasePkg) Cpv() *Cpv {
-	ptr := C.pkgcraft_pkg_cpv(self.ptr)
-	cpv, _ := cpvFromPtr(ptr)
-	return cpv
+	if self.cpv == nil {
+		ptr := C.pkgcraft_pkg_cpv(self.ptr)
+		self.cpv, _ = cpvFromPtr(ptr)
+	}
+	return self.cpv
 }
 
 // Return a package's EAPI.
