@@ -61,50 +61,50 @@ func (self *EbuildPkg) Subslot() string {
 
 // Return a package's DEPEND.
 func (self *EbuildPkg) Depend() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_depend(self.ptr), DepSetAtom)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_depend(self.ptr))
 }
 
 // Return a package's BDEPEND.
 func (self *EbuildPkg) Bdepend() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_bdepend(self.ptr), DepSetAtom)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_bdepend(self.ptr))
 }
 
 // Return a package's IDEPEND.
 func (self *EbuildPkg) Idepend() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_idepend(self.ptr), DepSetAtom)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_idepend(self.ptr))
 }
 
 // Return a package's PDEPEND.
 func (self *EbuildPkg) Pdepend() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_pdepend(self.ptr), DepSetAtom)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_pdepend(self.ptr))
 }
 
 // Return a package's RDEPEND.
 func (self *EbuildPkg) Rdepend() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_rdepend(self.ptr), DepSetAtom)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_rdepend(self.ptr))
 }
 
 // Return a package's LICENSE.
 func (self *EbuildPkg) License() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_license(self.ptr), DepSetString)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_license(self.ptr))
 }
 
 // Return a package's PROPERTIES.
 func (self *EbuildPkg) Properties() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_properties(self.ptr), DepSetString)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_properties(self.ptr))
 }
 
 // Return a package's REQUIRED_USE.
 func (self *EbuildPkg) RequiredUse() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_required_use(self.ptr), DepSetString)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_required_use(self.ptr))
 }
 
 // Return a package's Restrict.
 func (self *EbuildPkg) Restrict() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_restrict(self.ptr), DepSetString)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_restrict(self.ptr))
 }
 
 // Return a package's SRC_URI.
 func (self *EbuildPkg) SrcUri() *DepSet {
-	return depSetFromPtr(C.pkgcraft_pkg_ebuild_src_uri(self.ptr), DepSetUri)
+	return depSetFromPtr(C.pkgcraft_pkg_ebuild_src_uri(self.ptr))
 }

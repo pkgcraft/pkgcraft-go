@@ -24,22 +24,22 @@ type pkgRepo[P Pkg] interface {
 	createPkg(*C.Pkg) P
 }
 
-type pkgIter[P Pkg] struct {
-	ptr  *C.RepoPkgIter
+type repoIter[P Pkg] struct {
+	ptr  *C.RepoIter
 	repo pkgRepo[P]
 	next P
 }
 
 // Create an iterator over the packages of a repo.
-func newPkgIter[P Pkg](repo pkgRepo[P]) *pkgIter[P] {
+func newRepoIter[P Pkg](repo pkgRepo[P]) *repoIter[P] {
 	ptr := C.pkgcraft_repo_iter(repo.p())
-	iter := &pkgIter[P]{ptr: ptr, repo: repo}
-	runtime.SetFinalizer(iter, func(self *pkgIter[P]) { C.pkgcraft_repo_iter_free(self.ptr) })
+	iter := &repoIter[P]{ptr: ptr, repo: repo}
+	runtime.SetFinalizer(iter, func(self *repoIter[P]) { C.pkgcraft_repo_iter_free(self.ptr) })
 	return iter
 }
 
 // Determine if a package iterator has another entry.
-func (self *pkgIter[P]) HasNext() bool {
+func (self *repoIter[P]) HasNext() bool {
 	ptr := C.pkgcraft_repo_iter_next(self.ptr)
 	if ptr != nil {
 		self.next = self.repo.createPkg(ptr)
@@ -50,7 +50,7 @@ func (self *pkgIter[P]) HasNext() bool {
 }
 
 // Return the next available package in the iterator.
-func (self *pkgIter[P]) Next() P {
+func (self *repoIter[P]) Next() P {
 	return self.next
 }
 
@@ -58,7 +58,7 @@ func (self *pkgIter[P]) Next() P {
 func repoPkgs[P Pkg](repo pkgRepo[P]) <-chan P {
 	pkgs := make(chan P)
 	go func() {
-		for iter := newPkgIter[P](repo); iter.HasNext(); {
+		for iter := newRepoIter[P](repo); iter.HasNext(); {
 			pkgs <- iter.Next()
 		}
 		close(pkgs)
@@ -66,23 +66,23 @@ func repoPkgs[P Pkg](repo pkgRepo[P]) <-chan P {
 	return pkgs
 }
 
-type restrictPkgIter[P Pkg] struct {
-	ptr  *C.RepoRestrictPkgIter
+type repoIterRestrict[P Pkg] struct {
+	ptr  *C.RepoIterRestrict
 	repo pkgRepo[P]
 	next P
 }
 
 // Create a restricted iterator over the packages of a repo.
-func newRestrictPkgIter[P Pkg](repo pkgRepo[P], restrict *Restrict) *restrictPkgIter[P] {
-	ptr := C.pkgcraft_repo_restrict_iter(repo.p(), restrict.ptr)
-	iter := &restrictPkgIter[P]{ptr: ptr, repo: repo}
-	runtime.SetFinalizer(iter, func(self *restrictPkgIter[P]) { C.pkgcraft_repo_restrict_iter_free(self.ptr) })
+func newRepoIterRestrict[P Pkg](repo pkgRepo[P], restrict *Restrict) *repoIterRestrict[P] {
+	ptr := C.pkgcraft_repo_iter_restrict(repo.p(), restrict.ptr)
+	iter := &repoIterRestrict[P]{ptr: ptr, repo: repo}
+	runtime.SetFinalizer(iter, func(self *repoIterRestrict[P]) { C.pkgcraft_repo_iter_restrict_free(self.ptr) })
 	return iter
 }
 
 // Determine if a restricted package iterator has another entry.
-func (self *restrictPkgIter[P]) HasNext() bool {
-	ptr := C.pkgcraft_repo_restrict_iter_next(self.ptr)
+func (self *repoIterRestrict[P]) HasNext() bool {
+	ptr := C.pkgcraft_repo_iter_restrict_next(self.ptr)
 	if ptr != nil {
 		self.next = self.repo.createPkg(ptr)
 		return true
@@ -92,7 +92,7 @@ func (self *restrictPkgIter[P]) HasNext() bool {
 }
 
 // Return the next available package in the iterator.
-func (self *restrictPkgIter[P]) Next() P {
+func (self *repoIterRestrict[P]) Next() P {
 	return self.next
 }
 
@@ -101,7 +101,7 @@ func repoRestrictPkgs[P Pkg](repo pkgRepo[P], restrict *Restrict) <-chan P {
 	pkgs := make(chan P)
 
 	go func(restrict *Restrict) {
-		for iter := newRestrictPkgIter[P](repo, restrict); iter.HasNext(); {
+		for iter := newRepoIterRestrict[P](repo, restrict); iter.HasNext(); {
 			pkgs <- iter.Next()
 		}
 		close(pkgs)

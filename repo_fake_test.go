@@ -54,19 +54,19 @@ func TestFakeRepoExtend(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestFakeRepoPkgIter(t *testing.T) {
+func TestFakeRepoIter(t *testing.T) {
 	var cpvs []string
 
 	// empty
 	repo, _ := NewFakeRepo("fake", 0, []string{})
-	iter := repo.PkgIter()
+	iter := repo.Iter()
 	assert.False(t, iter.HasNext())
 	assert.Nil(t, iter.Next())
 
 	// add single pkg
 	err := repo.Extend([]string{"cat/pkg-1"})
 	assert.Nil(t, err)
-	for iter := repo.PkgIter(); iter.HasNext(); {
+	for iter := repo.Iter(); iter.HasNext(); {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
@@ -80,7 +80,7 @@ func TestFakeRepoPkgIter(t *testing.T) {
 	// add multiple pkgs with overlap
 	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
 	assert.Nil(t, err)
-	for iter := repo.PkgIter(); iter.HasNext(); {
+	for iter := repo.Iter(); iter.HasNext(); {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
@@ -120,20 +120,20 @@ func TestFakeRepoPkgs(t *testing.T) {
 	assert.Equal(t, cpvs, []string{"cat/pkg-1", "cat/pkg-2"})
 }
 
-func TestFakeRepoRestrictPkgIter(t *testing.T) {
+func TestFakeRepoIterRestrict(t *testing.T) {
 	var cpvs []string
 	restrict, _ := NewRestrict("<cat/pkg-2")
 
 	// empty
 	repo, _ := NewFakeRepo("fake", 0, []string{})
-	iter := repo.RestrictPkgIter(restrict)
+	iter := repo.IterRestrict(restrict)
 	assert.False(t, iter.HasNext())
 	assert.Nil(t, iter.Next())
 
 	// add single pkg
 	err := repo.Extend([]string{"cat/pkg-1"})
 	assert.Nil(t, err)
-	for iter := repo.RestrictPkgIter(restrict); iter.HasNext(); {
+	for iter := repo.IterRestrict(restrict); iter.HasNext(); {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)
@@ -147,7 +147,7 @@ func TestFakeRepoRestrictPkgIter(t *testing.T) {
 	// add multiple pkgs with overlap
 	err = repo.Extend([]string{"cat/pkg-1", "cat/pkg-2"})
 	assert.Nil(t, err)
-	for iter := repo.RestrictPkgIter(restrict); iter.HasNext(); {
+	for iter := repo.IterRestrict(restrict); iter.HasNext(); {
 		pkg := iter.Next()
 		// verify repos are equal
 		assert.True(t, repo.Cmp(pkg.Repo()) == 0)

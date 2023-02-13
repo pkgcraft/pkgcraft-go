@@ -46,7 +46,7 @@ func (self *BasePkg) Cpn() string {
 	return self.Cpv().Cpn()
 }
 
-// Return a package's atom.
+// Return a package's Cpv.
 func (self *BasePkg) Cpv() *Cpv {
 	if self.cpv == nil {
 		ptr := C.pkgcraft_pkg_cpv(self.ptr)

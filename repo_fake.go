@@ -66,8 +66,8 @@ func (self *FakeRepo) createPkg(ptr *C.Pkg) *FakePkg {
 }
 
 // Return an iterator over the packages of a repo.
-func (self *FakeRepo) PkgIter() *pkgIter[*FakePkg] {
-	return newPkgIter[*FakePkg](self)
+func (self *FakeRepo) Iter() *repoIter[*FakePkg] {
+	return newRepoIter[*FakePkg](self)
 }
 
 // Return a channel iterating over the packages of a repo.
@@ -76,8 +76,8 @@ func (self *FakeRepo) Pkgs() <-chan *FakePkg {
 }
 
 // Return an iterator over the restricted packages of a repo.
-func (self *FakeRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*FakePkg] {
-	return newRestrictPkgIter[*FakePkg](self, restrict)
+func (self *FakeRepo) IterRestrict(restrict *Restrict) *repoIterRestrict[*FakePkg] {
+	return newRepoIterRestrict[*FakePkg](self, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.

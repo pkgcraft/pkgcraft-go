@@ -34,9 +34,9 @@ func NewRestrict(obj interface{}) (*Restrict, error) {
 // Try to convert a string to a restriction.
 func stringToRestrict(s string) (*C.Restrict, error) {
 	if cpv, _ := NewCpv(s); cpv != nil {
-		return C.pkgcraft_atom_restrict(cpv.ptr), nil
-	} else if atom, _ := NewAtomCached(s); atom != nil {
-		return C.pkgcraft_atom_restrict(atom.ptr), nil
+		return C.pkgcraft_dep_restrict(cpv.ptr), nil
+	} else if dep, _ := NewDepCached(s); dep != nil {
+		return C.pkgcraft_dep_restrict(dep.ptr), nil
 	} else {
 		c_str := C.CString(s)
 		defer C.free(unsafe.Pointer(c_str))
@@ -53,7 +53,7 @@ func stringToRestrict(s string) (*C.Restrict, error) {
 func objectToRestrict(obj interface{}) (*C.Restrict, error) {
 	switch obj := obj.(type) {
 	case *Cpv:
-		return C.pkgcraft_atom_restrict(obj.ptr), nil
+		return C.pkgcraft_dep_restrict(obj.ptr), nil
 	case *BasePkg:
 		return C.pkgcraft_pkg_restrict(obj.ptr), nil
 	case string:

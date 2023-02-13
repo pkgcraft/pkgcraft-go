@@ -33,8 +33,8 @@ func (self *EbuildRepo) createPkg(ptr *C.Pkg) *EbuildPkg {
 }
 
 // Return an iterator over the packages of a repo.
-func (self *EbuildRepo) PkgIter() *pkgIter[*EbuildPkg] {
-	return newPkgIter[*EbuildPkg](self)
+func (self *EbuildRepo) Iter() *repoIter[*EbuildPkg] {
+	return newRepoIter[*EbuildPkg](self)
 }
 
 // Return a channel iterating over the packages of a repo.
@@ -43,8 +43,8 @@ func (self *EbuildRepo) Pkgs() <-chan *EbuildPkg {
 }
 
 // Return an iterator over the restricted packages of a repo.
-func (self *EbuildRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*EbuildPkg] {
-	return newRestrictPkgIter[*EbuildPkg](self, restrict)
+func (self *EbuildRepo) IterRestrict(restrict *Restrict) *repoIterRestrict[*EbuildPkg] {
+	return newRepoIterRestrict[*EbuildPkg](self, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.

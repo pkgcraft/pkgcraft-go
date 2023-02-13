@@ -60,8 +60,8 @@ func (self *BaseRepo) createPkg(ptr *C.Pkg) *BasePkg {
 }
 
 // Return an iterator over the packages of a repo.
-func (self *BaseRepo) PkgIter() *pkgIter[*BasePkg] {
-	return newPkgIter[*BasePkg](self)
+func (self *BaseRepo) Iter() *repoIter[*BasePkg] {
+	return newRepoIter[*BasePkg](self)
 }
 
 // Return a channel iterating over the packages of a repo.
@@ -70,8 +70,8 @@ func (self *BaseRepo) Pkgs() <-chan *BasePkg {
 }
 
 // Return an iterator over the restricted packages of a repo.
-func (self *BaseRepo) RestrictPkgIter(restrict *Restrict) *restrictPkgIter[*BasePkg] {
-	return newRestrictPkgIter[*BasePkg](self, restrict)
+func (self *BaseRepo) IterRestrict(restrict *Restrict) *repoIterRestrict[*BasePkg] {
+	return newRepoIterRestrict[*BasePkg](self, restrict)
 }
 
 // Return a channel iterating over the restricted packages of a repo.

@@ -13,7 +13,7 @@ import (
 
 func BlockerFromString(s string) (Blocker, error) {
 	c_str := C.CString(s)
-	i := C.pkgcraft_atom_blocker_from_str(c_str)
+	i := C.pkgcraft_dep_blocker_from_str(c_str)
 	C.free(unsafe.Pointer(c_str))
 	if i > 0 {
 		return Blocker(i), nil
@@ -24,7 +24,7 @@ func BlockerFromString(s string) (Blocker, error) {
 
 func SlotOperatorFromString(s string) (SlotOperator, error) {
 	c_str := C.CString(s)
-	i := C.pkgcraft_atom_slot_op_from_str(c_str)
+	i := C.pkgcraft_dep_slot_op_from_str(c_str)
 	C.free(unsafe.Pointer(c_str))
 	if i > 0 {
 		return SlotOperator(i), nil
