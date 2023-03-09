@@ -59,9 +59,7 @@ func getEapis() map[string]*Eapi {
 
 	// append unofficial Eapi objects
 	unofficial_eapis := eapisToSlice(unsafe.Slice(c_eapis, length), len(eapis))
-	for _, eapi := range unofficial_eapis {
-		eapis = append(eapis, eapi)
-	}
+	eapis = append(eapis, unofficial_eapis...)
 	defer C.pkgcraft_eapis_free(c_eapis, length)
 
 	// set global alias for the most recent EAPI
