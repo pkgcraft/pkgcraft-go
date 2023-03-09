@@ -9,7 +9,7 @@ import (
 )
 
 type DepSet struct {
-	ptr  *C.DepSet
+	ptr *C.DepSet
 }
 
 func depSetFromPtr(ptr *C.DepSet) *DepSet {

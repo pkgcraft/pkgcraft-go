@@ -31,7 +31,7 @@ func TestDep(t *testing.T) {
 	assert.Equal(t, dep.Pv(), "")
 	assert.Equal(t, dep.Pvr(), "")
 	assert.Equal(t, dep.Cpn(), "cat/pkg")
-	assert.Equal(t, dep.CPV(), "cat/pkg")
+	assert.Equal(t, dep.Cpv(), "cat/pkg")
 	assert.Equal(t, dep.Blocker(), BlockerNone)
 	assert.Equal(t, dep.Slot(), "")
 	assert.Equal(t, dep.Subslot(), "")
@@ -54,7 +54,7 @@ func TestDep(t *testing.T) {
 	assert.Equal(t, dep.Pv(), "1")
 	assert.Equal(t, dep.Pvr(), "1-r2")
 	assert.Equal(t, dep.Cpn(), "cat/pkg")
-	assert.Equal(t, dep.CPV(), "cat/pkg-1-r2")
+	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, dep.String(), "=cat/pkg-1-r2")
 
 	// blocker
@@ -108,7 +108,7 @@ func TestDep(t *testing.T) {
 	assert.Equal(t, dep.Pv(), "1")
 	assert.Equal(t, dep.Pvr(), "1-r2")
 	assert.Equal(t, dep.Cpn(), "cat/pkg")
-	assert.Equal(t, dep.CPV(), "cat/pkg-1-r2")
+	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, dep.String(), "!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 
 	// verify cached deps reuse objects
@@ -182,7 +182,7 @@ func TestDepIntersects(t *testing.T) {
 }
 
 type validDep struct {
-	Dep     string
+	Dep      string
 	Eapis    string
 	Category string
 	Package  string

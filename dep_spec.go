@@ -17,7 +17,7 @@ const (
 )
 
 type DepSpec struct {
-	ptr  *C.DepSpec
+	ptr *C.DepSpec
 }
 
 func depFromPtr(ptr *C.DepSpec) *DepSpec {

@@ -5,13 +5,20 @@ package pkgcraft
 import "C"
 
 import (
+	"errors"
+	"runtime"
 	"unsafe"
 
 	"github.com/hashicorp/golang-lru/v2"
 )
 
 type Dep struct {
-	*Cpv
+	ptr *C.Dep
+	// cached fields
+	_category string
+	_package  string
+	_version  *Version
+	_hash     uint64
 }
 
 type Blocker int
@@ -49,11 +56,14 @@ func newDep(s string, eapi *Eapi) (*Dep, error) {
 	ptr := C.pkgcraft_dep_new(c_str, eapi_ptr)
 	C.free(unsafe.Pointer(c_str))
 
-	cpv, err := cpvFromPtr(ptr)
-	if cpv != nil {
-		return &Dep{cpv}, nil
+	if ptr != nil {
+		dep := &Dep{ptr: ptr}
+		runtime.SetFinalizer(dep, func(self *Dep) { C.pkgcraft_dep_free(self.ptr) })
+		return dep, nil
 	} else {
-		return nil, err
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
 	}
 }
 
@@ -96,27 +106,69 @@ func (self *Dep) Blocker() Blocker {
 	return Blocker(i)
 }
 
-// Get the slot of a package dependency.
+// Return a package dependency's category.
+func (self *Dep) Category() string {
+	if self._category == "" {
+		s := C.pkgcraft_dep_category(self.ptr)
+		defer C.pkgcraft_str_free(s)
+		self._category = C.GoString(s)
+	}
+	return self._category
+}
+
+// Return a package dependency's package.
+func (self *Dep) Package() string {
+	if self._package == "" {
+		s := C.pkgcraft_dep_package(self.ptr)
+		defer C.pkgcraft_str_free(s)
+		self._package = C.GoString(s)
+	}
+	return self._package
+}
+
+// Return a package dependency's version.
+func (self *Dep) Version() *Version {
+	if self._version == nil {
+		ptr := C.pkgcraft_dep_version(self.ptr)
+		if ptr != nil {
+			self._version, _ = versionFromPtr(ptr)
+		} else {
+			self._version = &Version{}
+		}
+	}
+	return self._version
+}
+
+// Return a package dependency's revision.
+func (self *Dep) Revision() string {
+	version := self.Version()
+	if *version != (Version{}) {
+		return version.Revision()
+	}
+	return ""
+}
+
+// Return a package dependency's slot.
 func (self *Dep) Slot() string {
 	s := C.pkgcraft_dep_slot(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
-// Get the subslot of a package dependency.
+// Return a package dependency's subslot.
 func (self *Dep) Subslot() string {
 	s := C.pkgcraft_dep_subslot(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
-// Get the slot operator of a package dependency.
+// Return a package dependency's slot operator.
 func (self *Dep) SlotOp() SlotOperator {
 	i := C.pkgcraft_dep_slot_op(self.ptr)
 	return SlotOperator(i)
 }
 
-// Get the USE dependencies of a package dependency.
+// Return a package dependency's USE flag dependencies.
 func (self *Dep) Use() []string {
 	var length C.size_t
 	array := C.pkgcraft_dep_use_deps(self.ptr, &length)
@@ -129,15 +181,98 @@ func (self *Dep) Use() []string {
 	return use
 }
 
-// Get the repo of a package dependency.
+// Return a package dependency's repository.
 func (self *Dep) Repo() string {
 	s := C.pkgcraft_dep_repo(self.ptr)
 	defer C.pkgcraft_str_free(s)
 	return C.GoString(s)
 }
 
+// Return a package dependency's package and version.
+func (self *Dep) P() string {
+	c_str := C.pkgcraft_dep_p(self.ptr)
+	defer C.pkgcraft_str_free(c_str)
+	return C.GoString(c_str)
+}
+
+// Return a package dependency's package, version, and revision.
+func (self *Dep) Pf() string {
+	c_str := C.pkgcraft_dep_pf(self.ptr)
+	defer C.pkgcraft_str_free(c_str)
+	return C.GoString(c_str)
+}
+
+// Return a package dependency's revision.
+func (self *Dep) Pr() string {
+	c_str := C.pkgcraft_dep_pr(self.ptr)
+	if c_str != nil {
+		defer C.pkgcraft_str_free(c_str)
+		return C.GoString(c_str)
+	}
+	return ""
+}
+
+// Return a package dependency's version.
+func (self *Dep) Pv() string {
+	c_str := C.pkgcraft_dep_pv(self.ptr)
+	if c_str != nil {
+		defer C.pkgcraft_str_free(c_str)
+		return C.GoString(c_str)
+	}
+	return ""
+}
+
+// Return a package dependency's version and revision.
+func (self *Dep) Pvr() string {
+	c_str := C.pkgcraft_dep_pvr(self.ptr)
+	if c_str != nil {
+		defer C.pkgcraft_str_free(c_str)
+		return C.GoString(c_str)
+	}
+	return ""
+}
+
+// Return a package dependency's category and package.
+func (self *Dep) Cpn() string {
+	s := C.pkgcraft_dep_cpn(self.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+// Return a package dependency's category, package, version, and revision.
+func (self *Dep) Cpv() string {
+	s := C.pkgcraft_dep_cpv(self.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+func (self *Dep) String() string {
+	s := C.pkgcraft_dep_str(self.ptr)
+	defer C.pkgcraft_str_free(s)
+	return C.GoString(s)
+}
+
+func (self *Dep) Hash() uint64 {
+	if self._hash == 0 {
+		self._hash = uint64(C.pkgcraft_dep_hash(self.ptr))
+	}
+	return self._hash
+}
+
 // Compare two package dependencies returning -1, 0, or 1 if the first is
 // less than, equal to, or greater than the second, respectively.
 func (self *Dep) Cmp(other *Dep) int {
 	return int(C.pkgcraft_dep_cmp(self.ptr, other.ptr))
+}
+
+// Determine if two Cpv or Dep objects intersect.
+func (self *Dep) Intersects(other interface{}) bool {
+	switch other := other.(type) {
+	case *Cpv:
+		return bool(C.pkgcraft_dep_intersects_cpv(self.ptr, other.ptr))
+	case *Dep:
+		return bool(C.pkgcraft_dep_intersects(self.ptr, other.ptr))
+	default:
+		return false
+	}
 }
