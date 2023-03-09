@@ -6,49 +6,72 @@ import "C"
 
 import (
 	"errors"
-	"strconv"
 	"unsafe"
 )
 
 var EAPIS_OFFICIAL = getOfficialEapis()
 var EAPIS = getEapis()
-var EAPI_LATEST = EAPIS_OFFICIAL[strconv.Itoa(len(EAPIS_OFFICIAL)-1)]
+var EAPI_LATEST_OFFICIAL *Eapi
+var EAPI_LATEST *Eapi
 
-// Convert an array of Eapi pointers to a mapping.
-func eapisToMap(eapis []*C.Eapi, start int) map[string]*Eapi {
-	m := make(map[string]*Eapi)
-	for i, ptr := range eapis {
+// Convert an array of Eapi pointers to a slice of Eapi objects.
+func eapisToSlice(c_eapis []*C.Eapi, start int) []*Eapi {
+	var eapis []*Eapi
+	for i, ptr := range c_eapis {
 		if i >= start {
 			s := C.pkgcraft_eapi_as_str(ptr)
 			id := C.GoString(s)
 			defer C.pkgcraft_str_free(s)
-			m[id] = &Eapi{ptr, id}
+			eapis = append(eapis, &Eapi{ptr, id})
 		}
 	}
-	return m
+	return eapis
 }
 
 // Return the mapping of all official EAPIs.
 func getOfficialEapis() map[string]*Eapi {
 	var length C.size_t
-	eapis := C.pkgcraft_eapis_official(&length)
-	m := eapisToMap(unsafe.Slice(eapis, length), 0)
-	defer C.pkgcraft_eapis_free(eapis, length)
+	c_eapis := C.pkgcraft_eapis_official(&length)
+	eapis := eapisToSlice(unsafe.Slice(c_eapis, length), 0)
+	defer C.pkgcraft_eapis_free(c_eapis, length)
+
+	// set global alias for the most recent, official EAPI
+	EAPI_LATEST_OFFICIAL = eapis[len(eapis)-1]
+
+	m := make(map[string]*Eapi)
+	for _, eapi := range eapis {
+		m[eapi.id] = eapi
+	}
+
 	return m
 }
 
 // Return the mapping of all known EAPIs.
 func getEapis() map[string]*Eapi {
+	var eapis []*Eapi
 	var length C.size_t
-	eapis := C.pkgcraft_eapis(&length)
+	c_eapis := C.pkgcraft_eapis(&length)
+
+	// copy official Eapi objects
+	for _, eapi := range EAPIS_OFFICIAL {
+		eapis = append(eapis, eapi)
+	}
+
+	// append unofficial Eapi objects
+	unofficial_eapis := eapisToSlice(unsafe.Slice(c_eapis, length), len(eapis))
+	for _, eapi := range unofficial_eapis {
+		eapis = append(eapis, eapi)
+	}
+	defer C.pkgcraft_eapis_free(c_eapis, length)
+
+	// set global alias for the most recent EAPI
+	EAPI_LATEST = unofficial_eapis[len(unofficial_eapis)-1]
+
 	m := make(map[string]*Eapi)
-	for k, v := range EAPIS_OFFICIAL {
-		m[k] = v
+	for _, eapi := range eapis {
+		m[eapi.id] = eapi
 	}
-	for k, v := range eapisToMap(unsafe.Slice(eapis, length), len(m)) {
-		m[k] = v
-	}
-	defer C.pkgcraft_eapis_free(eapis, length)
+
 	return m
 }
 

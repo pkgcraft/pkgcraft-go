@@ -114,7 +114,7 @@ func TestDep(t *testing.T) {
 	assert.Equal(t, dep.String(), "cat/pkg::repo")
 
 	// repo dep invalid on official EAPIs
-	dep, err = NewDepWithEapi("cat/pkg::repo", EAPI_LATEST)
+	dep, err = NewDepWithEapi("cat/pkg::repo", EAPI_LATEST_OFFICIAL)
 	assert.Nil(t, dep)
 	assert.NotNil(t, err)
 
@@ -147,8 +147,8 @@ func TestDep(t *testing.T) {
 	assert.True(t, dep != c1)
 	c2, _ = NewDepCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
 	assert.True(t, c1 == c2)
-	c1, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST)
-	c2, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST)
+	c1, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST_OFFICIAL)
+	c2, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST_OFFICIAL)
 	assert.True(t, c1 == c2)
 }
 

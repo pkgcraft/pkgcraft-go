@@ -13,7 +13,7 @@ func TestEapiGlobals(t *testing.T) {
 	for id, eapi := range EAPIS_OFFICIAL {
 		assert.True(t, EAPIS[id] == eapi)
 	}
-	assert.True(t, EAPIS[EAPI_LATEST.String()] == EAPI_LATEST)
+	assert.True(t, EAPIS[EAPI_LATEST_OFFICIAL.String()] == EAPI_LATEST_OFFICIAL)
 }
 
 func TestEapiRange(t *testing.T) {
