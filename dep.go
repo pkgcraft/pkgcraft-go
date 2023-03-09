@@ -6,6 +6,7 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
 	"runtime"
 	"unsafe"
 
@@ -29,6 +30,17 @@ const (
 	BlockerWeak
 )
 
+func BlockerFromString(s string) (Blocker, error) {
+	c_str := C.CString(s)
+	i := C.pkgcraft_dep_blocker_from_str(c_str)
+	C.free(unsafe.Pointer(c_str))
+	if i > 0 {
+		return Blocker(i), nil
+	} else {
+		return BlockerNone, fmt.Errorf("invalid blocker: %s", s)
+	}
+}
+
 type SlotOperator int
 
 const (
@@ -36,6 +48,17 @@ const (
 	SlotOpEqual
 	SlotOpStar
 )
+
+func SlotOperatorFromString(s string) (SlotOperator, error) {
+	c_str := C.CString(s)
+	i := C.pkgcraft_dep_slot_op_from_str(c_str)
+	C.free(unsafe.Pointer(c_str))
+	if i > 0 {
+		return SlotOperator(i), nil
+	} else {
+		return SlotOpNone, fmt.Errorf("invalid slot operator: %s", s)
+	}
+}
 
 type Pair[T, U any] struct {
 	First  T
