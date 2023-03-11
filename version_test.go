@@ -13,6 +13,43 @@ import (
 	. "github.com/pkgcraft/pkgcraft-go/internal"
 )
 
+type intersectsVersion struct {
+	Vals   []string
+	Status bool
+}
+
+type sortedVersion struct {
+	Sorted []string
+	Equal  bool
+}
+
+type hashingVersion struct {
+	Versions []string
+	Equal    bool
+}
+
+type versionData struct {
+	Compares   []string
+	Intersects []intersectsVersion
+	Sorting    []sortedVersion
+	Hashing    []hashingVersion
+}
+
+func parseVersionToml() versionData {
+	var data versionData
+	f, err := os.ReadFile("testdata/toml/version.toml")
+	if err != nil {
+		panic(err)
+	}
+	err = toml.Unmarshal(f, &data)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+var VERSION_TOML = parseVersionToml()
+
 func TestVersion(t *testing.T) {
 	// non-revision
 	ver, err := NewVersion("1")
@@ -110,41 +147,8 @@ func TestVersionIntersects(t *testing.T) {
 	assert.True(t, v1.Intersects(vo2))
 }
 
-type intersectsVersion struct {
-	Vals   []string
-	Status bool
-}
-
-type sortedVersion struct {
-	Sorted []string
-	Equal  bool
-}
-
-type hashingVersion struct {
-	Versions []string
-	Equal    bool
-}
-
-type versionData struct {
-	Compares   []string
-	Intersects []intersectsVersion
-	Sorting    []sortedVersion
-	Hashing    []hashingVersion
-}
-
-func TestVersionToml(t *testing.T) {
-	var ver_data versionData
-	f, err := os.ReadFile("testdata/toml/version.toml")
-	if err != nil {
-		panic(err)
-	}
-	err = toml.Unmarshal(f, &ver_data)
-	if err != nil {
-		panic(err)
-	}
-
-	// sorting
-	for _, data := range ver_data.Sorting {
+func TestVersionSort(t *testing.T) {
+	for _, data := range VERSION_TOML.Sorting {
 		var expected []*Version
 		for _, s := range data.Sorted {
 			ver, _ := NewVersion(s)

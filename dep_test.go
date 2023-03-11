@@ -13,6 +13,52 @@ import (
 	. "github.com/pkgcraft/pkgcraft-go/internal"
 )
 
+type validDep struct {
+	Dep      string
+	Eapis    string
+	Category string
+	Package  string
+	Blocker  string
+	Version  string
+	Revision string
+	Slot     string
+	Subslot  string
+	Slot_Op  string
+	Use      []string
+}
+
+type intersectsDep struct {
+	Vals   []string
+	Status bool
+}
+
+type sortedDep struct {
+	Sorted []string
+	Equal  bool
+}
+
+type depData struct {
+	Valid      []validDep
+	Invalid    []string
+	Intersects []intersectsDep
+	Sorting    []sortedDep
+}
+
+func parseDepToml() depData {
+	var data depData
+	f, err := os.ReadFile("testdata/toml/dep.toml")
+	if err != nil {
+		panic(err)
+	}
+	err = toml.Unmarshal(f, &data)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+var DEP_TOML = parseDepToml()
+
 func TestBlockerFromString(t *testing.T) {
 	valid := map[string]Blocker{"!": BlockerWeak, "!!": BlockerStrong}
 	for s, expected := range valid {
@@ -211,53 +257,12 @@ func TestDepIntersects(t *testing.T) {
 	assert.True(t, cpv.Intersects(dep))
 }
 
-type validDep struct {
-	Dep      string
-	Eapis    string
-	Category string
-	Package  string
-	Blocker  string
-	Version  string
-	Revision string
-	Slot     string
-	Subslot  string
-	Slot_Op  string
-	Use      []string
-}
-
-type intersectsDep struct {
-	Vals   []string
-	Status bool
-}
-
-type sortedDep struct {
-	Sorted []string
-	Equal  bool
-}
-
-type depData struct {
-	Valid      []validDep
-	Invalid    []string
-	Intersects []intersectsDep
-	Sorting    []sortedDep
-}
-
-func TestDepToml(t *testing.T) {
-	var dep_data depData
-	f, err := os.ReadFile("testdata/toml/dep.toml")
-	if err != nil {
-		panic(err)
-	}
-	err = toml.Unmarshal(f, &dep_data)
-	if err != nil {
-		panic(err)
-	}
-
-	// valid deps
+func TestDepParse(t *testing.T) {
+	// valid
 	var ver *VersionWithOp
 	var blocker Blocker
 	var slot_op SlotOperator
-	for _, el := range dep_data.Valid {
+	for _, el := range DEP_TOML.Valid {
 		eapis, err := EapiRange(el.Eapis)
 		if err != nil {
 			panic(err)
@@ -294,16 +299,17 @@ func TestDepToml(t *testing.T) {
 		}
 	}
 
-	// invalid deps
-	for _, s := range dep_data.Invalid {
+	// invalid
+	for _, s := range DEP_TOML.Invalid {
 		for _, eapi := range EAPIS {
 			_, err := NewDepWithEapi(s, eapi)
 			assert.NotNil(t, err, "%s passed for EAPI=%s", s, eapi)
 		}
 	}
+}
 
-	// sorting
-	for _, data := range dep_data.Sorting {
+func TestDepSort(t *testing.T) {
+	for _, data := range DEP_TOML.Sorting {
 		var expected []*Dep
 		for _, s := range data.Sorted {
 			dep, _ := NewDep(s)
