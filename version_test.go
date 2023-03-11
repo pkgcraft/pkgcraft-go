@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/pelletier/go-toml"
@@ -83,20 +84,25 @@ func TestVersionWithOp(t *testing.T) {
 }
 
 func TestVersionCmp(t *testing.T) {
-	// v1 < v2
-	v1, _ := NewVersion("1")
-	v2, _ := NewVersion("2")
-	assert.Equal(t, v1.Cmp(v2), -1)
+	for _, s := range VERSION_TOML.Compares {
+		vals := strings.Fields(s)
+		v1, _ := NewVersion(vals[0])
+		op := vals[1]
+		v2, _ := NewVersion(vals[2])
 
-	// v1 == v2
-	v1, _ = NewVersion("2")
-	v2, _ = NewVersion("2")
-	assert.Equal(t, v1.Cmp(v2), 0)
-
-	// v1 > v2
-	v1, _ = NewVersion("2")
-	v2, _ = NewVersion("1")
-	assert.Equal(t, v1.Cmp(v2), 1)
+		switch op {
+		case "<":
+			assert.Equal(t, v1.Cmp(v2), -1)
+		case "==":
+			assert.Equal(t, v1.Cmp(v2), 0)
+		case "!=":
+			assert.NotEqual(t, v1.Cmp(v2), 0)
+		case ">":
+			assert.Equal(t, v1.Cmp(v2), 1)
+		default:
+			panic(fmt.Sprintf("invalid operator: %s", op))
+		}
+	}
 }
 
 func TestVersionHash(t *testing.T) {
