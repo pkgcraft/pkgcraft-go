@@ -100,27 +100,19 @@ func TestVersionCmp(t *testing.T) {
 }
 
 func TestVersionHash(t *testing.T) {
-	// hashing equal values
-	v1, _ := NewVersion("1.0.2")
-	v2, _ := NewVersion("1.0.2-r0")
-	v3, _ := NewVersion("1.000.2")
-	v4, _ := NewVersion("1.00.2-r0")
-	m := make(map[uint64]bool)
-	m[v1.Hash()] = true
-	m[v2.Hash()] = true
-	m[v3.Hash()] = true
-	m[v4.Hash()] = true
-	assert.Equal(t, len(m), 1)
+	for _, data := range VERSION_TOML.Hashing {
+		m := make(map[uint64]bool)
+		for _, s := range data.Versions {
+			ver, _ := NewVersion(s)
+			m[ver.Hash()] = true
+		}
 
-	// hashing unequal values
-	v1, _ = NewVersion("0.1")
-	v2, _ = NewVersion("0.01")
-	v3, _ = NewVersion("0.001")
-	m = make(map[uint64]bool)
-	m[v1.Hash()] = true
-	m[v2.Hash()] = true
-	m[v3.Hash()] = true
-	assert.Equal(t, len(m), 3)
+		if data.Equal {
+			assert.Equal(t, len(m), 1)
+		} else {
+			assert.Equal(t, len(m), len(data.Versions))
+		}
+	}
 }
 
 // TODO: use shared intersects test data
