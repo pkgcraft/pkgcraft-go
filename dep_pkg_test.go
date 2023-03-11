@@ -89,7 +89,7 @@ func TestSlotOperatorFromString(t *testing.T) {
 	}
 }
 
-func TestDep(t *testing.T) {
+func TestDepAttrs(t *testing.T) {
 	var dep, c1, c2 *Dep
 	var err error
 	var ver *VersionWithOp
@@ -215,7 +215,7 @@ func TestDepCmp(t *testing.T) {
 	assert.Equal(t, d1.Cmp(d2), 1)
 }
 
-func TestHash(t *testing.T) {
+func TestDepHash(t *testing.T) {
 	// hashing equal values
 	d1, _ := NewDep("=cat/pkg-1.0.2")
 	d2, _ := NewDep("=cat/pkg-1.0.2-r0")
