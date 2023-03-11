@@ -216,27 +216,19 @@ func TestDepCmp(t *testing.T) {
 }
 
 func TestDepHash(t *testing.T) {
-	// hashing equal values
-	d1, _ := NewDep("=cat/pkg-1.0.2")
-	d2, _ := NewDep("=cat/pkg-1.0.2-r0")
-	a3, _ := NewDep("=cat/pkg-1.000.2")
-	a4, _ := NewDep("=cat/pkg-1.00.2-r0")
-	m := make(map[uint64]bool)
-	m[d1.Hash()] = true
-	m[d2.Hash()] = true
-	m[a3.Hash()] = true
-	m[a4.Hash()] = true
-	assert.Equal(t, len(m), 1)
+	for _, data := range VERSION_TOML.Hashing {
+		m := make(map[uint64]bool)
+		for _, s := range data.Versions {
+			dep, _ := NewDep(fmt.Sprintf("=cat/pkg-%s", s))
+			m[dep.Hash()] = true
+		}
 
-	// hashing unequal values
-	d1, _ = NewDep("=cat/pkg-0.1")
-	d2, _ = NewDep("=cat/pkg-0.01")
-	a3, _ = NewDep("=cat/pkg-0.001")
-	m = make(map[uint64]bool)
-	m[d1.Hash()] = true
-	m[d2.Hash()] = true
-	m[a3.Hash()] = true
-	assert.Equal(t, len(m), 3)
+		if data.Equal {
+			assert.Equal(t, len(m), 1)
+		} else {
+			assert.Equal(t, len(m), len(data.Versions))
+		}
+	}
 }
 
 // TODO: use shared intersects test data
