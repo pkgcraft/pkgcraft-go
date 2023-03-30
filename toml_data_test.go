@@ -1,6 +1,7 @@
 package pkgcraft_test
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pelletier/go-toml"
@@ -37,21 +38,6 @@ type depData struct {
 	Sorting    []sortedDep
 }
 
-func parseDepToml() depData {
-	var data depData
-	f, err := os.ReadFile("testdata/toml/dep.toml")
-	if err != nil {
-		panic(err)
-	}
-	err = toml.Unmarshal(f, &data)
-	if err != nil {
-		panic(err)
-	}
-	return data
-}
-
-var DEP_TOML = parseDepToml()
-
 type intersectsVersion struct {
 	Vals   []string
 	Status bool
@@ -74,9 +60,10 @@ type versionData struct {
 	Hashing    []hashingVersion
 }
 
-func parseVersionToml() versionData {
-	var data versionData
-	f, err := os.ReadFile("testdata/toml/version.toml")
+func parseToml[T any](file string) T {
+	var data T
+	path := fmt.Sprintf("testdata/toml/%s", file)
+	f, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -87,4 +74,5 @@ func parseVersionToml() versionData {
 	return data
 }
 
-var VERSION_TOML = parseVersionToml()
+var DEP_TOML = parseToml[depData]("dep.toml")
+var VERSION_TOML = parseToml[versionData]("version.toml")
