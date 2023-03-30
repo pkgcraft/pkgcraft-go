@@ -2,54 +2,15 @@ package pkgcraft_test
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 	"testing"
 
-	"github.com/pelletier/go-toml"
 	"github.com/stretchr/testify/assert"
 
 	. "github.com/pkgcraft/pkgcraft-go"
 	. "github.com/pkgcraft/pkgcraft-go/internal"
 )
-
-type intersectsVersion struct {
-	Vals   []string
-	Status bool
-}
-
-type sortedVersion struct {
-	Sorted []string
-	Equal  bool
-}
-
-type hashingVersion struct {
-	Versions []string
-	Equal    bool
-}
-
-type versionData struct {
-	Compares   []string
-	Intersects []intersectsVersion
-	Sorting    []sortedVersion
-	Hashing    []hashingVersion
-}
-
-func parseVersionToml() versionData {
-	var data versionData
-	f, err := os.ReadFile("testdata/toml/version.toml")
-	if err != nil {
-		panic(err)
-	}
-	err = toml.Unmarshal(f, &data)
-	if err != nil {
-		panic(err)
-	}
-	return data
-}
-
-var VERSION_TOML = parseVersionToml()
 
 func TestVersion(t *testing.T) {
 	// non-revision

@@ -2,62 +2,14 @@ package pkgcraft_test
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"testing"
 
-	"github.com/pelletier/go-toml"
 	"github.com/stretchr/testify/assert"
 
 	. "github.com/pkgcraft/pkgcraft-go"
 	. "github.com/pkgcraft/pkgcraft-go/internal"
 )
-
-type validDep struct {
-	Dep      string
-	Eapis    string
-	Category string
-	Package  string
-	Blocker  string
-	Version  string
-	Revision string
-	Slot     string
-	Subslot  string
-	Slot_Op  string
-	Use      []string
-}
-
-type intersectsDep struct {
-	Vals   []string
-	Status bool
-}
-
-type sortedDep struct {
-	Sorted []string
-	Equal  bool
-}
-
-type depData struct {
-	Valid      []validDep
-	Invalid    []string
-	Intersects []intersectsDep
-	Sorting    []sortedDep
-}
-
-func parseDepToml() depData {
-	var data depData
-	f, err := os.ReadFile("testdata/toml/dep.toml")
-	if err != nil {
-		panic(err)
-	}
-	err = toml.Unmarshal(f, &data)
-	if err != nil {
-		panic(err)
-	}
-	return data
-}
-
-var DEP_TOML = parseDepToml()
 
 func TestBlockerFromString(t *testing.T) {
 	valid := map[string]Blocker{"!": BlockerWeak, "!!": BlockerStrong}
