@@ -33,7 +33,7 @@ func getOfficialEapis() map[string]*Eapi {
 	var length C.size_t
 	c_eapis := C.pkgcraft_eapis_official(&length)
 	eapis := eapisToSlice(unsafe.Slice(c_eapis, length), 0)
-	defer C.pkgcraft_eapis_free(c_eapis, length)
+	C.pkgcraft_array_free((*unsafe.Pointer)(unsafe.Pointer(c_eapis)), length)
 
 	// set global alias for the most recent, official EAPI
 	EAPI_LATEST_OFFICIAL = eapis[len(eapis)-1]
@@ -60,7 +60,7 @@ func getEapis() map[string]*Eapi {
 	// append unofficial Eapi objects
 	unofficial_eapis := eapisToSlice(unsafe.Slice(c_eapis, length), len(eapis))
 	eapis = append(eapis, unofficial_eapis...)
-	defer C.pkgcraft_eapis_free(c_eapis, length)
+	C.pkgcraft_array_free((*unsafe.Pointer)(unsafe.Pointer(c_eapis)), length)
 
 	// set global alias for the most recent EAPI
 	EAPI_LATEST = unofficial_eapis[len(unofficial_eapis)-1]

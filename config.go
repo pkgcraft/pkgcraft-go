@@ -75,11 +75,11 @@ func (self *Config) LoadReposConf(path string) error {
 
 	path_str := C.CString(path)
 	defer C.free(unsafe.Pointer(path_str))
-	repos := C.pkgcraft_config_load_repos_conf(self.ptr, path_str, &length)
+	c_repos := C.pkgcraft_config_load_repos_conf(self.ptr, path_str, &length)
 
-	if repos != nil {
+	if c_repos != nil {
 		self.updateRepos()
-		C.pkgcraft_repos_free(repos, length)
+		C.pkgcraft_array_free((*unsafe.Pointer)(unsafe.Pointer(c_repos)), length)
 		return nil
 	} else {
 		err := C.pkgcraft_error_last()
@@ -99,7 +99,7 @@ func (self *Config) updateRepos() {
 		defer C.pkgcraft_str_free(s)
 		repos[id] = repoFromPtr(r)
 	}
-	C.pkgcraft_repos_free(c_repos, length)
+	C.pkgcraft_array_free((*unsafe.Pointer)(unsafe.Pointer(c_repos)), length)
 
 	repos_ebuild := make(map[string]*EbuildRepo)
 	repos_fake := make(map[string]*FakeRepo)
