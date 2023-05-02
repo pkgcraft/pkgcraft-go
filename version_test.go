@@ -31,17 +31,16 @@ func TestVersion(t *testing.T) {
 	assert.Equal(t, ver.Revision(), "0")
 	assert.Equal(t, ver.String(), "1-r0")
 
-	// invalid
+	// with operator
 	ver, err = NewVersion(">1-r2")
-	assert.Nil(t, ver)
-	assert.NotNil(t, err)
-}
-
-func TestVersionWithOp(t *testing.T) {
-	ver, err := NewVersionWithOp(">1-r2")
 	assert.Nil(t, err)
 	assert.Equal(t, ver.Revision(), "2")
 	assert.Equal(t, ver.String(), ">1-r2")
+
+	// invalid
+	ver, err = NewVersion("-1")
+	assert.Nil(t, ver)
+	assert.NotNil(t, err)
 }
 
 func TestVersionCmp(t *testing.T) {
@@ -85,7 +84,6 @@ func TestVersionHash(t *testing.T) {
 // TODO: use shared intersects test data
 func TestVersionIntersects(t *testing.T) {
 	var v1, v2 *Version
-	var vo1, vo2 *VersionWithOp
 
 	// equal, non-op versions
 	v1, _ = NewVersion("1.0.2")
@@ -98,12 +96,12 @@ func TestVersionIntersects(t *testing.T) {
 	assert.False(t, v1.Intersects(v2))
 
 	// non-op and op versions
-	vo1, _ = NewVersionWithOp("<0")
+	v1, _ = NewVersion("<0")
 	v2, _ = NewVersion("0")
-	assert.False(t, vo1.Intersects(v2))
+	assert.False(t, v1.Intersects(v2))
 	v1, _ = NewVersion("0")
-	vo2, _ = NewVersionWithOp("=0*")
-	assert.True(t, v1.Intersects(vo2))
+	v2, _ = NewVersion("=0*")
+	assert.True(t, v1.Intersects(v2))
 }
 
 func TestVersionSort(t *testing.T) {

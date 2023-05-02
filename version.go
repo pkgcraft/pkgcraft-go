@@ -70,26 +70,3 @@ func (self *Version) Hash() uint64 {
 func (self *Version) Intersects(other versionPtr) bool {
 	return bool(C.pkgcraft_version_intersects(self.ptr, other.p()))
 }
-
-type VersionWithOp struct {
-	*Version
-}
-
-// Parse a string into a version with an operator.
-func NewVersionWithOp(s string) (*VersionWithOp, error) {
-	ver_str := C.CString(s)
-	defer C.free(unsafe.Pointer(ver_str))
-	ptr := C.pkgcraft_version_with_op(ver_str)
-	ver, err := versionFromPtr(ptr)
-	if ver != nil {
-		return &VersionWithOp{ver}, nil
-	} else {
-		return nil, err
-	}
-}
-
-func (self *VersionWithOp) String() string {
-	s := C.pkgcraft_version_str_with_op(self.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
-}

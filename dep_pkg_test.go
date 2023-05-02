@@ -44,7 +44,7 @@ func TestSlotOperatorFromString(t *testing.T) {
 func TestDepAttrs(t *testing.T) {
 	var dep, c1, c2 *Dep
 	var err error
-	var ver *VersionWithOp
+	var ver *Version
 
 	// unversioned
 	dep, err = NewDep("cat/pkg")
@@ -73,7 +73,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, dep.Category(), "cat")
 	assert.Equal(t, dep.Package(), "pkg")
-	ver, _ = NewVersionWithOp("=1-r2")
+	ver, _ = NewVersion("=1-r2")
 	assert.True(t, dep.Version().Cmp(ver) == 0)
 	assert.Equal(t, dep.Revision(), "2")
 	assert.Equal(t, dep.P(), "pkg-1")
@@ -121,7 +121,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, dep.Category(), "cat")
 	assert.Equal(t, dep.Package(), "pkg")
-	ver, _ = NewVersionWithOp("=1-r2")
+	ver, _ = NewVersion("=1-r2")
 	assert.True(t, dep.Version().Cmp(ver) == 0)
 	assert.Equal(t, dep.Revision(), "2")
 	assert.Equal(t, dep.Blocker(), BlockerStrong)
@@ -203,7 +203,7 @@ func TestDepIntersects(t *testing.T) {
 
 func TestDepParse(t *testing.T) {
 	// valid
-	var ver *VersionWithOp
+	var ver *Version
 	var blocker Blocker
 	var slot_op SlotOperator
 	for _, el := range DEP_TOML.Valid {
@@ -225,7 +225,7 @@ func TestDepParse(t *testing.T) {
 			}
 			assert.Equal(t, dep.Blocker(), blocker, "unequal blocker: %s", el.Dep)
 			if el.Version != "" {
-				ver, _ = NewVersionWithOp(el.Version)
+				ver, _ = NewVersion(el.Version)
 				assert.True(t, dep.Version().Cmp(ver) == 0)
 			} else {
 				assert.Equal(t, dep.Version(), &Version{})
