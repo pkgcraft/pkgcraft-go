@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"runtime"
 	"unsafe"
 )
@@ -24,9 +23,7 @@ func versionFromPtr(ptr *C.Version) (*Version, error) {
 		runtime.SetFinalizer(ver, func(self *Version) { C.pkgcraft_version_free(self.ptr) })
 		return ver, nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, newPkgcraftError()
 	}
 }
 

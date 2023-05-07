@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"runtime"
 	"unsafe"
 )
@@ -27,9 +26,7 @@ func NewFakeRepo(id string, priority int, cpvs []string) (*FakeRepo, error) {
 		runtime.SetFinalizer(repo, func(self *FakeRepo) { C.pkgcraft_repo_free(self.ptr) })
 		return repo, nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, newPkgcraftError()
 	}
 }
 
@@ -42,9 +39,7 @@ func (self *FakeRepo) Extend(cpvs []string) error {
 	if ptr != nil {
 		return nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return errors.New(C.GoString(err.message))
+		return newPkgcraftError()
 	}
 }
 

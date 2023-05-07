@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"unsafe"
 )
 
@@ -80,9 +79,7 @@ func EapiRange(s string) ([]*Eapi, error) {
 	defer C.free(unsafe.Pointer(cstr))
 	c_eapis := C.pkgcraft_eapis_range(cstr, &length)
 	if c_eapis == nil {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, newPkgcraftError()
 	}
 
 	var eapis []*Eapi

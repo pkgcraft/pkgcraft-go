@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"fmt"
 	"runtime"
 	"unsafe"
@@ -47,9 +46,7 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 
 	ptr := C.pkgcraft_config_add_repo_path(self.ptr, id_str, C.int(priority), path_str)
 	if ptr == nil {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return errors.New(C.GoString(err.message))
+		return newPkgcraftError()
 	}
 
 	self.updateRepos()
@@ -60,9 +57,7 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 func (self *Config) AddRepo(repo repoPtr) error {
 	ptr := C.pkgcraft_config_add_repo(self.ptr, repo.p())
 	if ptr == nil {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return errors.New(C.GoString(err.message))
+		return newPkgcraftError()
 	}
 
 	self.updateRepos()
@@ -82,9 +77,7 @@ func (self *Config) LoadReposConf(path string) error {
 		C.pkgcraft_array_free((*unsafe.Pointer)(unsafe.Pointer(c_repos)), length)
 		return nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return errors.New(C.GoString(err.message))
+		return newPkgcraftError()
 	}
 }
 

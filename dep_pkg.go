@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"fmt"
 	"runtime"
 	"unsafe"
@@ -84,9 +83,7 @@ func newDep(s string, eapi *Eapi) (*Dep, error) {
 		runtime.SetFinalizer(dep, func(self *Dep) { C.pkgcraft_dep_free(self.ptr) })
 		return dep, nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, newPkgcraftError()
 	}
 }
 

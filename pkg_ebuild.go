@@ -4,10 +4,6 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
-import (
-	"errors"
-)
-
 type EbuildPkg struct {
 	*BasePkg
 }
@@ -32,9 +28,7 @@ func (self *EbuildPkg) Ebuild() (string, error) {
 		defer C.pkgcraft_str_free(s)
 		return C.GoString(s), nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return "", errors.New(C.GoString(err.message))
+		return "", newPkgcraftError()
 	}
 }
 
@@ -66,9 +60,7 @@ func (self *EbuildPkg) Dependencies(keys []string) (*DepSet, error) {
 	if ptr != nil {
 		return depSetFromPtr(ptr), nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, newPkgcraftError()
 	}
 }
 

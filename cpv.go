@@ -5,7 +5,6 @@ package pkgcraft
 import "C"
 
 import (
-	"errors"
 	"runtime"
 	"unsafe"
 )
@@ -29,9 +28,7 @@ func cpvFromPtr(ptr *C.Cpv) (*Cpv, error) {
 		runtime.SetFinalizer(cpv, func(self *Cpv) { C.pkgcraft_cpv_free(self.ptr) })
 		return cpv, nil
 	} else {
-		err := C.pkgcraft_error_last()
-		defer C.pkgcraft_error_free(err)
-		return nil, errors.New(C.GoString(err.message))
+		return nil, newPkgcraftError()
 	}
 }
 
