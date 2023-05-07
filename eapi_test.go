@@ -51,6 +51,12 @@ func TestEapiDepKeys(t *testing.T) {
 	assert.True(t, slices.Contains(EAPI_LATEST.DepKeys(), "BDEPEND"))
 }
 
+func TestEapiMetadataKeys(t *testing.T) {
+	assert.True(t, slices.Contains(EAPIS["0"].MetadataKeys(), "SLOT"))
+	assert.False(t, slices.Contains(EAPIS["0"].MetadataKeys(), "BDEPEND"))
+	assert.True(t, slices.Contains(EAPI_LATEST.MetadataKeys(), "BDEPEND"))
+}
+
 func TestEapiString(t *testing.T) {
 	for id, eapi := range EAPIS {
 		assert.Equal(t, eapi.String(), id)

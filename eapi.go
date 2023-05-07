@@ -117,6 +117,13 @@ func (self *Eapi) DepKeys() []string {
 	return charArrayToSlice(ptr, length)
 }
 
+// Get an EAPI's metadata keys.
+func (self *Eapi) MetadataKeys() []string {
+	var length C.size_t
+	ptr := C.pkgcraft_eapi_metadata_keys(self.ptr, &length)
+	return charArrayToSlice(ptr, length)
+}
+
 // Compare an Eapi with another Eapi chronologically returning -1, 0, or 1 if
 // the first is less than, equal to, or greater than the second, respectively.
 func (self *Eapi) Cmp(other *Eapi) int {
