@@ -59,6 +59,19 @@ func (self *EbuildPkg) Subslot() string {
 	return C.GoString(s)
 }
 
+// Return a package's dependencies for the given descriptors.
+func (self *EbuildPkg) Dependencies(keys []string) (*DepSet, error) {
+	c_keys, c_len := sliceToCharArray(keys)
+	ptr := C.pkgcraft_pkg_ebuild_dependencies(self.ptr, c_keys, c_len)
+	if ptr != nil {
+		return depSetFromPtr(ptr), nil
+	} else {
+		err := C.pkgcraft_error_last()
+		defer C.pkgcraft_error_free(err)
+		return nil, errors.New(C.GoString(err.message))
+	}
+}
+
 // Return a package's DEPEND.
 func (self *EbuildPkg) Depend() *DepSet {
 	return depSetFromPtr(C.pkgcraft_pkg_ebuild_depend(self.ptr))
