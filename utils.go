@@ -17,3 +17,14 @@ func sliceToCharArray(vals []string) (**C.char, C.size_t) {
 	}
 	return (**C.char)(c_strs), C.size_t(len(vals))
 }
+
+// Convert an array of C strings to a slice of Go strings.
+func charArrayToSlice(ptr **C.char, length C.size_t) []string {
+	slice := unsafe.Slice(ptr, length)
+	var vals []string
+	for _, s := range slice {
+		vals = append(vals, C.GoString(s))
+	}
+	C.pkgcraft_str_array_free(ptr, length)
+	return vals
+}

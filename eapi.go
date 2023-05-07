@@ -110,6 +110,13 @@ func (self *Eapi) Has(s string) bool {
 	return bool(C.pkgcraft_eapi_has(self.ptr, cstr))
 }
 
+// Get an EAPI's dependency keys.
+func (self *Eapi) DepKeys() []string {
+	var length C.size_t
+	ptr := C.pkgcraft_eapi_dep_keys(self.ptr, &length)
+	return charArrayToSlice(ptr, length)
+}
+
 // Compare an Eapi with another Eapi chronologically returning -1, 0, or 1 if
 // the first is less than, equal to, or greater than the second, respectively.
 func (self *Eapi) Cmp(other *Eapi) int {

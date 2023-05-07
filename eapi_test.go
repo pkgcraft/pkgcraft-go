@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/slices"
 
 	. "github.com/pkgcraft/pkgcraft-go"
 )
@@ -42,6 +43,12 @@ func TestEapiRange(t *testing.T) {
 func TestEapiHas(t *testing.T) {
 	assert.False(t, EAPIS["1"].Has("nonexistent_feature"))
 	assert.True(t, EAPIS["1"].Has("slot_deps"))
+}
+
+func TestEapiDepKeys(t *testing.T) {
+	assert.True(t, slices.Contains(EAPIS["0"].DepKeys(), "DEPEND"))
+	assert.False(t, slices.Contains(EAPIS["0"].DepKeys(), "BDEPEND"))
+	assert.True(t, slices.Contains(EAPI_LATEST.DepKeys(), "BDEPEND"))
 }
 
 func TestEapiString(t *testing.T) {
