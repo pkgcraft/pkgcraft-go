@@ -150,6 +150,33 @@ func TestDepAttrs(t *testing.T) {
 	assert.True(t, c1 == c2)
 }
 
+func TestCpnAttrs(t *testing.T) {
+	cpn, err := NewCpn("cat/pkg")
+	assert.Nil(t, err)
+	assert.Equal(t, cpn.Category(), "cat")
+	assert.Equal(t, cpn.Package(), "pkg")
+	assert.Equal(t, cpn.Version(), &Version{})
+	assert.Equal(t, cpn.Revision(), "")
+	assert.Equal(t, cpn.P(), "pkg")
+	assert.Equal(t, cpn.Pf(), "pkg")
+	assert.Equal(t, cpn.Pr(), "")
+	assert.Equal(t, cpn.Pv(), "")
+	assert.Equal(t, cpn.Pvr(), "")
+	assert.Equal(t, cpn.Cpn(), "cat/pkg")
+	assert.Equal(t, cpn.Cpv(), "cat/pkg")
+	assert.Equal(t, cpn.Blocker(), BlockerNone)
+	assert.Equal(t, cpn.Slot(), "")
+	assert.Equal(t, cpn.Subslot(), "")
+	assert.Equal(t, cpn.SlotOp(), SlotOpNone)
+	assert.Equal(t, len(cpn.Use()), 0)
+	assert.Equal(t, cpn.Repo(), "")
+	assert.Equal(t, cpn.String(), "cat/pkg")
+
+	// invalid
+	_, err = NewCpn("=cat/pkg-1")
+	assert.NotNil(t, err)
+}
+
 func TestDepCmp(t *testing.T) {
 	// d1 < d2
 	d1, _ := NewDep("=cat/pkg-1")
