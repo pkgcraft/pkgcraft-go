@@ -64,17 +64,18 @@ func (self *Config) AddRepo(repo repoPtr) error {
 	return nil
 }
 
-// Load repos from a portage-compatible repos.conf directory or file.
-func (self *Config) LoadReposConf(path string) error {
-	var length C.size_t
+// Load portage config from a given directory, falling back to default locations.
+func (self *Config) LoadPortageConf(path string) error {
+	var c_path *C.char
+	if path != "" {
+		c_path = C.CString(path)
+		defer C.free(unsafe.Pointer(c_path))
+	}
 
-	path_str := C.CString(path)
-	defer C.free(unsafe.Pointer(path_str))
-	c_repos := C.pkgcraft_config_load_repos_conf(self.ptr, path_str, &length)
+	ptr := C.pkgcraft_config_load_portage_conf(self.ptr, c_path)
 
-	if c_repos != nil {
+	if ptr != nil {
 		self.updateRepos()
-		C.pkgcraft_array_free((*unsafe.Pointer)(unsafe.Pointer(c_repos)), length)
 		return nil
 	} else {
 		return newPkgcraftError()
