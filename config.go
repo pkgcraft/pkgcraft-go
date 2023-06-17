@@ -44,7 +44,7 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 	id_str := C.CString(id)
 	defer C.free(unsafe.Pointer(id_str))
 
-	ptr := C.pkgcraft_config_add_repo_path(self.ptr, id_str, C.int(priority), path_str)
+	ptr := C.pkgcraft_config_add_repo_path(self.ptr, id_str, C.int(priority), path_str, true)
 	if ptr == nil {
 		return newPkgcraftError()
 	}
@@ -55,7 +55,7 @@ func (self *Config) AddRepoPath(path string, id string, priority int) error {
 
 // Add an external repo.
 func (self *Config) AddRepo(repo repoPtr) error {
-	ptr := C.pkgcraft_config_add_repo(self.ptr, repo.p())
+	ptr := C.pkgcraft_config_add_repo(self.ptr, repo.p(), false)
 	if ptr == nil {
 		return newPkgcraftError()
 	}
