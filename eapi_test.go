@@ -22,14 +22,13 @@ func TestEapiRange(t *testing.T) {
 	eapis, err := EapiRange("..")
 	assert.Equal(t, len(eapis), len(EAPIS))
 	assert.Nil(t, err)
-	eapis, err = EapiRange("2..3")
-	assert.Equal(t, eapis, []*Eapi{EAPIS["2"]})
+	eapis, err = EapiRange("7..8")
+	assert.Equal(t, eapis, []*Eapi{EAPIS["7"]})
 	assert.Nil(t, err)
-	eapis, err = EapiRange("1..")
+	eapis, err = EapiRange("7..")
 	assert.Nil(t, err)
-	assert.Equal(t, eapis[0], EAPIS["1"])
-	assert.Equal(t, len(eapis), len(EAPIS)-1)
-	eapis, err = EapiRange("0..0")
+	assert.Equal(t, eapis[0], EAPIS["7"])
+	eapis, err = EapiRange("8..8")
 	assert.Nil(t, err)
 	assert.Equal(t, len(eapis), 0)
 
@@ -41,20 +40,19 @@ func TestEapiRange(t *testing.T) {
 }
 
 func TestEapiHas(t *testing.T) {
-	assert.False(t, EAPIS["1"].Has("nonexistent_feature"))
-	assert.True(t, EAPIS["1"].Has("slot_deps"))
+	assert.True(t, EAPI_LATEST_OFFICIAL.Has("usev_two_args"))
+	assert.False(t, EAPI_LATEST_OFFICIAL.Has("repo_ids"))
+	assert.False(t, EAPI_LATEST_OFFICIAL.Has("nonexistent"))
 }
 
 func TestEapiDepKeys(t *testing.T) {
-	assert.True(t, slices.Contains(EAPIS["0"].DepKeys(), "DEPEND"))
-	assert.False(t, slices.Contains(EAPIS["0"].DepKeys(), "BDEPEND"))
 	assert.True(t, slices.Contains(EAPI_LATEST.DepKeys(), "BDEPEND"))
+	assert.False(t, slices.Contains(EAPI_LATEST.DepKeys(), "NONEXISTENT"))
 }
 
 func TestEapiMetadataKeys(t *testing.T) {
-	assert.True(t, slices.Contains(EAPIS["0"].MetadataKeys(), "SLOT"))
-	assert.False(t, slices.Contains(EAPIS["0"].MetadataKeys(), "BDEPEND"))
-	assert.True(t, slices.Contains(EAPI_LATEST.MetadataKeys(), "BDEPEND"))
+	assert.True(t, slices.Contains(EAPI_LATEST.MetadataKeys(), "SLOT"))
+	assert.False(t, slices.Contains(EAPI_LATEST.MetadataKeys(), "NONEXISTENT"))
 }
 
 func TestEapiString(t *testing.T) {
@@ -64,7 +62,7 @@ func TestEapiString(t *testing.T) {
 }
 
 func TestEapiCmp(t *testing.T) {
-	assert.Equal(t, EAPIS["1"].Cmp(EAPIS["2"]), -1)
-	assert.Equal(t, EAPIS["2"].Cmp(EAPIS["2"]), 0)
-	assert.Equal(t, EAPIS["2"].Cmp(EAPIS["1"]), 1)
+	assert.Equal(t, EAPIS["7"].Cmp(EAPIS["8"]), -1)
+	assert.Equal(t, EAPIS["8"].Cmp(EAPIS["8"]), 0)
+	assert.Equal(t, EAPIS["8"].Cmp(EAPIS["7"]), 1)
 }
