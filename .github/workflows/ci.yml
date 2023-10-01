@@ -34,7 +34,7 @@ jobs:
     steps:
     - name: Checkout code to determine the minimum supported go version
       if: ${{ inputs.go-version == '' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: pkgcraft/pkgcraft-go
 
@@ -85,7 +85,7 @@ jobs:
         path: ${{ env.pkgcraft_dir }}
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: pkgcraft/pkgcraft-go
         submodules: true
