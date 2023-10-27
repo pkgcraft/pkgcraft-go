@@ -40,8 +40,8 @@ func TestEapiRange(t *testing.T) {
 }
 
 func TestEapiHas(t *testing.T) {
-	assert.True(t, EAPI_LATEST_OFFICIAL.Has("usev_two_args"))
-	assert.False(t, EAPI_LATEST_OFFICIAL.Has("repo_ids"))
+	assert.True(t, EAPI_LATEST_OFFICIAL.Has("UsevTwoArgs"))
+	assert.False(t, EAPI_LATEST_OFFICIAL.Has("RepoIds"))
 	assert.False(t, EAPI_LATEST_OFFICIAL.Has("nonexistent"))
 }
 
