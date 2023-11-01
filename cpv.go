@@ -78,12 +78,12 @@ func (self *Cpv) Version() *Version {
 }
 
 // Return a Cpv's revision.
-func (self *Cpv) Revision() string {
+func (self *Cpv) Revision() *Revision {
 	version := self.Version()
 	if *version != (Version{}) {
 		return version.Revision()
 	}
-	return ""
+	return &Revision{}
 }
 
 // Return a Cpv's package and version.

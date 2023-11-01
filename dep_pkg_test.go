@@ -45,6 +45,7 @@ func TestDepAttrs(t *testing.T) {
 	var dep, c1, c2 *Dep
 	var err error
 	var ver *Version
+	var rev *Revision
 
 	// unversioned
 	dep, err = NewDep("cat/pkg")
@@ -52,7 +53,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Category(), "cat")
 	assert.Equal(t, dep.Package(), "pkg")
 	assert.Equal(t, dep.Version(), &Version{})
-	assert.Equal(t, dep.Revision(), "")
+	assert.Equal(t, dep.Revision(), &Revision{})
 	assert.Equal(t, dep.P(), "pkg")
 	assert.Equal(t, dep.Pf(), "pkg")
 	assert.Equal(t, dep.Pr(), "")
@@ -75,7 +76,8 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Package(), "pkg")
 	ver, _ = NewVersion("=1-r2")
 	assert.True(t, dep.Version().Cmp(ver) == 0)
-	assert.Equal(t, dep.Revision(), "2")
+	rev, _ = NewRevision("2")
+	assert.Equal(t, dep.Revision(), rev)
 	assert.Equal(t, dep.P(), "pkg-1")
 	assert.Equal(t, dep.Pf(), "pkg-1-r2")
 	assert.Equal(t, dep.Pr(), "r2")
@@ -123,7 +125,8 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Package(), "pkg")
 	ver, _ = NewVersion("=1-r2")
 	assert.True(t, dep.Version().Cmp(ver) == 0)
-	assert.Equal(t, dep.Revision(), "2")
+	rev, _ = NewRevision("2")
+	assert.Equal(t, dep.Revision(), rev)
 	assert.Equal(t, dep.Blocker(), BlockerStrong)
 	assert.Equal(t, dep.Slot(), "3")
 	assert.Equal(t, dep.Subslot(), "4")
@@ -156,7 +159,7 @@ func TestCpnAttrs(t *testing.T) {
 	assert.Equal(t, cpn.Category(), "cat")
 	assert.Equal(t, cpn.Package(), "pkg")
 	assert.Equal(t, cpn.Version(), &Version{})
-	assert.Equal(t, cpn.Revision(), "")
+	assert.Equal(t, cpn.Revision(), &Revision{})
 	assert.Equal(t, cpn.P(), "pkg")
 	assert.Equal(t, cpn.Pf(), "pkg")
 	assert.Equal(t, cpn.Pr(), "")
@@ -231,6 +234,7 @@ func TestDepIntersects(t *testing.T) {
 func TestDepParse(t *testing.T) {
 	// valid
 	var ver *Version
+	var rev *Revision
 	var blocker Blocker
 	var slot_op SlotOperator
 	for _, el := range DEP_TOML.Valid {
@@ -257,7 +261,12 @@ func TestDepParse(t *testing.T) {
 			} else {
 				assert.Equal(t, dep.Version(), &Version{})
 			}
-			assert.Equal(t, dep.Revision(), el.Revision)
+			if el.Revision != "" {
+				rev, _ = NewRevision(el.Revision)
+				assert.True(t, dep.Revision().Cmp(rev) == 0)
+			} else {
+				assert.Equal(t, dep.Revision(), &Revision{})
+			}
 			assert.Equal(t, dep.Slot(), el.Slot)
 			assert.Equal(t, dep.Subslot(), el.Subslot)
 			if el.Slot_Op == "" {

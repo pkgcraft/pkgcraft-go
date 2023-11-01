@@ -179,12 +179,12 @@ func (self *Dep) Version() *Version {
 }
 
 // Return a package dependency's revision.
-func (self *Dep) Revision() string {
+func (self *Dep) Revision() *Revision {
 	version := self.Version()
 	if *version != (Version{}) {
 		return version.Revision()
 	}
-	return ""
+	return &Revision{}
 }
 
 // Return a package dependency's slot.
