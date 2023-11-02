@@ -106,7 +106,8 @@ jobs:
         go test -v -race -coverprofile=coverage.out ./...
 
     - name: Upload coverage to Codecov
-      if: ${{ inputs.go-version == '' }}
+      if: ${{ inputs.go-version == '' && github.ref_name == 'main' }}
       uses: codecov/codecov-action@v3
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: coverage.out
