@@ -119,7 +119,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.NotNil(t, err)
 
 	// all fields
-	dep, err = NewDep("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	dep, err = NewDep("!!=cat/pkg-1-r2:3/4=::repo[a,b,c]")
 	assert.Nil(t, err)
 	assert.Equal(t, dep.Category(), "cat")
 	assert.Equal(t, dep.Package(), "pkg")
@@ -140,13 +140,13 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pvr(), "1-r2")
 	assert.Equal(t, dep.Cpn(), "cat/pkg")
 	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
-	assert.Equal(t, dep.String(), "!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	assert.Equal(t, dep.String(), "!!=cat/pkg-1-r2:3/4=::repo[a,b,c]")
 
 	// verify cached deps reuse objects
-	c1, _ = NewDepCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	c1, _ = NewDepCached("!!=cat/pkg-1-r2:3/4=::repo[a,b,c]")
 	assert.Equal(t, dep.Cmp(c1), 0)
 	assert.True(t, dep != c1)
-	c2, _ = NewDepCached("!!=cat/pkg-1-r2:3/4=[a,b,c]::repo")
+	c2, _ = NewDepCached("!!=cat/pkg-1-r2:3/4=::repo[a,b,c]")
 	assert.True(t, c1 == c2)
 	c1, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST_OFFICIAL)
 	c2, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST_OFFICIAL)
