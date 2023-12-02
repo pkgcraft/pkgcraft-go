@@ -210,7 +210,7 @@ func (self *Dep) SlotOp() SlotOperator {
 // Return a package dependency's USE flag dependencies.
 func (self *Dep) Use() []string {
 	var length C.size_t
-	array := C.pkgcraft_dep_use_deps(self.ptr, &length)
+	array := C.pkgcraft_dep_use_deps_str(self.ptr, &length)
 	use_slice := unsafe.Slice(array, length)
 	var use []string
 	for _, s := range use_slice {
