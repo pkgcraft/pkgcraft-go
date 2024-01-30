@@ -130,11 +130,11 @@ func (self *Cpv) Pvr() string {
 	return ""
 }
 
-// Return a Cpv's category and package.
-func (self *Cpv) Cpn() string {
-	s := C.pkgcraft_cpv_cpn(self.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+// Return a Cpv object's Cpn.
+func (self *Cpv) Cpn() *Cpn {
+	ptr := C.pkgcraft_cpv_cpn(self.ptr)
+	cpn, _ := cpnFromPtr(ptr)
+	return cpn
 }
 
 func (self *Cpv) String() string {

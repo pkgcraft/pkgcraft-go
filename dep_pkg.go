@@ -120,25 +120,6 @@ func NewDepCachedWithEapi(s string, eapi *Eapi) (*Dep, error) {
 	return newCachedDep(s, eapi)
 }
 
-type Cpn struct {
-	*Dep
-}
-
-// Parse a string into an unversioned Dep.
-func NewCpn(s string) (*Cpn, error) {
-	c_str := C.CString(s)
-	ptr := C.pkgcraft_dep_new_cpn(c_str)
-	C.free(unsafe.Pointer(c_str))
-
-	if ptr != nil {
-		cpn := &Cpn{&Dep{ptr: ptr}}
-		runtime.SetFinalizer(cpn, func(self *Cpn) { C.pkgcraft_dep_free(self.ptr) })
-		return cpn, nil
-	} else {
-		return nil, newPkgcraftError()
-	}
-}
-
 // Get the blocker of a package dependency.
 func (self *Dep) Blocker() Blocker {
 	i := C.pkgcraft_dep_blocker(self.ptr)
@@ -271,11 +252,11 @@ func (self *Dep) Pvr() string {
 	return ""
 }
 
-// Return a package dependency's category and package.
-func (self *Dep) Cpn() string {
-	s := C.pkgcraft_dep_cpn(self.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+// Return a package dependency's Cpn.
+func (self *Dep) Cpn() *Cpn {
+	ptr := C.pkgcraft_dep_cpn(self.ptr)
+	cpn, _ := cpnFromPtr(ptr)
+	return cpn
 }
 
 // Return a package dependency's category, package, version, and revision.

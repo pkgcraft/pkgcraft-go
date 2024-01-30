@@ -43,6 +43,7 @@ func TestSlotOperatorFromString(t *testing.T) {
 
 func TestDepAttrs(t *testing.T) {
 	var dep, c1, c2 *Dep
+	var cpn *Cpn
 	var err error
 	var ver *Version
 	var rev *Revision
@@ -59,7 +60,8 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pr(), "")
 	assert.Equal(t, dep.Pv(), "")
 	assert.Equal(t, dep.Pvr(), "")
-	assert.Equal(t, dep.Cpn(), "cat/pkg")
+	cpn, _ = NewCpn("cat/pkg")
+	assert.Equal(t, dep.Cpn(), cpn)
 	assert.Equal(t, dep.Cpv(), "cat/pkg")
 	assert.Equal(t, dep.Blocker(), BlockerNone)
 	assert.Equal(t, dep.Slot(), "")
@@ -83,7 +85,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pr(), "r2")
 	assert.Equal(t, dep.Pv(), "1")
 	assert.Equal(t, dep.Pvr(), "1-r2")
-	assert.Equal(t, dep.Cpn(), "cat/pkg")
+	assert.Equal(t, dep.Cpn(), cpn)
 	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, dep.String(), "=cat/pkg-1-r2")
 
@@ -138,7 +140,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pr(), "r2")
 	assert.Equal(t, dep.Pv(), "1")
 	assert.Equal(t, dep.Pvr(), "1-r2")
-	assert.Equal(t, dep.Cpn(), "cat/pkg")
+	assert.Equal(t, dep.Cpn(), cpn)
 	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
 	assert.Equal(t, dep.String(), "!!=cat/pkg-1-r2:3/4=::repo[a,b,c]")
 
@@ -151,33 +153,6 @@ func TestDepAttrs(t *testing.T) {
 	c1, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST_OFFICIAL)
 	c2, _ = NewDepCachedWithEapi("!!=a/b-1-r2:3/4=[a,b,c]", EAPI_LATEST_OFFICIAL)
 	assert.True(t, c1 == c2)
-}
-
-func TestCpnAttrs(t *testing.T) {
-	cpn, err := NewCpn("cat/pkg")
-	assert.Nil(t, err)
-	assert.Equal(t, cpn.Category(), "cat")
-	assert.Equal(t, cpn.Package(), "pkg")
-	assert.Equal(t, cpn.Version(), &Version{})
-	assert.Equal(t, cpn.Revision(), &Revision{})
-	assert.Equal(t, cpn.P(), "pkg")
-	assert.Equal(t, cpn.Pf(), "pkg")
-	assert.Equal(t, cpn.Pr(), "")
-	assert.Equal(t, cpn.Pv(), "")
-	assert.Equal(t, cpn.Pvr(), "")
-	assert.Equal(t, cpn.Cpn(), "cat/pkg")
-	assert.Equal(t, cpn.Cpv(), "cat/pkg")
-	assert.Equal(t, cpn.Blocker(), BlockerNone)
-	assert.Equal(t, cpn.Slot(), "")
-	assert.Equal(t, cpn.Subslot(), "")
-	assert.Equal(t, cpn.SlotOp(), SlotOpNone)
-	assert.Equal(t, len(cpn.Use()), 0)
-	assert.Equal(t, cpn.Repo(), "")
-	assert.Equal(t, cpn.String(), "cat/pkg")
-
-	// invalid
-	_, err = NewCpn("=cat/pkg-1")
-	assert.NotNil(t, err)
 }
 
 func TestDepCmp(t *testing.T) {

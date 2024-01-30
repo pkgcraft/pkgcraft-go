@@ -41,11 +41,6 @@ func (self *BasePkg) Pvr() string {
 	return self.Cpv().Pvr()
 }
 
-// Return a package's category and package.
-func (self *BasePkg) Cpn() string {
-	return self.Cpv().Cpn()
-}
-
 // Return a package's Cpv.
 func (self *BasePkg) Cpv() *Cpv {
 	if self.cpv == nil {
@@ -53,6 +48,11 @@ func (self *BasePkg) Cpv() *Cpv {
 		self.cpv, _ = cpvFromPtr(ptr)
 	}
 	return self.cpv
+}
+
+// Return a package's Cpn.
+func (self *BasePkg) Cpn() *Cpn {
+	return self.Cpv().Cpn()
 }
 
 // Return a package's EAPI.
