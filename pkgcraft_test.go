@@ -9,8 +9,8 @@ import (
 )
 
 // version requirements for pkgcraft C library
-const MIN_VERSION = "0.0.13"
-const MAX_VERSION = "0.0.13"
+const MIN_VERSION = "0.0.14"
+const MAX_VERSION = "0.0.14"
 
 func TestLibVersion(t *testing.T) {
 	ver, _ := version.NewVersion(pkgcraftLibVersion())
