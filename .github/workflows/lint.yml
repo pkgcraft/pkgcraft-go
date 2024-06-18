@@ -45,6 +45,8 @@ jobs:
         echo "LD_LIBRARY_PATH=${pkgcraft_dir}" >> $GITHUB_ENV
 
     - uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
 
     - name: Lint code
       uses: golangci/golangci-lint-action@v6
