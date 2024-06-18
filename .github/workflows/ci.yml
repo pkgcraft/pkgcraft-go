@@ -4,12 +4,14 @@ on:
   push:
     branches: ['**']
     paths:
+      - "go.*"
       - "**/*.go"
       - "testdata/**"
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
     paths:
+      - "go.*"
       - "**/*.go"
       - "testdata/**"
   workflow_dispatch:
