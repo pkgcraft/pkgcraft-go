@@ -38,7 +38,7 @@ jobs:
     - name: Override build variables
       run: |
         echo "PKG_CONFIG_PATH=${pkgcraft_dir}" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=${pkgcraft_dir}/lib" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${pkgcraft_dir}" >> $GITHUB_ENV
 
     - uses: actions/setup-go@v5
       with:
