@@ -259,11 +259,14 @@ func (self *Dep) Cpn() *Cpn {
 	return cpn
 }
 
-// Return a package dependency's category, package, version, and revision.
-func (self *Dep) Cpv() string {
-	s := C.pkgcraft_dep_cpv(self.ptr)
-	defer C.pkgcraft_str_free(s)
-	return C.GoString(s)
+// Return the Cpv of a package dependency if one exists.
+func (self *Dep) Cpv() *Cpv {
+	ptr := C.pkgcraft_dep_cpv(self.ptr)
+	if ptr != nil {
+		cpv, _ := cpvFromPtr(ptr)
+		return cpv
+	}
+	return nil
 }
 
 func (self *Dep) String() string {

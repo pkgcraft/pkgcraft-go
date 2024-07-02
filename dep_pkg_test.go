@@ -44,6 +44,7 @@ func TestSlotOperatorFromString(t *testing.T) {
 func TestDepAttrs(t *testing.T) {
 	var dep, c1, c2 *Dep
 	var cpn *Cpn
+	var cpv *Cpv
 	var err error
 	var ver *Version
 	var rev *Revision
@@ -62,7 +63,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pvr(), "")
 	cpn, _ = NewCpn("cat/pkg")
 	assert.Equal(t, dep.Cpn(), cpn)
-	assert.Equal(t, dep.Cpv(), "cat/pkg")
+	assert.Nil(t, dep.Cpv())
 	assert.Equal(t, dep.Blocker(), BlockerNone)
 	assert.Equal(t, dep.Slot(), "")
 	assert.Equal(t, dep.Subslot(), "")
@@ -86,7 +87,8 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pv(), "1")
 	assert.Equal(t, dep.Pvr(), "1-r2")
 	assert.Equal(t, dep.Cpn(), cpn)
-	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
+	cpv, _ = NewCpv("cat/pkg-1-r2")
+	assert.Equal(t, dep.Cpv(), cpv)
 	assert.Equal(t, dep.String(), "=cat/pkg-1-r2")
 
 	// blocker
@@ -141,7 +143,7 @@ func TestDepAttrs(t *testing.T) {
 	assert.Equal(t, dep.Pv(), "1")
 	assert.Equal(t, dep.Pvr(), "1-r2")
 	assert.Equal(t, dep.Cpn(), cpn)
-	assert.Equal(t, dep.Cpv(), "cat/pkg-1-r2")
+	assert.Equal(t, dep.Cpv(), cpv)
 	assert.Equal(t, dep.String(), "!!=cat/pkg-1-r2:3/4=::repo[a,b,c]")
 
 	// verify cached deps reuse objects
