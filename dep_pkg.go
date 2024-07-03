@@ -208,50 +208,6 @@ func (self *Dep) Repo() string {
 	return C.GoString(s)
 }
 
-// Return a package dependency's package and version.
-func (self *Dep) P() string {
-	c_str := C.pkgcraft_dep_p(self.ptr)
-	defer C.pkgcraft_str_free(c_str)
-	return C.GoString(c_str)
-}
-
-// Return a package dependency's package, version, and revision.
-func (self *Dep) Pf() string {
-	c_str := C.pkgcraft_dep_pf(self.ptr)
-	defer C.pkgcraft_str_free(c_str)
-	return C.GoString(c_str)
-}
-
-// Return a package dependency's revision.
-func (self *Dep) Pr() string {
-	c_str := C.pkgcraft_dep_pr(self.ptr)
-	if c_str != nil {
-		defer C.pkgcraft_str_free(c_str)
-		return C.GoString(c_str)
-	}
-	return ""
-}
-
-// Return a package dependency's version.
-func (self *Dep) Pv() string {
-	c_str := C.pkgcraft_dep_pv(self.ptr)
-	if c_str != nil {
-		defer C.pkgcraft_str_free(c_str)
-		return C.GoString(c_str)
-	}
-	return ""
-}
-
-// Return a package dependency's version and revision.
-func (self *Dep) Pvr() string {
-	c_str := C.pkgcraft_dep_pvr(self.ptr)
-	if c_str != nil {
-		defer C.pkgcraft_str_free(c_str)
-		return C.GoString(c_str)
-	}
-	return ""
-}
-
 // Return a package dependency's Cpn.
 func (self *Dep) Cpn() *Cpn {
 	ptr := C.pkgcraft_dep_cpn(self.ptr)
