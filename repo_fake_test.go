@@ -45,13 +45,13 @@ func TestFakeRepoExtend(t *testing.T) {
 	assert.Equal(t, repo.Len(), 2)
 	assert.Nil(t, err)
 
-	// error when added to a config
+	// mutations allowed after adding to a config
 	config := NewConfig()
 	defer config.Close()
 	err = config.AddRepo(repo)
 	assert.Nil(t, err)
 	err = repo.Extend([]string{"cat/pkg-3"})
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 }
 
 func TestFakeRepoIter(t *testing.T) {
