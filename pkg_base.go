@@ -4,6 +4,10 @@ package pkgcraft
 // #include <pkgcraft.h>
 import "C"
 
+import (
+	"runtime"
+)
+
 type BasePkg struct {
 	ptr    *C.Pkg
 	format PkgFormat
@@ -69,7 +73,9 @@ func (self *BasePkg) Eapi() *Eapi {
 // Return a package's repo.
 func (self *BasePkg) Repo() *BaseRepo {
 	ptr := C.pkgcraft_pkg_repo(self.ptr)
-	return repoFromPtr(ptr)
+	repo := repoFromPtr(ptr)
+	runtime.SetFinalizer(repo, func(self *BaseRepo) { C.pkgcraft_repo_free(self.ptr) })
+	return repo
 }
 
 // Return a package's version.
